@@ -7,10 +7,6 @@ program
         )*
     ;
 
-functionDeclaration
-    :   type declarator compoundStatement
-    ;
-
 classDeclaration
     :   'class' Identifier '{' (varDeclaration | functionDeclaration)* '}'
     ;
@@ -20,8 +16,17 @@ varDeclaration
     |   type Identifier '=' expression ';'
     ;
 
+functionDeclaration
+    :   funcType declarator compoundStatement
+    ;
+
+funcType
+    :   type
+    |   Void
+    ;
+
 declarator
-    :  Identifier '(' parameterList ')'
+    :  Identifier '(' parameterList? ')'
     ;
 
 parameterList
@@ -37,10 +42,6 @@ compoundStatement
     :   '{' statement* '}'
     ;
 
-//compoundFuncStatement
-//    :   '{' statement* '}'
-//    ;
-
 statement
     :   compoundStatement
     |   varDeclaration
@@ -48,6 +49,7 @@ statement
     |   selectionStatement
     |   iterationStatement
     |   jumpStatement
+    |   ';'
     ;
 
 expressionStatement
@@ -74,16 +76,28 @@ jumpStatement
     ;
 
 primaryExpression
-    :   Identifier
-    |   Constant
+    :   constantExpression
     |   This
+    |   Identifier
     ;
+
+constantExpression
+    :   True
+    |   False
+    |   Null
+    |   IntegerLiteral
+    |   StringLiteral
+    ;
+
 
 expression
     :   primaryExpression
     |   '(' expression ')'
-    |   src1=expression '[' expression ']'
+    |   Identifier '(' parameterList? ')'
+    |   'new' newSpecifier
+    |   src1=expression '[' src2=expression ']'
     |   expression '.' Identifier
+    |   expression op=('++' | '--')
     |   op=('++' | '--') expression
     |   unaryOperator expression
     |   src1=expression op=('*' | '/' | '%') src2=expression
@@ -107,19 +121,29 @@ unaryOperator
     |   '!'
     ;
 
+newSpecifier
+    :   primaryType
+    |   primaryType '(' ')'
+    |   primaryType ('[' expression ']')+ ('[' ']')*
+    ;
+
 type
     :   primaryType
-    |   type '[]'
+    |   type '[' ']'
     ;
 
 primaryType
     :   Bool
     |   Int
-    |   Void
     |   String
+    |   Identifier
     ;
 
+True : 'true';
+False : 'false';
 This : 'this';
+Null : 'null';
+
 
 Bool : 'bool';
 Int : 'int';
@@ -128,6 +152,26 @@ String : 'string';
 
 While : 'while';
 For : 'for';
+
+IntegerLiteral
+    :   [0-9]+
+    ;
+
+StringLiteral
+    :   '"' SChar* '"'
+    ;
+
+fragment
+SChar
+    :   ~["\\\r\n]
+    |   EscapeSequence
+    ;
+
+fragment
+EscapeSequence
+    :   '\\' ["n\\]
+    ;
+
 
 Identifier
     :   Letter
