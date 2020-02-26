@@ -50,6 +50,7 @@ statement
 
 expressionStatement
     :   expression? ';'
+    ;
 
 selectionStatement
     :   'if' '(' expression ')' statement ('else' statement)?
@@ -65,9 +66,9 @@ forCondition
     ;
 
 jumpStatement
-    |   'return' expression? ';'
-    |   'continue' ';'
+    :   'return' expression? ';'
     |   'break' ';'
+    |   'continue' ';'
     ;
 
 primaryExpression
@@ -78,6 +79,7 @@ primaryExpression
 
 expression
     :   primaryExpression
+    |   expression '=' expression
     ;
 
 type
@@ -99,8 +101,8 @@ Int : 'int';
 Void : 'void';
 String : 'string';
 
-While : 'while'
-For : 'for'
+While : 'while';
+For : 'for';
 
 Identifier
     :   Letter

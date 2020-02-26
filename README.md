@@ -1,3 +1,3 @@
 # Mxstar-Compiler
 
-An Mx* language compilefirr for course Compiler 2020.
+An Mx* language compiler for course Compiler 2020.
