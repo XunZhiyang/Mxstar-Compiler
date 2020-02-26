@@ -1,8 +1,10 @@
 grammar Mxstar;
 
-declaration
-    :   functionDeclaration
-    |   classDeclaration
+program
+    :   (   functionDeclaration
+        |   classDeclaration
+        |   varDeclaration
+        )*
     ;
 
 functionDeclaration
@@ -79,7 +81,30 @@ primaryExpression
 
 expression
     :   primaryExpression
-    |   expression '=' expression
+    |   '(' expression ')'
+    |   src1=expression '[' expression ']'
+    |   expression '.' Identifier
+    |   op=('++' | '--') expression
+    |   unaryOperator expression
+    |   src1=expression op=('*' | '/' | '%') src2=expression
+    |   src1=expression op=('+' | '-') src2=expression
+    |   src1=expression op=('<<' | '>>') src2=expression
+    |   src1=expression op=('<' | '>' | '<=' | '>=') src2=expression
+    |   src1=expression op=('==' | '!=') src2=expression
+    |   src1=expression op='&' src2=expression
+    |   src1=expression op='^' src2=expression
+    |   src1=expression op='|' src2=expression
+    |   src1=expression op='&&' src2=expression
+    |   src1=expression op='||' src2=expression
+    |   <assoc=right> src1=expression '?' src2=expression ':' src3=expression
+    |   <assoc=right> src1=expression '=' src2=expression
+    ;
+
+unaryOperator
+    :   '+'
+    |   '-'
+    |   '~'
+    |   '!'
     ;
 
 type
