@@ -1,5 +1,9 @@
 grammar Mxstar;
 
+@header {
+package Parser;
+}
+
 program
     :   (   functionDeclaration
         |   classDeclaration

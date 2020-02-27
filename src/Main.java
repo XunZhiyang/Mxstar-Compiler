@@ -6,6 +6,8 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
+import Parser.MxstarLexer;
+import Parser.MxstarParser;
 
 public class Main {
     private static CharStream readCode() throws Exception{
