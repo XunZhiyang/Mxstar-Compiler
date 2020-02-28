@@ -25,11 +25,29 @@ public interface MxstarVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitClassDeclaration(MxstarParser.ClassDeclarationContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link MxstarParser#fieldDeclaration}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFieldDeclaration(MxstarParser.FieldDeclarationContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MxstarParser#constructorDeclaration}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConstructorDeclaration(MxstarParser.ConstructorDeclarationContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link MxstarParser#varDeclaration}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitVarDeclaration(MxstarParser.VarDeclarationContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MxstarParser#identifierList}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIdentifierList(MxstarParser.IdentifierListContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MxstarParser#functionDeclaration}.
 	 * @param ctx the parse tree

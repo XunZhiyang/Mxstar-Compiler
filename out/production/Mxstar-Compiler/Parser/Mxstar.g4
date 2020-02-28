@@ -12,12 +12,24 @@ program
     ;
 
 classDeclaration
-    :   'class' Identifier '{' (varDeclaration | functionDeclaration)* '}'
+    :   'class' Identifier '{' (fieldDeclaration | functionDeclaration | constructorDeclaration)* '}'
+    ;
+
+fieldDeclaration
+    :   type identifierList ';'
+    ;
+
+constructorDeclaration
+    :   Identifier '(' ')' compoundStatement
     ;
 
 varDeclaration
-    :   type Identifier ';'
+    :   type identifierList ';'
     |   type Identifier '=' expression ';'
+    ;
+
+identifierList
+    :   Identifier  (',' Identifier)*
     ;
 
 functionDeclaration
