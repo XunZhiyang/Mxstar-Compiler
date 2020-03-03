@@ -5,10 +5,13 @@ package Parser;
 }
 
 program
-    :   (   functionDeclaration
-        |   classDeclaration
-        |   varDeclaration
-        )*
+    :   programFraction*
+    ;
+
+programFraction
+    :   functionDeclaration
+    |   classDeclaration
+    |   varDeclaration
     ;
 
 classDeclaration
@@ -42,12 +45,12 @@ funcType
     ;
 
 declarator
-    :  Identifier '(' parameterList? ')'
+    :  Identifier '(' parameterDeclarationList? ')'
     ;
 
-parameterList
+parameterDeclarationList
     :   parameterDeclaration
-    |   parameterList ',' parameterDeclaration
+    |   parameterDeclarationList ',' parameterDeclaration
     ;
 
 parameterDeclaration
@@ -59,13 +62,13 @@ parameterDeclaration
     ;
 
 statement
-    :   compoundStatement
-    |   varDeclaration
-    |   expressionStatement
-    |   selectionStatement
-    |   iterationStatement
-    |   jumpStatement
-    |   ';'
+    :   compoundStatement           #CompoundStmt
+    |   varDeclaration              #VarDeclStmt
+    |   expressionStatement         #ExprStmt
+    |   selectionStatement          #SelectionStmt
+    |   iterationStatement          #IterationStmt
+    |   jumpStatement               #JumpStmt
+    |   ';'                         #EmptyStmt
     ;
 
 expressionStatement
@@ -73,12 +76,12 @@ expressionStatement
     ;
 
 selectionStatement
-    :   'if' '(' expression ')' statement ('else' statement)?
+    :   'if' '(' expression ')' opt1=statement ('else' opt2=statement)?
     ;
 
 iterationStatement
-    :   While '(' expression ')' statement
-    |   For '(' forCondition ')' statement
+    :   While '(' expression ')' statement      #WhileStmt
+    |   For '(' forCondition ')' statement      #ForStmt
     ;
 
 forCondition
@@ -86,48 +89,53 @@ forCondition
     ;
 
 jumpStatement
-    :   'return' expression? ';'
-    |   'break' ';'
-    |   'continue' ';'
+    :   'return' expression? ';'    #ReturnStmt
+    |   'break' ';'                 #BreakStmt
+    |   'continue' ';'              #ContinueStmt
     ;
 
 primaryExpression
-    :   constantExpression
-    |   This
-    |   Identifier
+    :   constantExpression      #ConstExpr
+    |   This                    #ThisExpr
+    |   Identifier              #VarExpr
     ;
 
 constantExpression
-    :   True
-    |   False
-    |   Null
-    |   IntegerLiteral
-    |   StringLiteral
+    :   True                    #BoolExpr
+    |   False                   #BoolExpr
+    |   Null                    #NullExpr
+    |   IntegerLiteral          #IntegerLiteral
+    |   StringLiteral           #StringLiteral
     ;
 
 
 expression
-    :   primaryExpression
-    |   '(' expression ')'
-    |   expression '.' Identifier
-    |   expression '(' parameterList? ')'
-    |   'new' newSpecifier
-    |   src1=expression '[' src2=expression ']'
-    |   expression op=('++' | '--')
-    |   op=('++' | '--') expression
-    |   unaryOperator expression
-    |   src1=expression op=('*' | '/' | '%') src2=expression
-    |   src1=expression op=('+' | '-') src2=expression
-    |   src1=expression op=('<<' | '>>') src2=expression
-    |   src1=expression op=('<' | '>' | '<=' | '>=') src2=expression
-    |   src1=expression op=('==' | '!=') src2=expression
-    |   src1=expression op='&' src2=expression
-    |   src1=expression op='^' src2=expression
-    |   src1=expression op='|' src2=expression
-    |   src1=expression op='&&' src2=expression
-    |   src1=expression op='||' src2=expression
-    |   <assoc=right> src1=expression '?' src2=expression ':' src3=expression
-    |   <assoc=right> src1=expression '=' src2=expression
+    :   primaryExpression                                                       #PrimaryExpr
+    |   '(' expression ')'                                                      #ParenthesesExpr
+    |   expression '.' Identifier                                               #FieldExpr
+    |   expression '(' parameterList? ')'                                       #FuncCallExpr
+    |   'new' newSpecifier                                                      #NewExpr
+    |   src1=expression '[' src2=expression ']'                                 #SubscriptExpr
+    |   expression op=('++' | '--')                                             #UnaryExpr
+    |   op=('++' | '--') expression                                             #UnaryExpr
+    |   unaryOperator expression                                                #UnaryExpr
+    |   src1=expression op=('*' | '/' | '%') src2=expression                    #BinaryExpr
+    |   src1=expression op=('+' | '-') src2=expression                          #BinaryExpr
+    |   src1=expression op=('<<' | '>>') src2=expression                        #BinaryExpr
+    |   src1=expression op=('<' | '>' | '<=' | '>=') src2=expression            #BinaryExpr
+    |   src1=expression op=('==' | '!=') src2=expression                        #BinaryExpr
+    |   src1=expression op='&' src2=expression                                  #BinaryExpr
+    |   src1=expression op='^' src2=expression                                  #BinaryExpr
+    |   src1=expression op='|' src2=expression                                  #BinaryExpr
+    |   src1=expression op='&&' src2=expression                                 #BinaryExpr
+    |   src1=expression op='||' src2=expression                                 #BinaryExpr
+    |   <assoc=right> src1=expression '?' src2=expression ':' src3=expression   #ConditionalExpr
+    |   <assoc=right> src1=expression '=' src2=expression                       #BinaryExpr
+    ;
+
+parameterList
+    :   expression
+    |   expression ',' parameterList
     ;
 
 unaryOperator
