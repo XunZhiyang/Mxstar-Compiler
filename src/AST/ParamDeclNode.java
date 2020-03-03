@@ -3,12 +3,12 @@ package AST;
 import Utils.Position;
 
 public class ParamDeclNode extends ASTNode {
-    TypeNode type;
-    String name;
+    private TypeNode type;
+    private String identifier;
 
-    ParamDeclNode(TypeNode type, String name, Position position) {
+    public ParamDeclNode(TypeNode type, String identifier, Position position) {
         super(position);
         this.type = type;
-        this.name = name;
+        this.identifier = identifier;
     }
 }

@@ -26,7 +26,7 @@ public class MxstarBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitProgramFraction(MxstarParser.ProgramFractionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitProgramFragment(MxstarParser.ProgramFragmentContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

@@ -16,7 +16,7 @@ public class ASTBuilder extends MxstarBaseVisitor<ASTNode> {
     public ASTNode visitProgram(MxstarParser.ProgramContext ctx) {
         List<ProgramFragment> fragmentList = new ArrayList<>();
 
-        for (ParserRuleContext fragment : ctx.programFraction()) {
+        for (ParserRuleContext fragment : ctx.programFragment()) {
             fragmentList.add((ProgramFragment) visit(fragment));
         }
 
@@ -24,10 +24,16 @@ public class ASTBuilder extends MxstarBaseVisitor<ASTNode> {
     }
 
     @Override
-    public ASTNode visitProgramFraction(MxstarParser.ProgramFractionContext ctx) {
-        if (ctx.functionDeclaration() != null) return visit(ctx.functionDeclaration());
-        if (ctx.classDeclaration() != null) return visit(ctx.classDeclaration());
-        if (ctx.varDeclaration() != null) return visit(ctx.varDeclaration());
+    public ASTNode visitProgramFragment(MxstarParser.ProgramFragmentContext ctx) {
+        ASTNode returnValue = null;
+        if (ctx.functionDeclaration() != null)
+            returnValue = visit(ctx.functionDeclaration());
+        if (ctx.classDeclaration() != null)
+            returnValue = visit(ctx.classDeclaration());
+        if (ctx.varDeclaration() != null)
+            returnValue = visit(ctx.varDeclaration());
+
+        return returnValue;
     }
 
     @Override
@@ -64,8 +70,8 @@ public class ASTBuilder extends MxstarBaseVisitor<ASTNode> {
     @Override
     public ASTNode visitConstructorDeclaration(MxstarParser.ConstructorDeclarationContext ctx) {
         String identifier = ctx.Identifier().getText();
-        return new FuncDeclNode(true, null, identifier,null, visit(ctx.compoundStatement()),
-                                new Position(ctx.getStart()));
+        CompoundStmtNode stmt = (CompoundStmtNode) visit(ctx.compoundStatement());
+        return new FuncDeclNode(true, null, identifier,null, stmt, new Position(ctx.getStart()));
     }
 
     @Override
@@ -102,32 +108,46 @@ public class ASTBuilder extends MxstarBaseVisitor<ASTNode> {
 
     @Override
     public ASTNode visitFuncType(MxstarParser.FuncTypeContext ctx) {
-        return visitChildren(ctx);
+        if (ctx.Void() == null) return visit(ctx.type());
+        else return new TypeNode("void", 0, new Position(ctx.getStart()));
     }
 
     @Override
     public ASTNode visitDeclarator(MxstarParser.DeclaratorContext ctx) {
-        return visitChildren(ctx);
+        throw new RuntimeException("visitDeclarator");
     }
 
     @Override
     public ASTNode visitParameterDeclarationList(MxstarParser.ParameterDeclarationListContext ctx) {
-        if (ctx.parameterDeclarationList() != null) {
-
+        ParamDeclNode decl = (ParamDeclNode) visit(ctx.parameterDeclaration());
+        List<ParamDeclNode> list;
+        if (ctx.parameterDeclarationList() == null) {
+            list = new ArrayList<>();
         }
         else {
-
+            ParamDeclList subList = (ParamDeclList) visit(ctx.parameterDeclarationList());
+            list = subList.getList();
         }
+
+        list.add(decl);
+        return new ParamDeclList(list, new Position(ctx.getStart()));
     }
 
     @Override
     public ASTNode visitParameterDeclaration(MxstarParser.ParameterDeclarationContext ctx) {
-        return visitChildren(ctx);
+        TypeNode type = (TypeNode) visit(ctx.type());
+        String identifier = ctx.Identifier().getText();
+
+        return new ParamDeclNode(type, identifier, new Position(ctx.getStart()));
     }
 
     @Override
     public ASTNode visitCompoundStatement(MxstarParser.CompoundStatementContext ctx) {
-        return visitChildren(ctx);
+        List<Stmt> stmtList = new ArrayList<>();
+        for (ParserRuleContext statement : ctx.statement()) {
+            stmtList.add((Stmt) visit(statement));
+        }
+        return new CompoundStmtNode(stmtList, new Position(ctx.getStart()));
     }
 
     @Override

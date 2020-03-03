@@ -5,10 +5,10 @@ package Parser;
 }
 
 program
-    :   programFraction*
+    :   programFragment*
     ;
 
-programFraction
+programFragment
     :   functionDeclaration
     |   classDeclaration
     |   varDeclaration

@@ -122,7 +122,7 @@ LineComment
 
 rule names:
 program
-programFraction
+programFragment
 classDeclaration
 fieldDeclaration
 constructorDeclaration

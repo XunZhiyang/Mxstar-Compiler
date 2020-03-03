@@ -30,13 +30,13 @@ public class MxstarBaseListener implements MxstarListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterProgramFraction(MxstarParser.ProgramFractionContext ctx) { }
+	@Override public void enterProgramFragment(MxstarParser.ProgramFragmentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitProgramFraction(MxstarParser.ProgramFractionContext ctx) { }
+	@Override public void exitProgramFragment(MxstarParser.ProgramFragmentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

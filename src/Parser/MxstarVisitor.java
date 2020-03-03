@@ -19,11 +19,11 @@ public interface MxstarVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitProgram(MxstarParser.ProgramContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MxstarParser#programFraction}.
+	 * Visit a parse tree produced by {@link MxstarParser#programFragment}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitProgramFraction(MxstarParser.ProgramFractionContext ctx);
+	T visitProgramFragment(MxstarParser.ProgramFragmentContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MxstarParser#classDeclaration}.
 	 * @param ctx the parse tree

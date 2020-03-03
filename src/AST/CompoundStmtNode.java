@@ -5,10 +5,10 @@ import Utils.Position;
 import java.util.List;
 
 public class CompoundStmtNode extends Stmt {
-    List<Stmt> stmt;
+    private List<Stmt> stmtList;
 
-    CompoundStmtNode(List<Stmt> stmt, Position position) {
+    public CompoundStmtNode(List<Stmt> stmtList, Position position) {
         super(position);
-        this.stmt = stmt;
+        this.stmtList = stmtList;
     }
 }

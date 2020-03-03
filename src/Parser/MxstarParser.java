@@ -28,7 +28,7 @@ public class MxstarParser extends Parser {
 		Int=47, Void=48, String=49, While=50, For=51, IntegerLiteral=52, StringLiteral=53, 
 		Identifier=54, Whitespace=55, Newline=56, BlockComment=57, LineComment=58;
 	public static final int
-		RULE_program = 0, RULE_programFraction = 1, RULE_classDeclaration = 2, 
+		RULE_program = 0, RULE_programFragment = 1, RULE_classDeclaration = 2, 
 		RULE_fieldDeclaration = 3, RULE_constructorDeclaration = 4, RULE_varDeclaration = 5, 
 		RULE_identifierList = 6, RULE_functionDeclaration = 7, RULE_funcType = 8, 
 		RULE_declarator = 9, RULE_parameterDeclarationList = 10, RULE_parameterDeclaration = 11, 
@@ -39,7 +39,7 @@ public class MxstarParser extends Parser {
 		RULE_newSpecifier = 24, RULE_type = 25, RULE_primaryType = 26;
 	private static String[] makeRuleNames() {
 		return new String[] {
-			"program", "programFraction", "classDeclaration", "fieldDeclaration", 
+			"program", "programFragment", "classDeclaration", "fieldDeclaration", 
 			"constructorDeclaration", "varDeclaration", "identifierList", "functionDeclaration", 
 			"funcType", "declarator", "parameterDeclarationList", "parameterDeclaration", 
 			"compoundStatement", "statement", "expressionStatement", "selectionStatement", 
@@ -123,11 +123,11 @@ public class MxstarParser extends Parser {
 	}
 
 	public static class ProgramContext extends ParserRuleContext {
-		public List<ProgramFractionContext> programFraction() {
-			return getRuleContexts(ProgramFractionContext.class);
+		public List<ProgramFragmentContext> programFragment() {
+			return getRuleContexts(ProgramFragmentContext.class);
 		}
-		public ProgramFractionContext programFraction(int i) {
-			return getRuleContext(ProgramFractionContext.class,i);
+		public ProgramFragmentContext programFragment(int i) {
+			return getRuleContext(ProgramFragmentContext.class,i);
 		}
 		public ProgramContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -162,7 +162,7 @@ public class MxstarParser extends Parser {
 				{
 				{
 				setState(54);
-				programFraction();
+				programFragment();
 				}
 				}
 				setState(59);
@@ -182,7 +182,7 @@ public class MxstarParser extends Parser {
 		return _localctx;
 	}
 
-	public static class ProgramFractionContext extends ParserRuleContext {
+	public static class ProgramFragmentContext extends ParserRuleContext {
 		public FunctionDeclarationContext functionDeclaration() {
 			return getRuleContext(FunctionDeclarationContext.class,0);
 		}
@@ -192,28 +192,28 @@ public class MxstarParser extends Parser {
 		public VarDeclarationContext varDeclaration() {
 			return getRuleContext(VarDeclarationContext.class,0);
 		}
-		public ProgramFractionContext(ParserRuleContext parent, int invokingState) {
+		public ProgramFragmentContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_programFraction; }
+		@Override public int getRuleIndex() { return RULE_programFragment; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof MxstarListener ) ((MxstarListener)listener).enterProgramFraction(this);
+			if ( listener instanceof MxstarListener ) ((MxstarListener)listener).enterProgramFragment(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof MxstarListener ) ((MxstarListener)listener).exitProgramFraction(this);
+			if ( listener instanceof MxstarListener ) ((MxstarListener)listener).exitProgramFragment(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MxstarVisitor ) return ((MxstarVisitor<? extends T>)visitor).visitProgramFraction(this);
+			if ( visitor instanceof MxstarVisitor ) return ((MxstarVisitor<? extends T>)visitor).visitProgramFragment(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 
-	public final ProgramFractionContext programFraction() throws RecognitionException {
-		ProgramFractionContext _localctx = new ProgramFractionContext(_ctx, getState());
-		enterRule(_localctx, 2, RULE_programFraction);
+	public final ProgramFragmentContext programFragment() throws RecognitionException {
+		ProgramFragmentContext _localctx = new ProgramFragmentContext(_ctx, getState());
+		enterRule(_localctx, 2, RULE_programFragment);
 		try {
 			setState(63);
 			_errHandler.sync(this);
