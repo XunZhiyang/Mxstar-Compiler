@@ -3,7 +3,7 @@ package AST;
 import Utils.Position;
 
 public abstract class PrimaryExpr extends Expr {
-    PrimaryExpr(Position position) {
+    public PrimaryExpr(Position position) {
         super(position);
     }
 }

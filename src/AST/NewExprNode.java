@@ -5,10 +5,10 @@ import Utils.Position;
 import java.util.List;
 
 public class NewExprNode extends Expr {
-    TypeNode type;
-    List<Integer> shape;
+    private TypeNode type;
+    private List<Expr> shape;
 
-    NewExprNode(TypeNode type, List<Integer> shape, Position position) {
+    public NewExprNode(TypeNode type, List<Expr> shape, Position position) {
         super(position);
         this.type = type;
         this.shape = shape;

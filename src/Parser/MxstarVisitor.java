@@ -242,6 +242,13 @@ public interface MxstarVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStringLiteral(MxstarParser.StringLiteralContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code PostfixExpr}
+	 * labeled alternative in {@link MxstarParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPostfixExpr(MxstarParser.PostfixExprContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code SubscriptExpr}
 	 * labeled alternative in {@link MxstarParser#expression}.
 	 * @param ctx the parse tree
@@ -310,12 +317,6 @@ public interface MxstarVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitParameterList(MxstarParser.ParameterListContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MxstarParser#unaryOperator}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitUnaryOperator(MxstarParser.UnaryOperatorContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MxstarParser#newSpecifier}.
 	 * @param ctx the parse tree

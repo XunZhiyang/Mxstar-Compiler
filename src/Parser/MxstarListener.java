@@ -398,6 +398,18 @@ public interface MxstarListener extends ParseTreeListener {
 	 */
 	void exitStringLiteral(MxstarParser.StringLiteralContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code PostfixExpr}
+	 * labeled alternative in {@link MxstarParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterPostfixExpr(MxstarParser.PostfixExprContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code PostfixExpr}
+	 * labeled alternative in {@link MxstarParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitPostfixExpr(MxstarParser.PostfixExprContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code SubscriptExpr}
 	 * labeled alternative in {@link MxstarParser#expression}.
 	 * @param ctx the parse tree
@@ -515,16 +527,6 @@ public interface MxstarListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitParameterList(MxstarParser.ParameterListContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MxstarParser#unaryOperator}.
-	 * @param ctx the parse tree
-	 */
-	void enterUnaryOperator(MxstarParser.UnaryOperatorContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MxstarParser#unaryOperator}.
-	 * @param ctx the parse tree
-	 */
-	void exitUnaryOperator(MxstarParser.UnaryOperatorContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MxstarParser#newSpecifier}.
 	 * @param ctx the parse tree

@@ -5,9 +5,11 @@ import Parser.MxstarBaseVisitor;
 import Parser.MxstarParser;
 import Utils.BinaryOp;
 import Utils.Position;
+import Utils.UnaryOp;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -115,7 +117,8 @@ public class ASTBuilder extends MxstarBaseVisitor<ASTNode> {
 
     @Override
     public ASTNode visitDeclarator(MxstarParser.DeclaratorContext ctx) {
-     }
+        throw new RuntimeException();
+    }
 
     @Override
     public ASTNode visitParameterDeclarationList(MxstarParser.ParameterDeclarationListContext ctx) {
@@ -157,7 +160,7 @@ public class ASTBuilder extends MxstarBaseVisitor<ASTNode> {
 
     @Override
     public ASTNode visitVarDeclStmt(MxstarParser.VarDeclStmtContext ctx) {
-        return visit(ctx.varDeclaration());
+        return new VarDeclStmtNode((VarDeclNode) visit(ctx.varDeclaration()), new Position(ctx.getStart()));
     }
 
     @Override
@@ -193,7 +196,7 @@ public class ASTBuilder extends MxstarBaseVisitor<ASTNode> {
 
     @Override
     public ASTNode visitSelectionStatement(MxstarParser.SelectionStatementContext ctx) {
-        Expr cond = (Expr) visit(expression);
+        Expr cond = (Expr) visit(ctx.expression());
         Stmt[] branch = new Stmt[2];
         branch[0] = (Stmt) visit(ctx.opt1);
         branch[1] = (Stmt) visit(ctx.opt2);
@@ -255,9 +258,8 @@ public class ASTBuilder extends MxstarBaseVisitor<ASTNode> {
 
     @Override
     public ASTNode visitBoolExpr(MxstarParser.BoolExprContext ctx) {
-        Boolean value;
-        if (ctx.True() != null) value = true;
-        else value = false;
+        boolean value;
+        value = ctx.True() != null;
         return new BoolExprNode(value, new Position(ctx.getStart()));
     }
 
@@ -289,7 +291,7 @@ public class ASTBuilder extends MxstarBaseVisitor<ASTNode> {
     public ASTNode visitBinaryExpr(MxstarParser.BinaryExprContext ctx) {
         Expr src1 = (Expr) visit(ctx.src1);
         Expr src2 = (Expr) visit(ctx.src2);
-        BinaryOp op;
+        BinaryOp op = null;
         switch (ctx.op.getText()) {
             case "*":
                 op = BinaryOp.MUL;
@@ -349,67 +351,150 @@ public class ASTBuilder extends MxstarBaseVisitor<ASTNode> {
                 op = BinaryOp.ASSIGN;
                 break;
         }
-        BinaryExprNode(src1, src2, op, new Position(ctx.getStart()));
+        return new BinaryExprNode(src1, src2, op, new Position(ctx.getStart()));
     }
 
     @Override
     public ASTNode visitNewExpr(MxstarParser.NewExprContext ctx) {
-        return visitChildren(ctx);
+        MxstarParser.NewSpecifierContext sp = ctx.newSpecifier();
+        TypeNode type = (TypeNode) visit(sp.primaryType());
+        int dim = (sp.getChildCount() - sp.expression().size() - 1) / 2;
+        type.setDim(dim);
+
+        List<Expr> shape = new ArrayList<>();
+        for (ParserRuleContext expr : sp.expression()) {
+            shape.add((Expr) visit(expr));
+        }
+
+        return new NewExprNode(type, shape, new Position(ctx.getStart()));
+
     }
 
     @Override
     public ASTNode visitPrimaryExpr(MxstarParser.PrimaryExprContext ctx) {
-        return visitChildren(ctx);
+        return visit(ctx.primaryExpression());
     }
 
     @Override
     public ASTNode visitParenthesesExpr(MxstarParser.ParenthesesExprContext ctx) {
-        return visitChildren(ctx);
+        return visit(ctx.expression());
     }
 
     @Override
     public ASTNode visitFieldExpr(MxstarParser.FieldExprContext ctx) {
-        return visitChildren(ctx);
+        Expr object = (Expr) visit(ctx.expression());
+        String field = ctx.Identifier().getText();
+
+        return new FieldExprNode(object, field, new Position(ctx.getStart()));
     }
 
     @Override
     public ASTNode visitConditionalExpr(MxstarParser.ConditionalExprContext ctx) {
-        return visitChildren(ctx);
+        Expr condition = (Expr) visit(ctx.src1);
+        Expr opt1 = (Expr) visit(ctx.src2);
+        Expr opt2 = (Expr) visit(ctx.src3);
+
+        return new ConditionalExprNode(condition, opt1, opt2, new Position(ctx.getStart()));
     }
 
     @Override
     public ASTNode visitUnaryExpr(MxstarParser.UnaryExprContext ctx) {
-        return visitChildren(ctx);
+        Expr expr = (Expr) visit(ctx.expression());
+        UnaryOp op = null;
+        switch (ctx.op.getText()) {
+            case "++":
+                op = UnaryOp.PRE_INC;
+                break;
+            case "--":
+                op = UnaryOp.PRE_DEC;
+                break;
+            case "+":
+                op = UnaryOp.POS;
+                break;
+            case "-":
+                op = UnaryOp.NEG;
+                break;
+            case "~":
+                op = UnaryOp.NOT;
+                break;
+            case "!":
+                op = UnaryOp.NOTL;
+                break;
+        }
+        return new UnaryExprNode(expr, op, new Position(ctx.getStart()));
+    }
+
+    @Override
+    public ASTNode visitPostfixExpr(MxstarParser.PostfixExprContext ctx) {
+        Expr expr = (Expr) visit(ctx.expression());
+        UnaryOp op = null;
+        switch (ctx.op.getText()) {
+            case "++":
+                op = UnaryOp.POST_INC;
+                break;
+            case "--":
+                op = UnaryOp.POST_DEC;
+                break;
+        }
+        return new UnaryExprNode(expr, op, new Position(ctx.getStart()));
     }
 
     @Override
     public ASTNode visitFuncCallExpr(MxstarParser.FuncCallExprContext ctx) {
-        return visitChildren(ctx);
+        Expr func = (Expr) visit(ctx.expression());
+        List<Expr> param = null;
+        if (ctx.parameterList() != null) {
+            param = ((ParamList) visit(ctx.parameterList())).getList();
+        }
+        return new FuncCallExprNode(func, param, new Position(ctx.getStart()));
     }
 
     @Override
     public ASTNode visitParameterList(MxstarParser.ParameterListContext ctx) {
-        return visitChildren(ctx);
+        Expr expr = (Expr) visit(ctx.expression());
+        List<Expr> list;
+        if (ctx.parameterList() == null) {
+            list = new ArrayList<>();
+        }
+        else {
+            ParamList subList = (ParamList) visit(ctx.parameterList());
+            list = subList.getList();
+        }
+
+        list.add(expr);
+        return new ParamList(list, new Position(ctx.getStart()));
     }
 
-    @Override
-    public ASTNode visitUnaryOperator(MxstarParser.UnaryOperatorContext ctx) {
-        return visitChildren(ctx);
-    }
+//    @Override
+//    public ASTNode visitUnaryOperator(MxstarParser.UnaryOperatorContext ctx) {
+//        return visitChildren(ctx);
+//    }
 
     @Override
     public ASTNode visitNewSpecifier(MxstarParser.NewSpecifierContext ctx) {
-        return visitChildren(ctx);
+        throw new RuntimeException();
     }
 
     @Override
     public ASTNode visitType(MxstarParser.TypeContext ctx) {
-        return visitChildren(ctx);
+        if (ctx.type() != null) {
+            TypeNode ret = (TypeNode) visit(ctx.type());
+            ret.setDim(ret.getDim() + 1);
+            return ret;
+        }
+        else {
+            return visit(ctx.primaryType());
+        }
     }
 
     @Override
     public ASTNode visitPrimaryType(MxstarParser.PrimaryTypeContext ctx) {
-        return visitChildren(ctx);
-    }
+        String identifier = null;
+        if (ctx.Bool() != null) identifier = "bool";
+        if (ctx.Int() != null) identifier = "int";
+        if (ctx.String() != null) identifier = "String";
+        if (ctx.Identifier() != null) identifier = ctx.Identifier().getText();
 
+        return new TypeNode(identifier, 0, new Position(ctx.getStart()));
+    }
 }

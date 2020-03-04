@@ -11,4 +11,12 @@ public class TypeNode extends ASTNode{
         this.type = type;
         this.arrayDimension = arrayDimension;
     }
+
+    public void setDim(int dim) {
+        arrayDimension = dim;
+    }
+
+    public int getDim() {
+        return arrayDimension;
+    }
 }

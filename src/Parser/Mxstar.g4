@@ -116,9 +116,9 @@ expression
     |   expression '(' parameterList? ')'                                       #FuncCallExpr
     |   'new' newSpecifier                                                      #NewExpr
     |   src1=expression '[' src2=expression ']'                                 #SubscriptExpr
-    |   expression op=('++' | '--')                                             #UnaryExpr
+    |   expression op=('++' | '--')                                             #PostfixExpr
     |   op=('++' | '--') expression                                             #UnaryExpr
-    |   unaryOperator expression                                                #UnaryExpr
+    |   op=('+' | '-' | '~' | '!') expression                                   #UnaryExpr
     |   src1=expression op=('*' | '/' | '%') src2=expression                    #BinaryExpr
     |   src1=expression op=('+' | '-') src2=expression                          #BinaryExpr
     |   src1=expression op=('<<' | '>>') src2=expression                        #BinaryExpr
@@ -138,12 +138,12 @@ parameterList
     |   expression ',' parameterList
     ;
 
-unaryOperator
-    :   '+'
-    |   '-'
-    |   '~'
-    |   '!'
-    ;
+//unaryOperator
+//    :   '+'
+//    |   '-'
+//    |   '~'
+//    |   '!'
+//    ;
 
 newSpecifier
     :   primaryType
