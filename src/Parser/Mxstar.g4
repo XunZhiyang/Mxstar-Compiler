@@ -57,7 +57,7 @@ parameterDeclaration
     :   type Identifier
     ;
 
-    compoundStatement
+compoundStatement
     :   '{' statement* '}'
     ;
 

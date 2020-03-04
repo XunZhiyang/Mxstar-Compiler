@@ -3,7 +3,7 @@ package AST;
 import Utils.Position;
 
 public class BreakNode extends Stmt {
-    BreakNode(Position position) {
+    public BreakNode(Position position) {
         super(position);
     }
 }

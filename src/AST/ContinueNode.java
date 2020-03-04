@@ -3,7 +3,7 @@ package AST;
 import Utils.Position;
 
 public class ContinueNode extends Stmt {
-    ContinueNode(Position position) {
+    public ContinueNode(Position position) {
         super(position);
     }
 }

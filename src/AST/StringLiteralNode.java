@@ -3,9 +3,9 @@ package AST;
 import Utils.Position;
 
 public class StringLiteralNode extends ConstExpr {
-    String value;
+    private String value;
 
-    StringLiteralNode(String value, Position position) {
+    public StringLiteralNode(String value, Position position) {
         super(position);
         this.value = value;
     }

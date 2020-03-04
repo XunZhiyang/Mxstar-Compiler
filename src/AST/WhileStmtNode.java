@@ -3,10 +3,10 @@ package AST;
 import Utils.Position;
 
 public class WhileStmtNode extends Stmt {
-    Expr condition;
-    Stmt statement;
+    private Expr condition;
+    private Stmt statement;
 
-    WhileStmtNode(Expr condition, Stmt statement, Position position) {
+    public WhileStmtNode(Expr condition, Stmt statement, Position position) {
         super(position);
         this.condition = condition;
         this.statement = statement;
