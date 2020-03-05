@@ -130,7 +130,7 @@ expression
     |   src1=expression op='&&' src2=expression                                 #BinaryExpr
     |   src1=expression op='||' src2=expression                                 #BinaryExpr
     |   <assoc=right> src1=expression '?' src2=expression ':' src3=expression   #ConditionalExpr
-    |   <assoc=right> src1=expression '=' src2=expression                       #BinaryExpr
+    |   <assoc=right> src1=expression op='=' src2=expression                       #BinaryExpr
     ;
 
 parameterList

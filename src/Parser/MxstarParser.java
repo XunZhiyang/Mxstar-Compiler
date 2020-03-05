@@ -2429,7 +2429,7 @@ public class MxstarParser extends Parser {
 						setState(264);
 						if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
 						setState(265);
-						match(T__6);
+						((BinaryExprContext)_localctx).op = match(T__6);
 						setState(266);
 						((BinaryExprContext)_localctx).src2 = expression(1);
 						}

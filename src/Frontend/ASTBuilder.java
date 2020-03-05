@@ -104,7 +104,12 @@ public class ASTBuilder extends MxstarBaseVisitor<ASTNode> {
     public ASTNode visitFunctionDeclaration(MxstarParser.FunctionDeclarationContext ctx) {
         TypeNode type = (TypeNode) visit(ctx.funcType());
         String identifier = ctx.declarator().Identifier().getText();
-        List<ParamDeclNode> params = ((ParamDeclList) visit(ctx.declarator().parameterDeclarationList())).getList();
+
+        List<ParamDeclNode> params = null;
+        ParserRuleContext paramList = ctx.declarator().parameterDeclarationList();
+        if (paramList != null)
+            params = ((ParamDeclList) visit(paramList)).getList();
+
         CompoundStmtNode stmt = (CompoundStmtNode) visit(ctx.compoundStatement());
         return new FuncDeclNode(false, type, identifier, params, stmt, new Position(ctx.getStart()));
     }
