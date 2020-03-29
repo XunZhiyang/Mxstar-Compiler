@@ -5,5 +5,5 @@ import Utils.Position;
 public interface Scope {
     void defineSymbol(Symbol symbol);
 
-    Symbol getSymbol(String name, Position position);
+    Symbol getSymbol(String identifier, Position position);
 }
