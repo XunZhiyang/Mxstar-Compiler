@@ -13,4 +13,9 @@ public class ForStmtNode extends Stmt {
         this.step = step;
         this.statement = statement;
     }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }

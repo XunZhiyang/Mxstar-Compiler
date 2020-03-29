@@ -19,4 +19,9 @@ public class TypeNode extends ASTNode{
     public int getDim() {
         return arrayDimension;
     }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }

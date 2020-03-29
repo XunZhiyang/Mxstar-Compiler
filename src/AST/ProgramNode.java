@@ -11,4 +11,9 @@ public class ProgramNode extends ASTNode {
         super(position);
         this.programFragments = programFragments;
     }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }

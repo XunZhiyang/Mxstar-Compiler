@@ -15,4 +15,9 @@ public class ClassDeclNode extends ProgramFragment {
         this.fields = fields;
         this.methods = methods;
     }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }

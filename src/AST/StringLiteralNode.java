@@ -9,4 +9,9 @@ public class StringLiteralNode extends ConstExpr {
         super(position);
         this.value = value;
     }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }

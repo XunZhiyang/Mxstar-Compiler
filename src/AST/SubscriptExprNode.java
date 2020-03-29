@@ -11,4 +11,9 @@ public class SubscriptExprNode extends Expr {
         this.array = array;
         this.subscript = subscript;
     }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }

@@ -31,4 +31,8 @@ public class VarDeclNode extends ProgramFragment{
         }
     }
 
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }

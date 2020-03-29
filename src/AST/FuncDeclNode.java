@@ -20,4 +20,9 @@ public class FuncDeclNode extends ProgramFragment {
         this.params = params;
         this.stmt = stmt;
     }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }

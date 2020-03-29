@@ -12,4 +12,9 @@ public class UnaryExprNode extends Expr {
         this.src = src;
         this.op = op;
     }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }

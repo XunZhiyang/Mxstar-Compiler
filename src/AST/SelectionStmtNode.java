@@ -11,4 +11,9 @@ public class SelectionStmtNode extends Stmt {
         this.cond = cond;
         this.branch = branch;
     }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }

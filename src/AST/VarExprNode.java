@@ -9,4 +9,9 @@ public class VarExprNode extends PrimaryExpr {
         super(position);
         this.identifier = identifier;
     }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }

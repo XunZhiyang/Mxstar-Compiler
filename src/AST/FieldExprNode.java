@@ -11,4 +11,9 @@ public class FieldExprNode extends Expr {
         this.object = object;
         this.field = field;
     }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }

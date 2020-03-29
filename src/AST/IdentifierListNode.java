@@ -11,4 +11,9 @@ public class IdentifierListNode extends ASTNode {
         super(position);
         this.identifiers = identifiers;
     }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }

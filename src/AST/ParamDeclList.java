@@ -15,4 +15,9 @@ public class ParamDeclList extends ASTNode {
     public List<ParamDeclNode> getList() {
         return paramList;
     }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }

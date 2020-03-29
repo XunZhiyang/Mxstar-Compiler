@@ -11,4 +11,9 @@ public class WhileStmtNode extends Stmt {
         this.condition = condition;
         this.statement = statement;
     }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }

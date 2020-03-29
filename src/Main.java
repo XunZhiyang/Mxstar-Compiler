@@ -11,6 +11,8 @@ import java.io.InputStream;
 import Parser.MxstarLexer;
 import Parser.MxstarParser;
 
+import Symbol.GlobalScope;
+
 public class Main {
     private static CharStream readCode() throws Exception{
         String inputFile = "test\\test0.m";
@@ -27,8 +29,9 @@ public class Main {
         return tree;
     }
 
-    private static void semanticAnalysis() {
+    private static void semanticAnalysis(ASTNode ast) {
         GlobalScope globalScope = new GlobalScope();
+        ast.accept(new ClassScanner(globalScope));
     }
 
     private static ASTNode buildAST(ParseTree tree) {
@@ -41,7 +44,7 @@ public class Main {
             CharStream input = readCode();
             ParseTree tree = buildCST(input);
             ASTNode ast = buildAST(tree);
-            semanticAnalysis();
+            semanticAnalysis(ast);
 
         } catch (Exception e) {
             e.printStackTrace();

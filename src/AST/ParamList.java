@@ -15,4 +15,9 @@ public class ParamList extends ASTNode {
     public List<Expr> getList() {
         return paramList;
     }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visit(this);
+    }
 }
