@@ -27,6 +27,10 @@ public class Main {
         return tree;
     }
 
+    private static void semanticAnalysis() {
+        GlobalScope globalScope = new GlobalScope();
+    }
+
     private static ASTNode buildAST(ParseTree tree) {
         ASTBuilder builder = new ASTBuilder();
         return builder.visit(tree);
@@ -37,6 +41,7 @@ public class Main {
             CharStream input = readCode();
             ParseTree tree = buildCST(input);
             ASTNode ast = buildAST(tree);
+            semanticAnalysis();
 
         } catch (Exception e) {
             e.printStackTrace();
