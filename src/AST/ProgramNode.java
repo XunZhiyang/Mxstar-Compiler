@@ -12,6 +12,10 @@ public class ProgramNode extends ASTNode {
         this.programFragments = programFragments;
     }
 
+    public List<ProgramFragment> getList() {
+        return programFragments;
+    }
+
     @Override
     public void accept(ASTVisitor visitor) {
         visitor.visit(this);

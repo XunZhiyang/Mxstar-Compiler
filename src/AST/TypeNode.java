@@ -20,6 +20,10 @@ public class TypeNode extends ASTNode{
         return arrayDimension;
     }
 
+    public String getIdentifier(){
+        return type;
+    }
+
     @Override
     public void accept(ASTVisitor visitor) {
         visitor.visit(this);

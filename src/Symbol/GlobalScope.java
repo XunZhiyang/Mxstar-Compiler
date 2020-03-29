@@ -1,9 +1,9 @@
 package Symbol;
 
+import AST.TypeNode;
 import Utils.Position;
 import Utils.RedefError;
 import Utils.SemanticError;
-import org.antlr.v4.runtime.misc.Triple;
 
 import java.util.*;
 
@@ -67,12 +67,15 @@ public class GlobalScope extends BaseScope{
         typeMap.put(classType.getName(), classType);
     }
 
-    public Type getType(String identifier, Position position) {
-        Type type = typeMap.get(identifier);
+    public Type getType(TypeNode node) {
+        Type type = typeMap.get(node.getIdentifier());
         if (type == null)
-            throw new SemanticError("'" + identifier + "' does not name a type.", position);
-        else
-            return type;
+            throw new SemanticError("'" + node.getIdentifier() + "' does not name a type.", node.getPosition());
+        else {
+            int d = node.getDim();
+            if (d > 0) return new ArrayType(type, d);
+            else return type;
+        }
     }
 
 
