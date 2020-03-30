@@ -4,18 +4,18 @@ import Utils.Position;
 import Utils.SemanticError;
 
 public abstract class Type {
-    private String typeName;
+    private String identifier;
 
-    public Type(String typename) {
-        this.typeName = typename;
+    public Type(String identifier) {
+        this.identifier = identifier;
     }
 
-    public String getName() {
-        return typeName;
+    public String getIdentifier() {
+        return identifier;
     }
 
     public void compatible(Type type, Position position) {
-        if (!typeName.equals(type.getName())) {
+        if (!identifier.equals(type.getIdentifier())) {
             throw new SemanticError("Type not compatible.", position);
         }
     }

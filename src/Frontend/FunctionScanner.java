@@ -1,15 +1,26 @@
 package Frontend;
 
 import AST.*;
-import Symbol.ClassType;
-import Symbol.FunctionSymbol;
-import Symbol.GlobalScope;
+import Symbol.*;
+import Utils.SemanticError;
 
 public class FunctionScanner implements ASTVisitor {
     private GlobalScope globalScope;
+    private Scope currentScope;
 
     public FunctionScanner(GlobalScope globalScope) {
         this.globalScope = globalScope;
+        this.currentScope = globalScope;
+    }
+
+    private void checkMain() {
+        FunctionSymbol mainFunction =  globalScope.getMain();
+        if (mainFunction.getType() != globalScope.getIntType()) {
+            throw new SemanticError("'main' must return int.", mainFunction.getPosition());
+        }
+        if (mainFunction.mapSize() > 0) {
+            throw new SemanticError("'main' must not have arguments.", mainFunction.getPosition());
+        }
     }
 
     @Override
@@ -23,9 +34,12 @@ public class FunctionScanner implements ASTVisitor {
 
     @Override
     public void visit(ClassDeclNode node){
-        ClassType classType = new ClassType(node.getIdentifier(), node, globalScope);
-        globalScope.defineClass(classType);
-        node.setClassType(classType);
+        currentScope = node.getClassType();
+        for (FuncDeclNode i : node.getMethods()) {
+            i.accept(this);
+            currentScope = node.getClassType();
+        }
+        node.getFields().forEach(x -> x.accept(this));
     }
 
     @Override
@@ -54,7 +68,24 @@ public class FunctionScanner implements ASTVisitor {
 
     @Override
     public void visit(FuncDeclNode node){
-        FunctionSymbol functionSymbol = new FunctionSymbol();
+        if (node.getType().getIdentifier().equals("") && !node.getIsConstructor())
+            throw new SemanticError("Define function without return type.", node.getPosition());
+
+        Type type = globalScope.getType(node.getType());
+        FunctionSymbol functionSymbol = new FunctionSymbol(type, node.getIdentifier(), node, currentScope);
+        functionSymbol.setConstructor(node.getIsConstructor());
+        if (functionSymbol.ifConstructor()
+                ^ functionSymbol.getIdentifier().equals(((ClassType) currentScope).getIdentifier())) {
+            throw new SemanticError("Not a legal constructor.", functionSymbol.getPosition());
+        }
+        currentScope.defineSymbol(functionSymbol);
+        node.setSymbol(functionSymbol);
+
+        currentScope = functionSymbol;
+        for (ParamDeclNode i : node.getParams()) {
+            i.accept(this);
+            currentScope = functionSymbol;
+        }
     }
 
     @Override
@@ -73,7 +104,10 @@ public class FunctionScanner implements ASTVisitor {
     public void visit(ParamDeclList node){}
 
     @Override
-    public void visit(ParamDeclNode node){}
+    public void visit(ParamDeclNode node){
+        VarSymbol varSymbol = new VarSymbol(globalScope.getType(node.getType()), node.getIdentifier(), node);
+        currentScope.defineSymbol(varSymbol);
+    }
 
     @Override
     public void visit(ParamList node){}
@@ -82,7 +116,9 @@ public class FunctionScanner implements ASTVisitor {
     public void visit(ProgramNode node){
         for (ProgramFragment i : node.getList()) {
             i.accept(this);
+            currentScope = globalScope;
         }
+        checkMain();
     }
 
     @Override
@@ -107,7 +143,13 @@ public class FunctionScanner implements ASTVisitor {
     public void visit(UnaryExprNode node){}
 
     @Override
-    public void visit(VarDeclNode node){}
+    public void visit(VarDeclNode node){
+        Type type = globalScope.getType(node.getType());
+        for (String i : node.getVariables()) {
+            VarSymbol varSymbol = new VarSymbol(type, i, node);
+            currentScope.defineSymbol(varSymbol);
+        }
+    }
 
     @Override
     public void visit(VarDeclStmtNode node){}

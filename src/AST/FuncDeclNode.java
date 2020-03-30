@@ -1,15 +1,18 @@
 package AST;
 
+import Symbol.FunctionSymbol;
 import Utils.Position;
 
 import java.util.List;
 
 public class FuncDeclNode extends ProgramFragment {
-    private Boolean isConstructor;
+    private boolean isConstructor;
     private TypeNode type;
     private String identifier;
     private List<ParamDeclNode> params;
     private CompoundStmtNode stmt;
+
+    private FunctionSymbol symbol;
 
     public FuncDeclNode(Boolean isConstructor, TypeNode type, String identifier, List<ParamDeclNode> params,
                         CompoundStmtNode stmt, Position position) {
@@ -19,6 +22,26 @@ public class FuncDeclNode extends ProgramFragment {
         this.identifier = identifier;
         this.params = params;
         this.stmt = stmt;
+    }
+
+    public void setSymbol(FunctionSymbol symbol) {
+        this.symbol = symbol;
+    }
+
+    public TypeNode getType() {
+        return type;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public Boolean getIsConstructor() {
+        return isConstructor;
+    }
+
+    public List<ParamDeclNode> getParams() {
+        return params;
     }
 
     @Override

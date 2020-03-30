@@ -1,6 +1,7 @@
 import AST.ASTNode;
 import Frontend.ASTBuilder;
 import Frontend.ClassScanner;
+import Frontend.FunctionScanner;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -33,6 +34,7 @@ public class Main {
     private static void semanticAnalysis(ASTNode ast) {
         GlobalScope globalScope = new GlobalScope();
         ast.accept(new ClassScanner(globalScope));
+        ast.accept(new FunctionScanner(globalScope));
     }
 
     private static ASTNode buildAST(ParseTree tree) {

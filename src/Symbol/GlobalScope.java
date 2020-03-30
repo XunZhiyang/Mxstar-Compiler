@@ -9,11 +9,11 @@ import java.util.*;
 
 public class GlobalScope extends BaseScope{
     Map<String, Type> typeMap = new LinkedHashMap<>();
+    private PrimitiveType intType = new PrimitiveType("int");
+    private PrimitiveType boolType = new PrimitiveType("bool");
+    private PrimitiveType voidType = new PrimitiveType("void");
 
     public GlobalScope() {
-        PrimitiveType intType = new PrimitiveType("int");
-        PrimitiveType boolType = new PrimitiveType("bool");
-        PrimitiveType voidType = new PrimitiveType("void");
         typeMap.put("int", intType);
         typeMap.put("bool", boolType);
         typeMap.put("void", voidType);
@@ -61,10 +61,10 @@ public class GlobalScope extends BaseScope{
     }
 
     public void defineClass(ClassType classType) {
-        if (typeMap.containsKey(classType.getName())) {
-            throw new RedefError(classType.getName(), classType.getPos());
+        if (typeMap.containsKey(classType.getIdentifier())) {
+            throw new RedefError(classType.getIdentifier(), classType.getPos());
         }
-        typeMap.put(classType.getName(), classType);
+        typeMap.put(classType.getIdentifier(), classType);
     }
 
     public Type getType(TypeNode node) {
@@ -78,5 +78,20 @@ public class GlobalScope extends BaseScope{
         }
     }
 
+    public FunctionSymbol getMain() {
+        FunctionSymbol mainFunction = (FunctionSymbol) symbolMap.get("main");
+        if (mainFunction == null)
+            throw new SemanticError("Main function not defined.", new Position(0, 0));
+        return mainFunction;
+    }
 
+    public PrimitiveType getIntType() {
+        return intType;
+    }
+    public PrimitiveType getBoolType() {
+        return boolType;
+    }
+    public PrimitiveType getVoidType() {
+        return voidType;
+    }
 }

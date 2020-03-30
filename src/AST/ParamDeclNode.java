@@ -12,6 +12,14 @@ public class ParamDeclNode extends ASTNode {
         this.identifier = identifier;
     }
 
+    public TypeNode getType() {
+        return type;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
     @Override
     public void accept(ASTVisitor visitor) {
         visitor.visit(this);

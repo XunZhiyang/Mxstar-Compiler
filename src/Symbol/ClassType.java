@@ -3,6 +3,7 @@ package Symbol;
 import AST.ClassDeclNode;
 import Utils.Position;
 import Utils.RedefError;
+import Utils.SemanticError;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -11,6 +12,7 @@ public class ClassType extends Type implements Scope {
     Map<String, Symbol> symbolMap = new LinkedHashMap<>();
     private Scope fatherScope;
     private ClassDeclNode define;
+    private boolean hasConstructor;
 
     public ClassType(String typeName, ClassDeclNode define, Scope fatherScope) {
         super(typeName);
@@ -20,10 +22,13 @@ public class ClassType extends Type implements Scope {
 
     @Override
     public void defineSymbol(Symbol symbol) {
-        if (symbolMap.containsKey(symbol.getName())) {
-            throw new RedefError(symbol.getName(), symbol.getPos());
+        if (hasConstructor && symbol.ifConstructor())
+            throw new SemanticError("Duplicate constructors.", symbol.getPosition());
+        hasConstructor = symbol.ifConstructor();
+        if (symbolMap.containsKey(symbol.getIdentifier())) {
+            throw new RedefError(symbol.getIdentifier(), symbol.getPos());
         }
-        symbolMap.put(symbol.getName(), symbol);
+        symbolMap.put(symbol.getIdentifier(), symbol);
     }
 
     @Override

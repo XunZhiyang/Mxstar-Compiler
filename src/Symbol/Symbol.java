@@ -15,7 +15,11 @@ public abstract class Symbol {
         this.define = define;
     }
 
-    public String getName() {
+    public Type getType() {
+        return type;
+    }
+
+    public String getIdentifier() {
         return identifier;
     }
 
@@ -29,5 +33,13 @@ public abstract class Symbol {
 
     public void setScope(Scope scope) {
         this.scope = scope;
+    }
+
+    public boolean ifConstructor() {
+        return false;
+    }
+
+    public Position getPosition() {
+        return define.getPosition();
     }
 }

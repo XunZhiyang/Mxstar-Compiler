@@ -27,6 +27,18 @@ public class ClassDeclNode extends ProgramFragment {
         this.classType = classType;
     }
 
+    public ClassType getClassType() {
+        return classType;
+    }
+
+    public List<FuncDeclNode> getMethods() {
+        return methods;
+    }
+
+    public List<VarDeclNode> getFields() {
+        return fields;
+    }
+
     @Override
     public void accept(ASTVisitor visitor) {
         visitor.visit(this);
