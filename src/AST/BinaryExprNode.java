@@ -14,6 +14,18 @@ public class BinaryExprNode extends Expr {
         this.op = op;
     }
 
+    public Expr getSrc1() {
+        return src1;
+    }
+
+    public Expr getSrc2() {
+        return src2;
+    }
+
+    public BinaryOp getOp() {
+        return op;
+    }
+
     @Override
     public void accept(ASTVisitor visitor) {
         visitor.visit(this);

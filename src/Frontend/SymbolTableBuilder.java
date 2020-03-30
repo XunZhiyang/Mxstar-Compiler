@@ -3,28 +3,86 @@ package Frontend;
 import AST.*;
 import Symbol.*;
 import Utils.SemanticError;
+import Utils.TypeError;
 
-public class FunctionScanner implements ASTVisitor {
+public class SymbolTableBuilder implements ASTVisitor {
     private GlobalScope globalScope;
     private Scope currentScope;
 
-    public FunctionScanner(GlobalScope globalScope) {
+    public SymbolTableBuilder(GlobalScope globalScope) {
         this.globalScope = globalScope;
         this.currentScope = globalScope;
     }
 
-    private void checkMain() {
-        FunctionSymbol mainFunction =  globalScope.getMain();
-        if (mainFunction.getType() != globalScope.getIntType()) {
-            throw new SemanticError("'main' must return int.", mainFunction.getPosition());
-        }
-        if (mainFunction.mapSize() > 0) {
-            throw new SemanticError("'main' must not have arguments.", mainFunction.getPosition());
+    @Override
+    public void visit(BinaryExprNode node){
+        Expr src1 = node.getSrc1();
+        Expr src2 = node.getSrc2();
+        src1.accept(this);
+        src2.accept(this);
+        switch (node.getOp()) {
+            case MUL:
+            case DIV:
+            case MOD:
+            case SUB:
+            case SAL:
+            case SAR:
+            case AND:
+            case OR: {
+                if (src1.getType().isInt() && src2.getType().isInt()) {
+                    node.setType(globalScope.getIntType());
+                }
+                else throw new TypeError(node.getPosition());
+                break;
+            }
+            case ADD: {
+                if (src1.getType().isInt() && src2.getType().isInt()) {
+                    node.setType(globalScope.getIntType());
+                } else if (src1.getType().isInt() && src2.getType().isInt()) {
+                    node.setType(globalScope.getStringType());
+                } else {
+                    throw new TypeError(node.getPosition());
+                }
+                break;
+            }
+            case LT:
+            case GT:
+            case LE:
+            case GE: {
+                if (src1.getType().isInt() && src2.getType().isInt()) {
+                    node.setType(globalScope.getBoolType());
+                } else if (src1.getType().isInt() && src2.getType().isInt()) {
+                    node.setType(globalScope.getBoolType());
+                } else {
+                    throw new TypeError(node.getPosition());
+                }
+                break;
+            }
+            case EQ:
+            case NE:
+                src1.getType().compatible(src2.getType(), node.getPosition());
+                node.setType(globalScope.getBoolType());
+                break;
+            case XOR:
+                if (src1.getType().isBoolean() && src2.getType().isBoolean()) {
+                    node.setType(globalScope.getBoolType());
+                } else if (src1.getType().isInt() && src2.getType().isInt()) {
+                    node.setType(globalScope.getIntType());
+                } else{
+                    throw new TypeError(node.getPosition());
+                }
+                break;
+            case ANL:
+            case ORL:
+                if (src1.getType().isBoolean() && src2.getType().isBoolean()) {
+                    node.setType(globalScope.getBoolType());
+                } else{
+                    throw new TypeError(node.getPosition());
+                }
+                break;
+            case ASSIGN:
         }
     }
-
-    @Override
-    public void visit(BinaryExprNode node){}
 
     @Override
     public void visit(BoolExprNode node){}
@@ -39,7 +97,7 @@ public class FunctionScanner implements ASTVisitor {
             i.accept(this);
             currentScope = node.getClassType();
         }
-//        node.getFields().forEach(x -> x.accept(this));
+        node.getFields().forEach(x -> x.accept(this));
     }
 
     @Override
@@ -85,7 +143,7 @@ public class FunctionScanner implements ASTVisitor {
                 }
             }
         }
-       functionSymbol.setConstructor(node.getIsConstructor());
+        functionSymbol.setConstructor(node.getIsConstructor());
         currentScope.defineSymbol(functionSymbol);
         node.setSymbol(functionSymbol);
 
@@ -126,7 +184,6 @@ public class FunctionScanner implements ASTVisitor {
             i.accept(this);
             currentScope = globalScope;
         }
-        checkMain();
     }
 
     @Override
@@ -151,14 +208,18 @@ public class FunctionScanner implements ASTVisitor {
     public void visit(UnaryExprNode node){}
 
     @Override
-    public void visit(VarDeclNode node){
-//        if (currentScope instanceof ClassType) {
-//            Type type = globalScope.getType(node.getType());
-//            for (String i : node.getVariables()) {
-//                VarSymbol varSymbol = new VarSymbol(type, i, node);
-//                currentScope.defineSymbol(varSymbol);
-//            }
-//        }
+    public void visit(VarDeclNode node) {
+        Type type = globalScope.getType(node.getType());
+        if (node.ifInitValue()) {
+            Expr rhs = node.getInitValue();
+            rhs.accept(this);
+            if (!type.equals(rhs.getType()) && !(type.isNullable() && rhs.getType().isNull()))
+                throw new TypeError(node.getPosition());
+        }
+        for (String i : node.getVariables()) {
+            VarSymbol varSymbol = new VarSymbol(type, i, node);
+            currentScope.defineSymbol(varSymbol);
+        }
     }
 
     @Override

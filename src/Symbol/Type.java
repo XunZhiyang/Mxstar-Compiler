@@ -19,5 +19,29 @@ public abstract class Type {
             throw new SemanticError("Type not compatible.", position);
         }
     }
+
+    public boolean equals(Type type) {
+        return identifier.equals(type.getIdentifier());
+    }
+
+    public boolean isInt() {
+        return false;
+    }
+
+    public boolean isBoolean() {
+        return false;
+    }
+
+    public boolean isNull() {
+        return false;
+    }
+
+    public boolean isString() {
+        return false;
+    }
+
+    public boolean isNullable() {
+        return false;
+    }
 }
 

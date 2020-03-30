@@ -12,30 +12,29 @@ public class GlobalScope extends BaseScope{
     private PrimitiveType intType = new PrimitiveType("int");
     private PrimitiveType boolType = new PrimitiveType("bool");
     private PrimitiveType voidType = new PrimitiveType("void");
+    private ClassType stringType = new ClassType("String", null, this);
 
     public GlobalScope() {
         typeMap.put("int", intType);
         typeMap.put("bool", boolType);
         typeMap.put("void", voidType);
+        defineClass(stringType);
 
-        ClassType string = new ClassType("String", null, this);
-        defineClass(string);
-
-        string.defineSymbol(new FunctionSymbol(intType, "length", null, string));
-        string.defineSymbol(new FunctionSymbol(string, "substring", null, string){{
+        stringType.defineSymbol(new FunctionSymbol(intType, "length", null, stringType));
+        stringType.defineSymbol(new FunctionSymbol(stringType, "substring", null, stringType){{
             defineSymbol(new VarSymbol(intType, "left", null));
             defineSymbol(new VarSymbol(intType, "right", null));
         }});
-        string.defineSymbol(new FunctionSymbol(intType, "parseInt", null, string));
-        string.defineSymbol(new FunctionSymbol(intType, "ord", null, string){{
+        stringType.defineSymbol(new FunctionSymbol(intType, "parseInt", null, stringType));
+        stringType.defineSymbol(new FunctionSymbol(intType, "ord", null, stringType){{
             defineSymbol(new VarSymbol(intType, "pos", null));
         }});
 
         this.defineSymbol(new FunctionSymbol(voidType, "print", null, this){{
-            defineSymbol(new VarSymbol(string, "str", null));
+            defineSymbol(new VarSymbol(stringType, "str", null));
         }});
         this.defineSymbol(new FunctionSymbol(voidType, "println", null, this){{
-            defineSymbol(new VarSymbol(string, "str", null));
+            defineSymbol(new VarSymbol(stringType, "str", null));
         }});
         this.defineSymbol(new FunctionSymbol(voidType, "printInt", null, this){{
             defineSymbol(new VarSymbol(intType, "n", null));
@@ -43,9 +42,9 @@ public class GlobalScope extends BaseScope{
         this.defineSymbol(new FunctionSymbol(voidType, "printlnInt", null, this){{
             defineSymbol(new VarSymbol(intType, "n", null));
         }});
-        this.defineSymbol(new FunctionSymbol(string, "getString", null, this));
+        this.defineSymbol(new FunctionSymbol(stringType, "getString", null, this));
         this.defineSymbol(new FunctionSymbol(intType, "getInt", null, this));
-        this.defineSymbol(new FunctionSymbol(string, "toString", null, this){{
+        this.defineSymbol(new FunctionSymbol(stringType, "toString", null, this){{
             defineSymbol(new VarSymbol(intType, "i", null));
         }});
     }
@@ -93,4 +92,8 @@ public class GlobalScope extends BaseScope{
     public PrimitiveType getVoidType() {
         return voidType;
     }
+    public ClassType getStringType() {
+        return stringType;
+    }
+
 }

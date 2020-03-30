@@ -41,6 +41,16 @@ public class ClassType extends Type implements Scope {
             return symbol;
     }
 
+    @Override
+    public boolean isString() {
+        return getIdentifier().equals("string");
+    }
+
+    @Override
+    public boolean isNullable() {
+        return true;
+    }
+
 //    public Type getType(String identifier, Position position) {
 //        Type type = syolMap.get(identifier);
 //        if (symbol == null)

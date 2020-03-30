@@ -2,6 +2,7 @@ import AST.ASTNode;
 import Frontend.ASTBuilder;
 import Frontend.ClassScanner;
 import Frontend.FunctionScanner;
+import Frontend.SymbolTableBuilder;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -35,6 +36,7 @@ public class Main {
         GlobalScope globalScope = new GlobalScope();
         ast.accept(new ClassScanner(globalScope));
         ast.accept(new FunctionScanner(globalScope));
+        ast.accept(new SymbolTableBuilder(globalScope));
     }
 
     private static ASTNode buildAST(ParseTree tree) {
