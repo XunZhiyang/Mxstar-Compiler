@@ -68,16 +68,24 @@ public class FunctionScanner implements ASTVisitor {
 
     @Override
     public void visit(FuncDeclNode node){
-        if (node.getType().getIdentifier().equals("") && !node.getIsConstructor())
-            throw new SemanticError("Define function without return type.", node.getPosition());
-
-        Type type = globalScope.getType(node.getType());
-        FunctionSymbol functionSymbol = new FunctionSymbol(type, node.getIdentifier(), node, currentScope);
-        functionSymbol.setConstructor(node.getIsConstructor());
-        if (functionSymbol.ifConstructor()
-                ^ functionSymbol.getIdentifier().equals(((ClassType) currentScope).getIdentifier())) {
-            throw new SemanticError("Not a legal constructor.", functionSymbol.getPosition());
+        FunctionSymbol functionSymbol;
+        if (node.getIsConstructor()) {
+            functionSymbol = new FunctionSymbol(null, node.getIdentifier(), node, currentScope);
+            if (!functionSymbol.getIdentifier().equals(((ClassType) currentScope).getIdentifier())) {
+                throw new SemanticError("Not a legal constructor.", functionSymbol.getPosition());
+            }
+            currentScope.defineSymbol(functionSymbol);
         }
+        else {
+            Type type = globalScope.getType(node.getType());
+            functionSymbol = new FunctionSymbol(type, node.getIdentifier(), node, currentScope);
+            if (currentScope instanceof ClassType) {
+                if (functionSymbol.getIdentifier().equals(((ClassType) currentScope).getIdentifier())) {
+                    throw new SemanticError("Not a legal constructor.", functionSymbol.getPosition());
+                }
+            }
+        }
+       functionSymbol.setConstructor(node.getIsConstructor());
         currentScope.defineSymbol(functionSymbol);
         node.setSymbol(functionSymbol);
 

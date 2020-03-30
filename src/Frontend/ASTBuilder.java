@@ -109,6 +109,9 @@ public class ASTBuilder extends MxstarBaseVisitor<ASTNode> {
         ParserRuleContext paramList = ctx.declarator().parameterDeclarationList();
         if (paramList != null)
             params = ((ParamDeclList) visit(paramList)).getList();
+        else {
+            params = new ArrayList<>();
+        }
 
         CompoundStmtNode stmt = (CompoundStmtNode) visit(ctx.compoundStatement());
         return new FuncDeclNode(false, type, identifier, params, stmt, new Position(ctx.getStart()));

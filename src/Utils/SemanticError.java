@@ -10,6 +10,6 @@ public class SemanticError extends RuntimeException {
 
     @Override
     public String getMessage() {
-        return "[Semantic Error] " + super.getMessage() + position.toString();
+        return "[Semantic Error] " + super.getMessage() + " " + position.toString();
     }
 }

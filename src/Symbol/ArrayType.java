@@ -5,7 +5,7 @@ public class ArrayType extends Type{
     private int dim;
 
     public ArrayType(Type baseType, int dim) {
-        super(baseType.getName() + "+" + String.valueOf(dim));
+        super(baseType.getIdentifier() + "+" + String.valueOf(dim));
         this.baseType = baseType;
         this.dim = dim;
     }

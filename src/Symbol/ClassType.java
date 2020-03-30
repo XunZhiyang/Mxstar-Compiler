@@ -26,6 +26,7 @@ public class ClassType extends Type implements Scope {
             throw new SemanticError("Duplicate constructors.", symbol.getPosition());
         hasConstructor = symbol.ifConstructor();
         if (symbolMap.containsKey(symbol.getIdentifier())) {
+            System.out.println(symbol.getIdentifier());
             throw new RedefError(symbol.getIdentifier(), symbol.getPos());
         }
         symbolMap.put(symbol.getIdentifier(), symbol);

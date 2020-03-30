@@ -2,9 +2,18 @@ int Wallace = 1 << 10;
 
 class sometimes {
     int naive;
+    int ccc() {
+    }
     void make_money() {
         this.naive++;
     }
+}
+
+int ccc() {
+
+}
+
+int ccc(int a) {
 }
 
 int main() {

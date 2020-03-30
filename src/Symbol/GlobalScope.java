@@ -30,7 +30,6 @@ public class GlobalScope extends BaseScope{
         string.defineSymbol(new FunctionSymbol(intType, "ord", null, string){{
             defineSymbol(new VarSymbol(intType, "pos", null));
         }});
-        string.defineSymbol(new FunctionSymbol(intType, "length", null, string));
 
         this.defineSymbol(new FunctionSymbol(voidType, "print", null, this){{
             defineSymbol(new VarSymbol(string, "str", null));
