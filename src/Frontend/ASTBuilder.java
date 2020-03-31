@@ -235,7 +235,9 @@ public class ASTBuilder extends MxstarBaseVisitor<ASTNode> {
 
     @Override
     public ASTNode visitReturnStmt(MxstarParser.ReturnStmtContext ctx) {
-        Expr expression = (Expr) visit(ctx.expression());
+        Expr expression = null;
+        if (ctx.expression() != null)
+            expression = (Expr) visit(ctx.expression());
         return new ReturnNode(expression, new Position(ctx.getStart()));
     }
 

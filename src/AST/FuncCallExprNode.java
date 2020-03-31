@@ -6,12 +6,20 @@ import java.util.List;
 
 public class FuncCallExprNode extends Expr {
     private Expr function;
-    private List<Expr> parameters;
+    private List<Expr> arguments;
 
-    public FuncCallExprNode(Expr function, List<Expr> parameters, Position position) {
+    public FuncCallExprNode(Expr function, List<Expr> arguments, Position position) {
         super(position);
         this.function = function;
-        this.parameters = parameters;
+        this.arguments = arguments;
+    }
+
+    public Expr getFunction() {
+        return function;
+    }
+
+    public List<Expr> getArguments() {
+        return arguments;
     }
 
     @Override

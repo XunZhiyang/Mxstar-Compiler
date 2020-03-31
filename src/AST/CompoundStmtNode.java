@@ -12,6 +12,10 @@ public class CompoundStmtNode extends Stmt {
         this.stmtList = stmtList;
     }
 
+    public List<Stmt> getStmtList() {
+        return stmtList;
+    }
+
     @Override
     public void accept(ASTVisitor visitor) {
         visitor.visit(this);

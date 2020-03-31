@@ -14,4 +14,9 @@ public class ArrayType extends Type{
     public boolean isNullable() {
         return true;
     }
+
+    @Override
+    public boolean isArray() {
+        return true;
+    }
 }

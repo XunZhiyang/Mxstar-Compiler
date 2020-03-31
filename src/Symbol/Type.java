@@ -24,6 +24,10 @@ public abstract class Type {
         return identifier.equals(type.getIdentifier());
     }
 
+    public boolean assignable(Type rhs) {
+        return this.equals(rhs) || (this.isNullable() && rhs.isNull());
+    }
+
     public boolean isInt() {
         return false;
     }
@@ -41,6 +45,14 @@ public abstract class Type {
     }
 
     public boolean isNullable() {
+        return false;
+    }
+
+    public boolean isClass() {
+        return false;
+    }
+
+    public boolean isArray() {
         return false;
     }
 }

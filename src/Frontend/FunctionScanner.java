@@ -85,7 +85,7 @@ public class FunctionScanner implements ASTVisitor {
                 }
             }
         }
-       functionSymbol.setConstructor(node.getIsConstructor());
+        functionSymbol.setConstructor(node.getIsConstructor());
         currentScope.defineSymbol(functionSymbol);
         node.setSymbol(functionSymbol);
 

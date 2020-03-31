@@ -9,11 +9,8 @@ class sometimes {
     }
 }
 
-int ccc() {
-
-}
-
-int ccc(int a) {
+void ccc(int a) {
+    return;
 }
 
 int main() {

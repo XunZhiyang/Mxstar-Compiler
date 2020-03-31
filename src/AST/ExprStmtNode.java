@@ -10,6 +10,10 @@ public class ExprStmtNode extends Stmt {
         this.expression = expression;
     }
 
+    public Expr getExpression() {
+        return expression;
+    }
+
     @Override
     public void accept(ASTVisitor visitor) {
         visitor.visit(this);

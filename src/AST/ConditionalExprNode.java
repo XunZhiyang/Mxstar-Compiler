@@ -12,6 +12,18 @@ public class ConditionalExprNode extends Expr {
         this.opt2 = opt2;
     }
 
+    public Expr getCondition() {
+        return condition;
+    }
+
+    public Expr getOpt1() {
+        return opt1;
+    }
+
+    public Expr getOpt2() {
+        return opt2;
+    }
+
     @Override
     public void accept(ASTVisitor visitor) {
         visitor.visit(this);

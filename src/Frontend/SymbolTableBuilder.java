@@ -5,9 +5,14 @@ import Symbol.*;
 import Utils.SemanticError;
 import Utils.TypeError;
 
+import java.util.List;
+
 public class SymbolTableBuilder implements ASTVisitor {
     private GlobalScope globalScope;
     private Scope currentScope;
+    private FunctionSymbol currentFunction;
+    private boolean inLoop = false;
+    private boolean inFunction = false;
 
     public SymbolTableBuilder(GlobalScope globalScope) {
         this.globalScope = globalScope;
@@ -15,9 +20,11 @@ public class SymbolTableBuilder implements ASTVisitor {
     }
 
     @Override
-    public void visit(BinaryExprNode node){
+    public void visit(BinaryExprNode node) {
         Expr src1 = node.getSrc1();
         Expr src2 = node.getSrc2();
+        Type lhs = src1.getType();
+        Type rhs = src2.getType();
         src1.accept(this);
         src2.accept(this);
         switch (node.getOp()) {
@@ -29,16 +36,16 @@ public class SymbolTableBuilder implements ASTVisitor {
             case SAR:
             case AND:
             case OR: {
-                if (src1.getType().isInt() && src2.getType().isInt()) {
+                if (lhs.isInt() && rhs.isInt()) {
                     node.setType(globalScope.getIntType());
                 }
                 else throw new TypeError(node.getPosition());
                 break;
             }
             case ADD: {
-                if (src1.getType().isInt() && src2.getType().isInt()) {
+                if (lhs.isInt() && rhs.isInt()) {
                     node.setType(globalScope.getIntType());
-                } else if (src1.getType().isInt() && src2.getType().isInt()) {
+                } else if (lhs.isInt() && rhs.isInt()) {
                     node.setType(globalScope.getStringType());
                 } else {
                     throw new TypeError(node.getPosition());
@@ -49,9 +56,9 @@ public class SymbolTableBuilder implements ASTVisitor {
             case GT:
             case LE:
             case GE: {
-                if (src1.getType().isInt() && src2.getType().isInt()) {
+                if (lhs.isInt() && rhs.isInt()) {
                     node.setType(globalScope.getBoolType());
-                } else if (src1.getType().isInt() && src2.getType().isInt()) {
+                } else if (lhs.isInt() && rhs.isInt()) {
                     node.setType(globalScope.getBoolType());
                 } else {
                     throw new TypeError(node.getPosition());
@@ -60,152 +67,259 @@ public class SymbolTableBuilder implements ASTVisitor {
             }
             case EQ:
             case NE:
-                src1.getType().compatible(src2.getType(), node.getPosition());
-                node.setType(globalScope.getBoolType());
+//                lhs.compatible(rhs, node.getPosition());
+                if (lhs.equals(rhs) || (lhs.isNullable() && rhs.isNull()) || (lhs.isNull() && rhs.isNullable()))
+                    node.setType(globalScope.getBoolType());
+                else {
+                    throw new TypeError(node.getPosition());
+                }
                 break;
             case XOR:
-                if (src1.getType().isBoolean() && src2.getType().isBoolean()) {
+                if (lhs.isBoolean() && rhs.isBoolean()) {
                     node.setType(globalScope.getBoolType());
-                } else if (src1.getType().isInt() && src2.getType().isInt()) {
+                } else if (lhs.isInt() && rhs.isInt()) {
                     node.setType(globalScope.getIntType());
-                } else{
+                } else {
                     throw new TypeError(node.getPosition());
                 }
                 break;
             case ANL:
             case ORL:
-                if (src1.getType().isBoolean() && src2.getType().isBoolean()) {
+                if (lhs.isBoolean() && rhs.isBoolean()) {
                     node.setType(globalScope.getBoolType());
-                } else{
+                } else {
                     throw new TypeError(node.getPosition());
                 }
                 break;
             case ASSIGN:
+                if (src1.getLvalue() && (lhs.assignable(rhs))) {
+                    node.setType(globalScope.getVoidType());
+                } else {
+                    throw new TypeError(node.getPosition());
+                }
         }
     }
 
     @Override
-    public void visit(BoolExprNode node){}
+    public void visit(BoolExprNode node) {
+        node.setType(globalScope.getBoolType());
+    }
 
     @Override
-    public void visit(BreakNode node){}
+    public void visit(BreakNode node) {
+        if (!inLoop) {
+            throw new SemanticError("break statement not within a loop", node.getPosition());
+        }
+    }
 
     @Override
-    public void visit(ClassDeclNode node){
+    public void visit(ClassDeclNode node) {
+        Scope thisScope = currentScope;
         currentScope = node.getClassType();
+        node.getFields().forEach(x -> x.accept(this));
         for (FuncDeclNode i : node.getMethods()) {
             i.accept(this);
-            currentScope = node.getClassType();
         }
-        node.getFields().forEach(x -> x.accept(this));
+        currentScope = thisScope;
     }
 
     @Override
-    public void visit(CompoundStmtNode node){}
+    public void visit(CompoundStmtNode node) {
+        Scope thisScope = currentScope;
+        currentScope = new LocalScope(currentScope);
+        for (Stmt i : node.getStmtList()) {
+            i.accept(this);
+//            currentScope = thisScope;
+        }
+        currentScope = thisScope;
+    }
 
     @Override
-    public void visit(ConditionalExprNode node){}
+    public void visit(ConditionalExprNode node) {
+        node.getCondition().accept(this);
+        Expr opt1 = node.getOpt1();
+        Expr opt2 = node.getOpt2();
 
-    @Override
-    public void visit(ContinueNode node){}
+        if (!node.getCondition().getType().isBoolean()) {
+            throw new TypeError(node.getPosition());
+        }
+        opt1.accept(this);
+        opt2.accept(this);
 
-    @Override
-    public void visit(EmptyStmtNode node){}
-
-    @Override
-    public void visit(ExprStmtNode node){}
-
-    @Override
-    public void visit(FieldExprNode node){}
-
-    @Override
-    public void visit(ForStmtNode node){}
-
-    @Override
-    public void visit(FuncCallExprNode node){}
-
-    @Override
-    public void visit(FuncDeclNode node){
-        FunctionSymbol functionSymbol;
-        if (node.getIsConstructor()) {
-            functionSymbol = new FunctionSymbol(null, node.getIdentifier(), node, currentScope);
-            if (!functionSymbol.getIdentifier().equals(((ClassType) currentScope).getIdentifier())) {
-                throw new SemanticError("Not a legal constructor.", functionSymbol.getPosition());
-            }
-            currentScope.defineSymbol(functionSymbol);
+        if (opt1.getType().equals(opt2.getType())) {
+            node.setType(opt1.getType());
         }
         else {
-            Type type = globalScope.getType(node.getType());
-            functionSymbol = new FunctionSymbol(type, node.getIdentifier(), node, currentScope);
-            if (currentScope instanceof ClassType) {
-                if (functionSymbol.getIdentifier().equals(((ClassType) currentScope).getIdentifier())) {
-                    throw new SemanticError("Not a legal constructor.", functionSymbol.getPosition());
+            throw new TypeError(node.getPosition());
+        }
+    }
+
+    @Override
+    public void visit(ContinueNode node) {
+        if (!inLoop) {
+            throw new SemanticError("continue statement not within a loop", node.getPosition());
+        }
+    }
+
+    @Override
+    public void visit(EmptyStmtNode node) {}
+
+    @Override
+    public void visit(ExprStmtNode node) {
+        node.getExpression().accept(this);
+    }
+
+    @Override
+    public void visit(FieldExprNode node) {
+        Expr object = node.getObject();
+        object.accept(this);
+        if (object.getType().isClass()) {
+            Symbol symbol = ((ClassType) object.getType()).getSymbol(node.getField(), node.getPosition());
+            node.setType(symbol.getType());
+            node.setLvalue(true);
+        } else{
+            throw new TypeError(node.getPosition());
+        }
+    }
+
+    @Override
+    public void visit(ForStmtNode node) {
+        Expr init = node.getInit();
+        Expr condition = node.getCondition();
+        Expr step = node.getStep();
+        Stmt statement = node.getStatement();
+
+        if (init != null)
+            init.accept(this);
+        if (condition != null)
+            condition.accept(this);
+            if (!condition.getType().isBoolean())
+                throw new TypeError(node.getPosition());
+        if (step != null)
+            step.accept(this);
+        boolean nowInLoop = inLoop;
+        inLoop = true;
+        statement.accept(this);
+        inLoop = nowInLoop;
+    }
+
+    @Override
+    public void visit(FuncCallExprNode node) {
+        Expr function = node.getFunction();
+        List<Expr> args = node.getArguments();
+        if (function.getCallable()) {
+            List<Type> param = function.getFunctionSymbol().getParam();
+            if (args.size() != param.size())
+                throw new SemanticError("Wrong argument number.", node.getPosition());
+            for (int i = 0; i < args.size(); ++i) {
+                args.get(i).accept(this);
+                if (args.get(i).getType() != param.get(i)) {
+                    throw new SemanticError("Wrong argument type.", node.getPosition());
                 }
             }
+            node.setType(function.getType());
+        } else{
+            throw new TypeError(node.getPosition());
         }
-        functionSymbol.setConstructor(node.getIsConstructor());
-        currentScope.defineSymbol(functionSymbol);
-        node.setSymbol(functionSymbol);
+    }
 
-        currentScope = functionSymbol;
-        for (ParamDeclNode i : node.getParams()) {
+    @Override
+    public void visit(FuncDeclNode node) {
+        inFunction = true;
+        Scope nowScope = currentScope;
+        currentScope = currentFunction = node.getSymbol();
+        node.getStmt().accept(this);
+        currentFunction = null;
+        currentScope = nowScope;
+        inFunction = false;
+    }
+
+    @Override
+    public void visit(IdentifierListNode node) {}
+
+    @Override
+    public void visit(IntLiteralNode node) {
+        node.setType(globalScope.getIntType());
+    }
+
+    @Override
+    public void visit(NewExprNode node) {
+        List<Expr> shape = node.getShape();
+        for (Expr i : shape) {
             i.accept(this);
-            currentScope = functionSymbol;
+            if (!i.getType().isInt())
+                throw new TypeError(node.getPosition());
         }
+        node.setType(globalScope.getType(node.getNewType()));
     }
 
     @Override
-    public void visit(IdentifierListNode node){}
-
-    @Override
-    public void visit(IntLiteralNode node){}
-
-    @Override
-    public void visit(NewExprNode node){}
-
-    @Override
-    public void visit(NullNode node){}
-
-    @Override
-    public void visit(ParamDeclList node){}
-
-    @Override
-    public void visit(ParamDeclNode node){
-        VarSymbol varSymbol = new VarSymbol(globalScope.getType(node.getType()), node.getIdentifier(), node);
-        currentScope.defineSymbol(varSymbol);
+    public void visit(NullNode node) {
+        node.setType(globalScope.getNullType());
     }
 
     @Override
-    public void visit(ParamList node){}
+    public void visit(ParamDeclList node) {}
 
     @Override
-    public void visit(ProgramNode node){
+    public void visit(ParamDeclNode node) {}
+
+    @Override
+    public void visit(ParamList node) {}
+
+    @Override
+    public void visit(ProgramNode node) {
         for (ProgramFragment i : node.getList()) {
             i.accept(this);
-            currentScope = globalScope;
         }
     }
 
     @Override
-    public void visit(ReturnNode node){}
+    public void visit(ReturnNode node) {
+        if (!inFunction) {
+            throw new SemanticError("return statement not within a function", node.getPosition());
+        }
+        if (node.getExpression() != null) {
+            node.getExpression().accept(this);
+            if (!node.getExpression().getType().assignable(currentFunction.getType())) {
+                throw new TypeError(node.getPosition());
+            }
+        }
+    }
 
     @Override
-    public void visit(SelectionStmtNode node){}
+    public void visit(SelectionStmtNode node) {
+        node.getCond().accept(this);
+        if (!node.getCond().getType().isBoolean()) {
+            throw new TypeError(node.getPosition());
+        }
+        for (Stmt i : node.getBranch()) {
+            i.accept(this);
+        }
+    }
 
     @Override
-    public void visit(StringLiteralNode node){}
+    public void visit(StringLiteralNode node) {
+        node.setType(globalScope.getStringType());
+    }
 
     @Override
-    public void visit(SubscriptExprNode node){}
+    public void visit(SubscriptExprNode node) {
+        node.getArray().accept(this);
+        node.getSubscript().accept(this);
+        if (node.getArray().getType().isArray()){
+
+        }
+    }
 
     @Override
-    public void visit(ThisNode node){}
+    public void visit(ThisNode node) {}
 
     @Override
-    public void visit(TypeNode node){}
+    public void visit(TypeNode node) {}
 
     @Override
-    public void visit(UnaryExprNode node){}
+    public void visit(UnaryExprNode node) {}
 
     @Override
     public void visit(VarDeclNode node) {
@@ -223,11 +337,11 @@ public class SymbolTableBuilder implements ASTVisitor {
     }
 
     @Override
-    public void visit(VarDeclStmtNode node){}
+    public void visit(VarDeclStmtNode node) {}
 
     @Override
-    public void visit(VarExprNode node){}
+    public void visit(VarExprNode node) {}
 
     @Override
-    public void visit(WhileStmtNode node){}
+    public void visit(WhileStmtNode node) {}
 }

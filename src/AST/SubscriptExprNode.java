@@ -12,6 +12,14 @@ public class SubscriptExprNode extends Expr {
         this.subscript = subscript;
     }
 
+    public Expr getArray() {
+        return array;
+    }
+
+    public Expr getSubscript() {
+        return subscript;
+    }
+
     @Override
     public void accept(ASTVisitor visitor) {
         visitor.visit(this);

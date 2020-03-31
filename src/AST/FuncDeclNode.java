@@ -40,8 +40,16 @@ public class FuncDeclNode extends ProgramFragment {
         return isConstructor;
     }
 
+    public FunctionSymbol getSymbol() {
+        return symbol;
+    }
+
     public List<ParamDeclNode> getParams() {
         return params;
+    }
+
+    public CompoundStmtNode getStmt() {
+        return stmt;
     }
 
     @Override

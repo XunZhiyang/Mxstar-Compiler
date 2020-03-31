@@ -12,6 +12,7 @@ public class GlobalScope extends BaseScope{
     private PrimitiveType intType = new PrimitiveType("int");
     private PrimitiveType boolType = new PrimitiveType("bool");
     private PrimitiveType voidType = new PrimitiveType("void");
+    private NullType nullType = new NullType();
     private ClassType stringType = new ClassType("String", null, this);
 
     public GlobalScope() {
@@ -94,6 +95,9 @@ public class GlobalScope extends BaseScope{
     }
     public ClassType getStringType() {
         return stringType;
+    }
+    public NullType getNullType() {
+        return nullType;
     }
 
 }

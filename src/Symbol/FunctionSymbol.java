@@ -4,11 +4,14 @@ import AST.FuncDeclNode;
 import Utils.Position;
 import Utils.RedefError;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FunctionSymbol extends Symbol implements Scope {
     Map<String, Symbol> symbolMap = new LinkedHashMap<>();
+    List<Type> param = new ArrayList<>();
     private Scope fatherScope;
     private boolean isConstructor;
 
@@ -31,6 +34,7 @@ public class FunctionSymbol extends Symbol implements Scope {
             throw new RedefError(symbol.getIdentifier(), symbol.getPos());
         }
         symbolMap.put(symbol.getIdentifier(), symbol);
+        param.add(symbol.getType());
     }
 
     @Override
@@ -40,6 +44,10 @@ public class FunctionSymbol extends Symbol implements Scope {
             return fatherScope.getSymbol(identifier, position);
         else
             return symbol;
+    }
+
+    public List<Type> getParam() {
+        return param;
     }
 
     @Override

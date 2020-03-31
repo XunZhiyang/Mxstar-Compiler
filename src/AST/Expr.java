@@ -1,16 +1,16 @@
 package AST;
 
+import Symbol.FunctionSymbol;
 import Symbol.Type;
 import Utils.Position;
 
 public abstract class Expr extends ASTNode {
     Type type;
     private boolean isLvalue;
-    private boolean isCallable;
+    private FunctionSymbol functionSymbol;
 
     public Expr(Position position) {
         super(position);
-        isCallable = false;
         isLvalue = false;
     }
 
@@ -18,8 +18,12 @@ public abstract class Expr extends ASTNode {
         this.isLvalue = isLvalue;
     }
 
-    public void setCallable(boolean isCallable) {
-        this.isCallable = isCallable;
+    public void setFunctionSymbol(FunctionSymbol functionSymbol) {
+        this.functionSymbol = functionSymbol;
+    }
+
+    public FunctionSymbol getFunctionSymbol() {
+        return functionSymbol;
     }
 
     public void setType(Type type) {
@@ -31,7 +35,7 @@ public abstract class Expr extends ASTNode {
     }
 
     public boolean getCallable() {
-        return isCallable;
+        return functionSymbol == null;
     }
 
     public Type getType() {
