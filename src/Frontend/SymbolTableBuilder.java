@@ -11,6 +11,7 @@ public class SymbolTableBuilder implements ASTVisitor {
     private GlobalScope globalScope;
     private Scope currentScope;
     private FunctionSymbol currentFunction;
+    private ClassType currentClass;
     private boolean inLoop = false;
     private boolean inFunction = false;
 
@@ -115,11 +116,12 @@ public class SymbolTableBuilder implements ASTVisitor {
     @Override
     public void visit(ClassDeclNode node) {
         Scope thisScope = currentScope;
-        currentScope = node.getClassType();
+        currentScope = currentClass = node.getClassType();
         node.getFields().forEach(x -> x.accept(this));
         for (FuncDeclNode i : node.getMethods()) {
             i.accept(this);
         }
+        currentClass = null;
         currentScope = thisScope;
     }
 
@@ -307,19 +309,54 @@ public class SymbolTableBuilder implements ASTVisitor {
     public void visit(SubscriptExprNode node) {
         node.getArray().accept(this);
         node.getSubscript().accept(this);
-        if (node.getArray().getType().isArray()){
-
+        if (!node.getArray().getType().isArray() || !node.getSubscript().getType().isInt()) {
+            throw new TypeError(node.getPosition());
         }
     }
 
     @Override
-    public void visit(ThisNode node) {}
+    public void visit(ThisNode node) {
+        node.setType(currentClass);
+    }
 
     @Override
     public void visit(TypeNode node) {}
 
     @Override
-    public void visit(UnaryExprNode node) {}
+    public void visit(UnaryExprNode node) {
+        Expr src = node.getSrc();
+        src.accept(this);
+        switch (node.getOp()) {
+            case PRE_INC:
+            case PRE_DEC:
+                if (!src.getType().isInt() || !src.getLvalue()) {
+                    throw new TypeError(node.getPosition());
+                }
+                node.setLvalue(true);
+                node.setType(globalScope.getIntType());
+                break;
+            case POST_INC:
+            case POST_DEC:
+                if (!src.getType().isInt() || !src.getLvalue()) {
+                    throw new TypeError(node.getPosition());
+                }
+                node.setType(globalScope.getIntType());
+                break;
+            case POS:
+            case NEG:
+            case NOT:
+                if (!src.getType().isInt()) {
+                    throw new TypeError(node.getPosition());
+                }
+                node.setType(globalScope.getIntType());
+                break;
+            case NOTL:
+                if (!src.getType().isBoolean()) {
+                    throw new TypeError(node.getPosition());
+                }
+                node.setType(globalScope.getBoolType());
+        }
+    }
 
     @Override
     public void visit(VarDeclNode node) {
