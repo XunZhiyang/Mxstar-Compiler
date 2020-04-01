@@ -18,7 +18,7 @@ import Symbol.GlobalScope;
 
 public class Main {
     private static CharStream readCode() throws Exception{
-        String inputFile = "test\\test0.m";
+        String inputFile = "test\\test2.m";
         InputStream is = new FileInputStream(inputFile);
         return CharStreams.fromStream(is);
     }

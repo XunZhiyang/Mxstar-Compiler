@@ -6,9 +6,6 @@ int f(int n) {
         res = res % 10000;
     }
     return res;
-    int c(){
-        return 0;
-    }
 }
 
 int main()

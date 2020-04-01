@@ -207,7 +207,11 @@ public class ASTBuilder extends MxstarBaseVisitor<ASTNode> {
         Expr cond = (Expr) visit(ctx.expression());
         Stmt[] branch = new Stmt[2];
         branch[0] = (Stmt) visit(ctx.opt1);
-        branch[1] = (Stmt) visit(ctx.opt2);
+        if (ctx.opt2 != null) {
+            branch[1] = (Stmt) visit(ctx.opt2);
+        } else {
+            branch[1] = new EmptyStmtNode(new Position(ctx.getStart()));
+        }
         return new SelectionStmtNode(cond, branch, new Position(ctx.getStart()));
     }
 
