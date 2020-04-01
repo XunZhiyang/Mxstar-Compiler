@@ -74,7 +74,6 @@ public class FunctionScanner implements ASTVisitor {
             if (!functionSymbol.getIdentifier().equals(((ClassType) currentScope).getIdentifier())) {
                 throw new SemanticError("Not a legal constructor.", functionSymbol.getPosition());
             }
-            currentScope.defineSymbol(functionSymbol);
         }
         else {
             Type type = globalScope.getType(node.getType());

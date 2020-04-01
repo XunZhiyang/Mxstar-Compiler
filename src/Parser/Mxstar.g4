@@ -15,7 +15,7 @@ programFragment
     ;
 
 classDeclaration
-    :   'class' Identifier '{' (fieldDeclaration | functionDeclaration | constructorDeclaration)* '}'
+    :   'class' Identifier '{' (fieldDeclaration | functionDeclaration | constructorDeclaration)* '}' ';'
     ;
 
 fieldDeclaration
@@ -80,8 +80,8 @@ selectionStatement
     ;
 
 iterationStatement
-    :   While '(' expression ')' statement      #WhileStmt
-    |   For '(' forCondition ')' statement      #ForStmt
+    :   While '(' expression ')' compoundStatement      #WhileStmt
+    |   For '(' forCondition ')' compoundStatement      #ForStmt
     ;
 
 forCondition
@@ -146,9 +146,9 @@ parameterList
 //    ;
 
 newSpecifier
-    :   primaryType
-    |   primaryType '(' ')'
+    :   primaryType '(' ')'
     |   primaryType ('[' expression ']')+ ('[' ']')*
+    |   primaryType
     ;
 
 type

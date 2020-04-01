@@ -68,7 +68,6 @@ public class SymbolTableBuilder implements ASTVisitor {
             }
             case EQ:
             case NE:
-//                lhs.compatible(rhs, node.getPosition());
                 if (lhs.equals(rhs) || (lhs.isNullable() && rhs.isNull()) || (lhs.isNull() && rhs.isNullable()))
                     node.setType(globalScope.getBoolType());
                 else {
@@ -131,7 +130,6 @@ public class SymbolTableBuilder implements ASTVisitor {
         currentScope = new LocalScope(currentScope);
         for (Stmt i : node.getStmtList()) {
             i.accept(this);
-//            currentScope = thisScope;
         }
         currentScope = thisScope;
     }
@@ -219,7 +217,7 @@ public class SymbolTableBuilder implements ASTVisitor {
                 throw new SemanticError("Wrong argument number.", node.getPosition());
             for (int i = 0; i < args.size(); ++i) {
                 args.get(i).accept(this);
-                if (args.get(i).getType() != param.get(i)) {
+                if (!args.get(i).getType().equals(param.get(i))) {
                     throw new SemanticError("Wrong argument type.", node.getPosition());
                 }
             }

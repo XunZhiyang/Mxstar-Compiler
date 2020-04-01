@@ -3,6 +3,7 @@ import Frontend.ASTBuilder;
 import Frontend.ClassScanner;
 import Frontend.FunctionScanner;
 import Frontend.SymbolTableBuilder;
+import Parser.MxstarErrorListener;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -18,7 +19,8 @@ import Symbol.GlobalScope;
 
 public class Main {
     private static CharStream readCode() throws Exception{
-        String inputFile = "test\\test2.m";
+//        String inputFile = "code.mx";
+        String inputFile = "test\\test3.m";
         InputStream is = new FileInputStream(inputFile);
         return CharStreams.fromStream(is);
     }
@@ -27,6 +29,7 @@ public class Main {
         MxstarLexer lexer = new MxstarLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         MxstarParser parser = new MxstarParser(tokens);
+        parser.addErrorListener(new MxstarErrorListener());
 //        ParseTree tree = parser.program();
 //        System.out.println(tree.toStringTree(parser));
         return parser.program();
@@ -53,6 +56,7 @@ public class Main {
 
         } catch (Exception e) {
             e.printStackTrace();
+            java.lang.System.exit(1);
 //            System.err.println(e.getMessage());
         }
     }

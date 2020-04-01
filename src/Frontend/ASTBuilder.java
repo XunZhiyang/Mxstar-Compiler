@@ -22,7 +22,6 @@ public class ASTBuilder extends MxstarBaseVisitor<ASTNode> {
         for (ParserRuleContext fragment : ctx.programFragment()) {
             fragmentList.add((ProgramFragment) visit(fragment));
         }
-
         return new ProgramNode(fragmentList, new Position(ctx.getStart()));
     }
 
@@ -74,7 +73,7 @@ public class ASTBuilder extends MxstarBaseVisitor<ASTNode> {
     public ASTNode visitConstructorDeclaration(MxstarParser.ConstructorDeclarationContext ctx) {
         String identifier = ctx.Identifier().getText();
         CompoundStmtNode stmt = (CompoundStmtNode) visit(ctx.compoundStatement());
-        return new FuncDeclNode(true, null, identifier,null, stmt, new Position(ctx.getStart()));
+        return new FuncDeclNode(true, null, identifier, new ArrayList<>(), stmt, new Position(ctx.getStart()));
     }
 
     @Override
@@ -218,7 +217,7 @@ public class ASTBuilder extends MxstarBaseVisitor<ASTNode> {
     @Override
     public ASTNode visitWhileStmt(MxstarParser.WhileStmtContext ctx) {
         Expr condition = (Expr) visit(ctx.expression());
-        Stmt statement = (Stmt) visit(ctx.statement());
+        Stmt statement = (Stmt) visit(ctx.compoundStatement());
         return new WhileStmtNode(condition, statement, new Position(ctx.getStart()));
     }
 
@@ -227,7 +226,7 @@ public class ASTBuilder extends MxstarBaseVisitor<ASTNode> {
         Expr init = (Expr) visit(ctx.forCondition().init);
         Expr cond = (Expr) visit(ctx.forCondition().cond);
         Expr step = (Expr) visit(ctx.forCondition().step);
-        Stmt statement = (Stmt) visit(ctx.statement());
+        Stmt statement = (Stmt) visit(ctx.compoundStatement());
 
         return new ForStmtNode(init, cond, step, statement, new Position(ctx.getStart()));
     }
