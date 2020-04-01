@@ -10,6 +10,10 @@ public class VarExprNode extends PrimaryExpr {
         this.identifier = identifier;
     }
 
+    public String getIdentifier() {
+        return identifier;
+    }
+
     @Override
     public void accept(ASTVisitor visitor) {
         visitor.visit(this);

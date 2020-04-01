@@ -35,7 +35,7 @@ public abstract class Expr extends ASTNode {
     }
 
     public boolean getCallable() {
-        return functionSymbol == null;
+        return functionSymbol != null;
     }
 
     public Type getType() {

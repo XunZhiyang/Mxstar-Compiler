@@ -10,6 +10,10 @@ public class VarDeclStmtNode extends Stmt {
         this.variable = variable;
     }
 
+    public VarDeclNode getVariable() {
+        return variable;
+    }
+
     @Override
     public void accept(ASTVisitor visitor) {
         visitor.visit(this);

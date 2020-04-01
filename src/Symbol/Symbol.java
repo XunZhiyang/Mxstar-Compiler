@@ -35,6 +35,10 @@ public abstract class Symbol {
         this.scope = scope;
     }
 
+    public boolean isFunction() {
+        return false;
+    }
+
     public boolean ifConstructor() {
         return false;
     }

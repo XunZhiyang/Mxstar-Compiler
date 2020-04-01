@@ -24,10 +24,10 @@ public class SymbolTableBuilder implements ASTVisitor {
     public void visit(BinaryExprNode node) {
         Expr src1 = node.getSrc1();
         Expr src2 = node.getSrc2();
-        Type lhs = src1.getType();
-        Type rhs = src2.getType();
         src1.accept(this);
         src2.accept(this);
+        Type lhs = src1.getType();
+        Type rhs = src2.getType();
         switch (node.getOp()) {
             case MUL:
             case DIV:
@@ -178,6 +178,9 @@ public class SymbolTableBuilder implements ASTVisitor {
         if (object.getType().isClass()) {
             Symbol symbol = ((ClassType) object.getType()).getSymbol(node.getField(), node.getPosition());
             node.setType(symbol.getType());
+            if (symbol.isFunction()) {
+                node.setFunctionSymbol((FunctionSymbol) symbol);
+            }
             node.setLvalue(true);
         } else{
             throw new TypeError(node.getPosition());
@@ -209,6 +212,7 @@ public class SymbolTableBuilder implements ASTVisitor {
     public void visit(FuncCallExprNode node) {
         Expr function = node.getFunction();
         List<Expr> args = node.getArguments();
+        function.accept(this);
         if (function.getCallable()) {
             List<Type> param = function.getFunctionSymbol().getParam();
             if (args.size() != param.size())
@@ -374,11 +378,30 @@ public class SymbolTableBuilder implements ASTVisitor {
     }
 
     @Override
-    public void visit(VarDeclStmtNode node) {}
+    public void visit(VarDeclStmtNode node) {
+        node.getVariable().accept(this);
+    }
 
     @Override
-    public void visit(VarExprNode node) {}
+    public void visit(VarExprNode node) {
+        Symbol symbol = currentScope.getSymbol(node.getIdentifier(), node.getPosition());
+        node.setType(symbol.getType());
+        node.setLvalue(true);
+        if (symbol.isFunction())
+            node.setFunctionSymbol((FunctionSymbol) symbol);
+    }
 
     @Override
-    public void visit(WhileStmtNode node) {}
+    public void visit(WhileStmtNode node) {
+        Expr condition = node.getCondition();
+        Stmt statement = node.getStatement();
+
+        condition.accept(this);
+        if (!condition.getType().isBoolean())
+            throw new TypeError(node.getPosition());
+        boolean nowInLoop = inLoop;
+        inLoop = true;
+        statement.accept(this);
+        inLoop = nowInLoop;
+    }
 }

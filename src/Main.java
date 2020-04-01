@@ -27,9 +27,9 @@ public class Main {
         MxstarLexer lexer = new MxstarLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         MxstarParser parser = new MxstarParser(tokens);
-        ParseTree tree = parser.program();
+//        ParseTree tree = parser.program();
 //        System.out.println(tree.toStringTree(parser));
-        return tree;
+        return parser.program();
     }
 
     private static void semanticAnalysis(ASTNode ast) {
