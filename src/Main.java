@@ -27,6 +27,7 @@ public class Main {
 
     private static ParseTree buildCST(CharStream input) {
         MxstarLexer lexer = new MxstarLexer(input);
+        lexer.addErrorListener(new MxstarErrorListener());
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         MxstarParser parser = new MxstarParser(tokens);
         parser.addErrorListener(new MxstarErrorListener());
