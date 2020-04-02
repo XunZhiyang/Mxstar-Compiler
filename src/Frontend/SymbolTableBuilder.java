@@ -61,7 +61,7 @@ public class SymbolTableBuilder implements ASTVisitor {
             case GE: {
                 if (lhs.isInt() && rhs.isInt()) {
                     node.setType(globalScope.getBoolType());
-                } else if (lhs.isInt() && rhs.isInt()) {
+                } else if (lhs.isString() && rhs.isString()) {
                     node.setType(globalScope.getBoolType());
                 } else {
                     throw new TypeError(node.getPosition());
@@ -302,7 +302,7 @@ public class SymbolTableBuilder implements ASTVisitor {
         }
         if (node.getExpression() != null) {
             node.getExpression().accept(this);
-            if (!node.getExpression().getType().assignable(currentFunction.getType())) {
+            if (!currentFunction.getType().assignable(node.getExpression().getType())) {
                 throw new TypeError(node.getPosition());
             }
         }
@@ -392,9 +392,11 @@ public class SymbolTableBuilder implements ASTVisitor {
                 throw new TypeError(node.getPosition());
             }
         }
-        for (String i : node.getVariables()) {
-            VarSymbol varSymbol = new VarSymbol(type, i, node);
-            currentScope.defineSymbol(varSymbol);
+        if (!(currentScope instanceof ClassType)) {
+            for (String i : node.getVariables()) {
+                VarSymbol varSymbol = new VarSymbol(type, i, node);
+                currentScope.defineSymbol(varSymbol);
+            }
         }
     }
 

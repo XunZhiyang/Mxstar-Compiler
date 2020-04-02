@@ -3,6 +3,7 @@ package Frontend;
 import AST.*;
 import Symbol.*;
 import Utils.SemanticError;
+import Utils.TypeError;
 
 public class FunctionScanner implements ASTVisitor {
     private GlobalScope globalScope;
@@ -39,7 +40,7 @@ public class FunctionScanner implements ASTVisitor {
             i.accept(this);
             currentScope = node.getClassType();
         }
-//        node.getFields().forEach(x -> x.accept(this));
+        node.getFields().forEach(x -> x.accept(this));
     }
 
     @Override
@@ -122,8 +123,10 @@ public class FunctionScanner implements ASTVisitor {
     @Override
     public void visit(ProgramNode node){
         for (ProgramFragment i : node.getList()) {
-            i.accept(this);
-            currentScope = globalScope;
+            if (!(i instanceof VarDeclNode)) {
+                i.accept(this);
+                currentScope = globalScope;
+            }
         }
         checkMain();
     }
@@ -151,13 +154,11 @@ public class FunctionScanner implements ASTVisitor {
 
     @Override
     public void visit(VarDeclNode node){
-//        if (currentScope instanceof ClassType) {
-//            Type type = globalScope.getType(node.getType());
-//            for (String i : node.getVariables()) {
-//                VarSymbol varSymbol = new VarSymbol(type, i, node);
-//                currentScope.defineSymbol(varSymbol);
-//            }
-//        }
+        Type type = globalScope.getType(node.getType());
+        for (String i : node.getVariables()) {
+            VarSymbol varSymbol = new VarSymbol(type, i, node);
+            currentScope.defineSymbol(varSymbol);
+        }
     }
 
     @Override

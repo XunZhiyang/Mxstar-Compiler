@@ -40,16 +40,6 @@ public interface MxstarListener extends ParseTreeListener {
 	 */
 	void exitClassDeclaration(MxstarParser.ClassDeclarationContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MxstarParser#fieldDeclaration}.
-	 * @param ctx the parse tree
-	 */
-	void enterFieldDeclaration(MxstarParser.FieldDeclarationContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MxstarParser#fieldDeclaration}.
-	 * @param ctx the parse tree
-	 */
-	void exitFieldDeclaration(MxstarParser.FieldDeclarationContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link MxstarParser#constructorDeclaration}.
 	 * @param ctx the parse tree
 	 */
@@ -537,6 +527,16 @@ public interface MxstarListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitNewSpecifier(MxstarParser.NewSpecifierContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MxstarParser#parentheses}.
+	 * @param ctx the parse tree
+	 */
+	void enterParentheses(MxstarParser.ParenthesesContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MxstarParser#parentheses}.
+	 * @param ctx the parse tree
+	 */
+	void exitParentheses(MxstarParser.ParenthesesContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MxstarParser#type}.
 	 * @param ctx the parse tree

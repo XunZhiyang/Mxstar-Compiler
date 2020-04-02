@@ -9,7 +9,6 @@ import Utils.UnaryOp;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +43,7 @@ public class ASTBuilder extends MxstarBaseVisitor<ASTNode> {
         List<VarDeclNode> fields = new ArrayList<>();
         List<FuncDeclNode> methods = new ArrayList<>();
 
-        for (ParserRuleContext decl : ctx.fieldDeclaration()) {
+        for (ParserRuleContext decl : ctx.varDeclaration()) {
             fields.add((VarDeclNode) visit(decl));
         }
         for (ParserRuleContext decl : ctx.functionDeclaration()) {
@@ -57,17 +56,17 @@ public class ASTBuilder extends MxstarBaseVisitor<ASTNode> {
         return new ClassDeclNode(identifier, fields, methods, new Position(ctx.getStart()));
     }
 
-    @Override
-    public ASTNode visitFieldDeclaration(MxstarParser.FieldDeclarationContext ctx) {
-        TypeNode type = (TypeNode) visit(ctx.type());
-        List<String> variables = new ArrayList<>();
-
-        for (TerminalNode identifier : ctx.identifierList().Identifier()) {
-            variables.add(identifier.getText());
-        }
-
-        return new VarDeclNode(type, variables, false, new Position(ctx.getStart()));
-    }
+//    @Override
+//    public ASTNode visitFieldDeclaration(MxstarParser.VarDeclarationContext ctx) {
+//        TypeNode type = (TypeNode) visit(ctx.type());
+//        List<String> variables = new ArrayList<>();
+//
+//        for (TerminalNode identifier : ctx.identifierList().Identifier()) {
+//            variables.add(identifier.getText());
+//        }
+//
+//        return new VarDeclNode(type, variables, false, new Position(ctx.getStart()));
+//    }
 
     @Override
     public ASTNode visitConstructorDeclaration(MxstarParser.ConstructorDeclarationContext ctx) {
@@ -372,7 +371,11 @@ public class ASTBuilder extends MxstarBaseVisitor<ASTNode> {
     public ASTNode visitNewExpr(MxstarParser.NewExprContext ctx) {
         MxstarParser.NewSpecifierContext sp = ctx.newSpecifier();
         TypeNode type = (TypeNode) visit(sp.primaryType());
-        int dim = (sp.getChildCount() - sp.expression().size() - 1) / 2;
+        int dim;
+        if (sp.parentheses() == null)
+            dim = (sp.getChildCount() - sp.expression().size() - 1) / 2;
+        else
+            dim = 0;
         type.setDim(dim);
 
         List<Expr> shape = new ArrayList<>();

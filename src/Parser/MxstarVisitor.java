@@ -31,12 +31,6 @@ public interface MxstarVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitClassDeclaration(MxstarParser.ClassDeclarationContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MxstarParser#fieldDeclaration}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitFieldDeclaration(MxstarParser.FieldDeclarationContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link MxstarParser#constructorDeclaration}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -323,6 +317,12 @@ public interface MxstarVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitNewSpecifier(MxstarParser.NewSpecifierContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MxstarParser#parentheses}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitParentheses(MxstarParser.ParenthesesContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MxstarParser#type}.
 	 * @param ctx the parse tree

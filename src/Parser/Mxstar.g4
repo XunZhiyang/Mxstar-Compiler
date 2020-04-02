@@ -15,11 +15,7 @@ programFragment
     ;
 
 classDeclaration
-    :   'class' Identifier '{' (fieldDeclaration | functionDeclaration | constructorDeclaration)* '}' ';'
-    ;
-
-fieldDeclaration
-    :   type identifierList ';'
+    :   'class' Identifier '{' (varDeclaration | functionDeclaration | constructorDeclaration)* '}' ';'
     ;
 
 constructorDeclaration
@@ -146,9 +142,13 @@ parameterList
 //    ;
 
 newSpecifier
-    :   primaryType '(' ')'
+    :   primaryType parentheses
     |   primaryType ('[' expression ']')+ ('[' ']')*
     |   primaryType
+    ;
+
+parentheses
+    : '(' ')'
     ;
 
 type
