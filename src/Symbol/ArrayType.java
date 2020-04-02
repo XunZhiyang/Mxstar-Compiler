@@ -15,6 +15,11 @@ public class ArrayType extends Type{
         return true;
     }
 
+    public Type getMember() {
+        if (dim == 1) return baseType;
+        else return new ArrayType(baseType, dim - 1);
+    }
+
     @Override
     public boolean isArray() {
         return true;

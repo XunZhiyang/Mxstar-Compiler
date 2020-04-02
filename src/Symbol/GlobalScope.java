@@ -9,11 +9,12 @@ import java.util.*;
 
 public class GlobalScope extends BaseScope{
     Map<String, Type> typeMap = new LinkedHashMap<>();
-    private PrimitiveType intType = new PrimitiveType("int");
-    private PrimitiveType boolType = new PrimitiveType("bool");
-    private PrimitiveType voidType = new PrimitiveType("void");
-    private NullType nullType = new NullType();
-    private ClassType stringType = new ClassType("String", null, this);
+    static private PrimitiveType intType = new PrimitiveType("int");
+    static private PrimitiveType boolType = new PrimitiveType("bool");
+    static private PrimitiveType voidType = new PrimitiveType("void");
+    static private NullType nullType = new NullType();
+    private ClassType stringType = new ClassType("string", null, this);
+    private FunctionSymbol size = new FunctionSymbol(intType, "size", null, this);
 
     public GlobalScope() {
         typeMap.put("int", intType);
@@ -68,9 +69,10 @@ public class GlobalScope extends BaseScope{
 
     public Type getType(TypeNode node) {
         Type type = typeMap.get(node.getIdentifier());
-        if (type == null)
+        if (type == null) {
+            System.out.println(node.getIdentifier());
             throw new SemanticError("'" + node.getIdentifier() + "' does not name a type.", node.getPosition());
-        else {
+        } else {
             int d = node.getDim();
             if (d > 0) return new ArrayType(type, d);
             else return type;
@@ -82,6 +84,10 @@ public class GlobalScope extends BaseScope{
         if (mainFunction == null)
             throw new SemanticError("Main function not defined.", new Position(0, 0));
         return mainFunction;
+    }
+
+    public FunctionSymbol getSize() {
+        return size;
     }
 
     public PrimitiveType getIntType() {

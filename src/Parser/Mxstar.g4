@@ -72,7 +72,7 @@ statement
     ;
 
 expressionStatement
-    :   expression? ';'
+    :   expression ';'
     ;
 
 selectionStatement
@@ -80,8 +80,8 @@ selectionStatement
     ;
 
 iterationStatement
-    :   While '(' expression ')' compoundStatement      #WhileStmt
-    |   For '(' forCondition ')' compoundStatement      #ForStmt
+    :   While '(' expression ')' statement      #WhileStmt
+    |   For '(' forCondition ')' statement      #ForStmt
     ;
 
 forCondition

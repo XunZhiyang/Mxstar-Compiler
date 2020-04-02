@@ -46,9 +46,11 @@ public class SymbolTableBuilder implements ASTVisitor {
             case ADD: {
                 if (lhs.isInt() && rhs.isInt()) {
                     node.setType(globalScope.getIntType());
-                } else if (lhs.isInt() && rhs.isInt()) {
+                } else if (lhs.isString() && rhs.isString()) {
                     node.setType(globalScope.getStringType());
                 } else {
+                    System.out.println(lhs.getIdentifier());
+                    System.out.println(rhs.getIdentifier());
                     throw new TypeError(node.getPosition());
                 }
                 break;
@@ -180,7 +182,16 @@ public class SymbolTableBuilder implements ASTVisitor {
                 node.setFunctionSymbol((FunctionSymbol) symbol);
             }
             node.setLvalue(true);
-        } else{
+        } else if (object.getType().isArray()) {
+            if (node.getField().equals("size")) {
+                node.setType(globalScope.getIntType());
+                node.setFunctionSymbol(globalScope.getSize());
+            } else {
+                throw new TypeError(node.getPosition());
+            }
+        }
+        else{
+            System.out.println(object.getType().getIdentifier());
             throw new TypeError(node.getPosition());
         }
     }
@@ -194,16 +205,22 @@ public class SymbolTableBuilder implements ASTVisitor {
 
         if (init != null)
             init.accept(this);
-        if (condition != null)
+        if (condition != null) {
             condition.accept(this);
             if (!condition.getType().isBoolean())
                 throw new TypeError(node.getPosition());
+        }
         if (step != null)
             step.accept(this);
-        boolean nowInLoop = inLoop;
-        inLoop = true;
-        statement.accept(this);
-        inLoop = nowInLoop;
+        if (statement != null) {
+            boolean nowInLoop = inLoop;
+            inLoop = true;
+            Scope thisScope = currentScope;
+            currentScope = new LocalScope(currentScope);
+            statement.accept(this);
+            currentScope = thisScope;
+            inLoop = nowInLoop;
+        }
     }
 
     @Override
@@ -297,9 +314,12 @@ public class SymbolTableBuilder implements ASTVisitor {
         if (!node.getCond().getType().isBoolean()) {
             throw new TypeError(node.getPosition());
         }
+        Scope thisScope = currentScope;
         for (Stmt i : node.getBranch()) {
+            currentScope = new LocalScope(currentScope);
             i.accept(this);
         }
+        currentScope = thisScope;
     }
 
     @Override
@@ -314,6 +334,8 @@ public class SymbolTableBuilder implements ASTVisitor {
         if (!node.getArray().getType().isArray() || !node.getSubscript().getType().isInt()) {
             throw new TypeError(node.getPosition());
         }
+        node.setLvalue(true);
+        node.setType(((ArrayType) node.getArray().getType()).getMember());
     }
 
     @Override
@@ -366,8 +388,9 @@ public class SymbolTableBuilder implements ASTVisitor {
         if (node.ifInitValue()) {
             Expr rhs = node.getInitValue();
             rhs.accept(this);
-            if (!type.equals(rhs.getType()) && !(type.isNullable() && rhs.getType().isNull()))
+            if (!type.equals(rhs.getType()) && !(type.isNullable() && rhs.getType().isNull())) {
                 throw new TypeError(node.getPosition());
+            }
         }
         for (String i : node.getVariables()) {
             VarSymbol varSymbol = new VarSymbol(type, i, node);
@@ -393,13 +416,19 @@ public class SymbolTableBuilder implements ASTVisitor {
     public void visit(WhileStmtNode node) {
         Expr condition = node.getCondition();
         Stmt statement = node.getStatement();
-
-        condition.accept(this);
-        if (!condition.getType().isBoolean())
-            throw new TypeError(node.getPosition());
-        boolean nowInLoop = inLoop;
-        inLoop = true;
-        statement.accept(this);
-        inLoop = nowInLoop;
+        if (condition != null) {
+            condition.accept(this);
+            if (!condition.getType().isBoolean())
+                throw new TypeError(node.getPosition());
+        }
+        if (statement != null) {
+            boolean nowInLoop = inLoop;
+            inLoop = true;
+            Scope thisScope = currentScope;
+            currentScope = new LocalScope(currentScope);
+            statement.accept(this);
+            currentScope = thisScope;
+            inLoop = nowInLoop;
+        }
     }
 }

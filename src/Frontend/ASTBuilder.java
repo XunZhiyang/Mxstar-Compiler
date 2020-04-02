@@ -79,6 +79,7 @@ public class ASTBuilder extends MxstarBaseVisitor<ASTNode> {
     @Override
     public ASTNode visitVarDeclaration(MxstarParser.VarDeclarationContext ctx) {
         TypeNode type = (TypeNode) visit(ctx.type());
+//        System.out.println(ctx.type());
         List<String> variables = new ArrayList<>();
 
         if (ctx.identifierList() == null) {
@@ -216,17 +217,17 @@ public class ASTBuilder extends MxstarBaseVisitor<ASTNode> {
 
     @Override
     public ASTNode visitWhileStmt(MxstarParser.WhileStmtContext ctx) {
-        Expr condition = (Expr) visit(ctx.expression());
-        Stmt statement = (Stmt) visit(ctx.compoundStatement());
+        Expr condition = ctx.expression() != null ? (Expr) visit(ctx.expression()) : null;
+        Stmt statement = ctx.statement() != null ? (Stmt) visit(ctx.statement()) : null;
         return new WhileStmtNode(condition, statement, new Position(ctx.getStart()));
     }
 
     @Override
     public ASTNode visitForStmt(MxstarParser.ForStmtContext ctx) {
-        Expr init = (Expr) visit(ctx.forCondition().init);
-        Expr cond = (Expr) visit(ctx.forCondition().cond);
-        Expr step = (Expr) visit(ctx.forCondition().step);
-        Stmt statement = (Stmt) visit(ctx.compoundStatement());
+        Expr init = ctx.forCondition().init != null ? (Expr) visit(ctx.forCondition().init) : null;
+        Expr cond = ctx.forCondition().cond != null ? (Expr) visit(ctx.forCondition().cond) : null;
+        Expr step = ctx.forCondition().step != null ? (Expr) visit(ctx.forCondition().step) : null;
+        Stmt statement = ctx.statement() != null ? (Stmt) visit(ctx.statement()) : null;
 
         return new ForStmtNode(init, cond, step, statement, new Position(ctx.getStart()));
     }
@@ -508,7 +509,7 @@ public class ASTBuilder extends MxstarBaseVisitor<ASTNode> {
         String identifier = null;
         if (ctx.Bool() != null) identifier = "bool";
         if (ctx.Int() != null) identifier = "int";
-        if (ctx.String() != null) identifier = "String";
+        if (ctx.String() != null) identifier = "string";
         if (ctx.Identifier() != null) identifier = ctx.Identifier().getText();
 
         return new TypeNode(identifier, 0, new Position(ctx.getStart()));
