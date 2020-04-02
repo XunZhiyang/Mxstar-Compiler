@@ -143,6 +143,7 @@ parameterList
 
 newSpecifier
     :   primaryType parentheses
+    |   primaryType ('[' expression ']')* ('[' ']')+ ('[' errSrc=expression ']')+
     |   primaryType ('[' expression ']')+ ('[' ']')*
     |   primaryType
     ;

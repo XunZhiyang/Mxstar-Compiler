@@ -5,6 +5,7 @@ import Parser.MxstarBaseVisitor;
 import Parser.MxstarParser;
 import Utils.BinaryOp;
 import Utils.Position;
+import Utils.SyntaxError;
 import Utils.UnaryOp;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -371,6 +372,9 @@ public class ASTBuilder extends MxstarBaseVisitor<ASTNode> {
     public ASTNode visitNewExpr(MxstarParser.NewExprContext ctx) {
         MxstarParser.NewSpecifierContext sp = ctx.newSpecifier();
         TypeNode type = (TypeNode) visit(sp.primaryType());
+        if (sp.errSrc != null) {
+            throw new SyntaxError("invalid new specifier", new Position(ctx.getStart()));
+        }
         int dim;
         if (sp.parentheses() == null)
             dim = (sp.getChildCount() - sp.expression().size() - 1) / 2;
