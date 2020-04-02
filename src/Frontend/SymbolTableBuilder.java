@@ -232,9 +232,12 @@ public class SymbolTableBuilder implements ASTVisitor {
             List<Type> param = function.getFunctionSymbol().getParam();
             if (args.size() != param.size())
                 throw new SemanticError("Wrong argument number.", node.getPosition());
+            int n = args.size();
             for (int i = 0; i < args.size(); ++i) {
                 args.get(i).accept(this);
-                if (!args.get(i).getType().equals(param.get(i))) {
+//                System.out.println(args.get(i).getType().getIdentifier());
+//                System.out.println(param.get(i).getIdentifier());
+                if (!args.get(i).getType().equals(param.get(n - i - 1)) && !(param.get(i).isNullable() && args.get(n - i - 1).getType().isNull())) {
                     throw new SemanticError("Wrong argument type.", node.getPosition());
                 }
             }
