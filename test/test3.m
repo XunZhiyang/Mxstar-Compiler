@@ -105,7 +105,7 @@ int main(){
 	boys[2].num;
 	boyss[1][2][3].num;
 
-	xu(new Mo, new RedBoy);
+	xu(new Mo, null);
 
 	//test for iteration
 	int i = 0;

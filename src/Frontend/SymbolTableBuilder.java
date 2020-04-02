@@ -237,7 +237,7 @@ public class SymbolTableBuilder implements ASTVisitor {
                 args.get(i).accept(this);
 //                System.out.println(args.get(i).getType().getIdentifier());
 //                System.out.println(param.get(i).getIdentifier());
-                if (!args.get(i).getType().equals(param.get(n - i - 1)) && !(param.get(i).isNullable() && args.get(n - i - 1).getType().isNull())) {
+                if (!args.get(i).getType().equals(param.get(n - i - 1)) && !(param.get(n - i - 1).isNullable() && args.get(i).getType().isNull())) {
                     throw new SemanticError("Wrong argument type.", node.getPosition());
                 }
             }
