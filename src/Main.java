@@ -2,7 +2,7 @@ import AST.ASTNode;
 import Frontend.ASTBuilder;
 import Frontend.ClassScanner;
 import Frontend.FunctionScanner;
-import Frontend.SymbolTableBuilder;
+import Frontend.SemanticAnalyser;
 import Parser.MxstarErrorListener;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -19,8 +19,8 @@ import Symbol.GlobalScope;
 
 public class Main {
     private static CharStream readCode() throws Exception{
-//        String inputFile = "code.mx";
-        String inputFile = "test\\test3.m";
+        String inputFile = "code.mx";
+//        String inputFile = "test\\test3.m";
         InputStream is = new FileInputStream(inputFile);
         return CharStreams.fromStream(is);
     }
@@ -31,8 +31,6 @@ public class Main {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         MxstarParser parser = new MxstarParser(tokens);
         parser.addErrorListener(new MxstarErrorListener());
-//        ParseTree tree = parser.program();
-//        System.out.println(tree.toStringTree(parser));
         return parser.program();
     }
 
@@ -40,7 +38,7 @@ public class Main {
         GlobalScope globalScope = new GlobalScope();
         ast.accept(new ClassScanner(globalScope));
         ast.accept(new FunctionScanner(globalScope));
-        ast.accept(new SymbolTableBuilder(globalScope));
+        ast.accept(new SemanticAnalyser(globalScope));
     }
 
     private static ASTNode buildAST(ParseTree tree) {
@@ -58,7 +56,6 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
             java.lang.System.exit(1);
-//            System.err.println(e.getMessage());
         }
     }
 }

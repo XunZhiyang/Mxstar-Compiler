@@ -6,4 +6,4 @@ An Mx* language compiler for course Compiler 2020.
 
 - [x] [02.27] Parser with ANTLR4.
 - [x] [03.05] AST builder.
-
+- [x] [04.03] Semantic Analysis.
