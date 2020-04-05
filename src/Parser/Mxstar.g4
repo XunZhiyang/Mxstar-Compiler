@@ -131,7 +131,7 @@ expression
 
 parameterList
     :   expression
-    |   expression ',' parameterList
+    |   parameterList ',' expression
     ;
 
 //unaryOperator
