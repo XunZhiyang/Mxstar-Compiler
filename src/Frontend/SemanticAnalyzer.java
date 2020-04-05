@@ -7,7 +7,7 @@ import Utils.TypeError;
 
 import java.util.List;
 
-public class SemanticAnalyser implements ASTVisitor {
+public class SemanticAnalyzer implements ASTVisitor {
     private GlobalScope globalScope;
     private Scope currentScope;
     private FunctionSymbol currentFunction;
@@ -15,7 +15,7 @@ public class SemanticAnalyser implements ASTVisitor {
     private boolean inLoop = false;
     private boolean inFunction = false;
 
-    public SemanticAnalyser(GlobalScope globalScope) {
+    public SemanticAnalyzer(GlobalScope globalScope) {
         this.globalScope = globalScope;
         this.currentScope = globalScope;
     }

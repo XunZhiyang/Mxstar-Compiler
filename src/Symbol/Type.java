@@ -14,12 +14,6 @@ public abstract class Type {
         return identifier;
     }
 
-    public void compatible(Type type, Position position) {
-        if (!identifier.equals(type.getIdentifier())) {
-            throw new SemanticError("Type not compatible.", position);
-        }
-    }
-
     public boolean equals(Type type) {
         return identifier.equals(type.getIdentifier());
     }

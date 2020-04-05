@@ -2,7 +2,7 @@ import AST.ASTNode;
 import Frontend.ASTBuilder;
 import Frontend.ClassScanner;
 import Frontend.FunctionScanner;
-import Frontend.SemanticAnalyser;
+import Frontend.SemanticAnalyzer;
 import Parser.MxstarErrorListener;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -38,7 +38,7 @@ public class Main {
         GlobalScope globalScope = new GlobalScope();
         ast.accept(new ClassScanner(globalScope));
         ast.accept(new FunctionScanner(globalScope));
-        ast.accept(new SemanticAnalyser(globalScope));
+        ast.accept(new SemanticAnalyzer(globalScope));
     }
 
     private static ASTNode buildAST(ParseTree tree) {
