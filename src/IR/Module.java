@@ -7,6 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Module {
-    List<ClassType> classList = new ArrayList<>();
-    List<Function> functionList = new ArrayList<>();
+    private List<ClassType> classList = new ArrayList<>();
+    private List<Function> functionList = new ArrayList<>();
+
+    public void addClass(ClassType c) {
+        classList.add(c);
+    }
+
+    public void addFunction(Function f) {
+        functionList.add(f);
+    }
 }
