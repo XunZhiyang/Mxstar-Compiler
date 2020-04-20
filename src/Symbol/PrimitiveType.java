@@ -15,4 +15,9 @@ public class PrimitiveType extends Type{
     public boolean isBoolean() {
         return getIdentifier().equals("bool");
     }
+
+    @Override
+    public boolean isVoid() {
+        return getIdentifier().equals("void");
+    }
 }

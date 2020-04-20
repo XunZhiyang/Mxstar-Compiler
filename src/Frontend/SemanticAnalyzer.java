@@ -301,6 +301,9 @@ public class SemanticAnalyzer implements ASTVisitor {
             throw new SemanticError("return statement not within a function", node.getPosition());
         }
         if (node.getExpression() != null) {
+            if (currentFunction.getType().isVoid()) {
+                throw new SemanticError("Void function should not have return value", node.getPosition());
+            }
             node.getExpression().accept(this);
             if (!currentFunction.getType().assignable(node.getExpression().getType())) {
                 throw new TypeError(node.getPosition());

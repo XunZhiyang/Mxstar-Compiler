@@ -1,13 +1,16 @@
 package AST;
 
+import IR.Value;
 import Symbol.FunctionSymbol;
 import Symbol.Type;
 import Utils.Position;
 
 public abstract class Expr extends ASTNode {
-    Type type;
+    private Type type;
     private boolean isLvalue;
     private FunctionSymbol functionSymbol;
+
+    private Value value;
 
     public Expr(Position position) {
         super(position);
@@ -36,6 +39,10 @@ public abstract class Expr extends ASTNode {
 
     public boolean getCallable() {
         return functionSymbol != null;
+    }
+
+    public Value getValue() {
+        return value;
     }
 
     public Type getType() {

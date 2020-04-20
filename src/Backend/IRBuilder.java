@@ -1,17 +1,43 @@
 package Backend;
 
 import AST.*;
+import IR.*;
+import IR.Constant.Function;
+import IR.Instruction.BranchInst;
+import IR.Module;
+import Symbol.GlobalScope;
 
 public class IRBuilder implements ASTVisitor {
+    Module module;
+    GlobalScope globalScope;
+    Function curFunction;
+    BasicBlock curBlock;
+    boolean justScan;
+
+    public IRBuilder(GlobalScope globalScope) {
+        this.globalScope = globalScope;
+    }
+
+    public Module getModule() {
+        return module;
+    }
 
     @Override
     public void visit(ProgramNode node) {
-
+        justScan = true;
+        for (ProgramFragment i : node.getList()) {
+            i.accept(this);
+        }
+        justScan = false;
+        for (ProgramFragment i : node.getList()) {
+            i.accept(this);
+        }
     }
 
     @Override
     public void visit(BinaryExprNode node) {
-
+        node.getSrc1().accept(this);
+        node.getSrc2().accept(this);
     }
 
     @Override
@@ -26,7 +52,7 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(ClassDeclNode node) {
-
+        module.addClass(node.getClassType());
     }
 
     @Override
@@ -36,7 +62,10 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(ConditionalExprNode node) {
-
+//        Suddenly found that there is no such Expr
+//        node.getCondition().accept(this);
+//        node.getOpt1().accept(this);
+//        node.getOpt2().accept(this);
     }
 
     @Override

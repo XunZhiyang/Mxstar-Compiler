@@ -49,5 +49,9 @@ public abstract class Type {
     public boolean isArray() {
         return false;
     }
+
+    public boolean isVoid() {
+        return false;
+    }
 }
 

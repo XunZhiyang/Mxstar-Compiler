@@ -6,9 +6,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BasicBlock {
+    private String label;
     private List<Instruction> instructionList = new ArrayList<>();
 
-    void addInst(Instruction instruction) {
+    public BasicBlock(String label) {
+        this.label = label;
+    }
+
+    public void addInst(Instruction instruction) {
         instructionList.add(instruction);
+    }
+
+    public String getLabel() {
+        return label;
     }
 }

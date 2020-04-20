@@ -1,8 +1,10 @@
 import AST.ASTNode;
+import Backend.IRBuilder;
 import Frontend.ASTBuilder;
 import Frontend.ClassScanner;
 import Frontend.FunctionScanner;
 import Frontend.SemanticAnalyzer;
+import IR.Module;
 import Parser.MxstarErrorListener;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -34,11 +36,12 @@ public class Main {
         return parser.program();
     }
 
-    private static void semanticAnalysis(ASTNode ast) {
+    private static GlobalScope analyzeSemantics(ASTNode ast) {
         GlobalScope globalScope = new GlobalScope();
         ast.accept(new ClassScanner(globalScope));
         ast.accept(new FunctionScanner(globalScope));
         ast.accept(new SemanticAnalyzer(globalScope));
+        return globalScope;
     }
 
     private static ASTNode buildAST(ParseTree tree) {
@@ -46,12 +49,18 @@ public class Main {
         return builder.visit(tree);
     }
 
+    private static Module buildIR(GlobalScope globalScope) {
+        Module module = new IRBuilder(globalScope).getModule();
+        return module;
+    }
+
     public static void main(String[] args) {
         try{
             CharStream input = readCode();
             ParseTree tree = buildCST(input);
             ASTNode ast = buildAST(tree);
-            semanticAnalysis(ast);
+            GlobalScope globalScope = analyzeSemantics(ast);
+            buildIR(globalScope);
 
         } catch (Exception e) {
             e.printStackTrace();
