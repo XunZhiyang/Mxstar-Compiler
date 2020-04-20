@@ -3,6 +3,12 @@ package Backend;
 import AST.*;
 
 public class IRBuilder implements ASTVisitor {
+
+    @Override
+    public void visit(ProgramNode node) {
+
+    }
+
     @Override
     public void visit(BinaryExprNode node) {
 
@@ -100,11 +106,6 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(ParamList node) {
-
-    }
-
-    @Override
-    public void visit(ProgramNode node) {
 
     }
 
