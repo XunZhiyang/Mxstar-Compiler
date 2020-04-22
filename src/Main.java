@@ -22,7 +22,6 @@ import Symbol.GlobalScope;
 public class Main {
     private static CharStream readCode() throws Exception{
         String inputFile = "code.mx";
-//        String inputFile = "test\\test3.m";
         InputStream is = new FileInputStream(inputFile);
         return CharStreams.fromStream(is);
     }
