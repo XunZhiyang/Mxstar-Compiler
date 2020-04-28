@@ -17,6 +17,14 @@ public abstract class Expr extends ASTNode {
         isLvalue = false;
     }
 
+    public void setValue(Value value) {
+        this.value = value;
+    }
+
+    public Value getValue(Value value) {
+        return value;
+    }
+
     public void setLvalue(boolean isLvalue) {
         this.isLvalue = isLvalue;
     }

@@ -9,8 +9,8 @@ import java.util.*;
 
 public class GlobalScope extends BaseScope{
     Map<String, Type> typeMap = new LinkedHashMap<>();
-    public static PrimitiveType intType = new PrimitiveType("int");
-    public static PrimitiveType boolType = new PrimitiveType("bool");
+    public static PrimitiveType intType = new PrimitiveType("int", 32);
+    public static PrimitiveType boolType = new PrimitiveType("bool", 1);
     public static PrimitiveType voidType = new PrimitiveType("void");
     public static NullType nullType = new NullType();
     private ClassType stringType = new ClassType("string", null, this);

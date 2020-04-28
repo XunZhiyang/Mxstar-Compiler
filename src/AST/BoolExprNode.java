@@ -10,6 +10,10 @@ public class BoolExprNode extends ConstExpr {
         this.value = value;
     }
 
+    public boolean getBoolValue() {
+        return value;
+    }
+
     @Override
     public void accept(ASTVisitor visitor) {
         visitor.visit(this);

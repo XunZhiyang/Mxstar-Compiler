@@ -9,10 +9,14 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ClassType extends Type implements Scope {
-    Map<String, Symbol> symbolMap = new LinkedHashMap<>();
+    private Map<String, Symbol> symbolMap = new LinkedHashMap<>();
     private Scope fatherScope;
     private ClassDeclNode define;
     private boolean hasConstructor;
+
+    //for IR
+    int fieldNum = 0;
+    private Map<String, Integer> fieldIndex = new LinkedHashMap<>();
 
     public ClassType(String typeName, ClassDeclNode define, Scope fatherScope) {
         super(typeName);
@@ -30,6 +34,11 @@ public class ClassType extends Type implements Scope {
             throw new RedefError(symbol.getIdentifier(), symbol.getPos());
         }
         symbolMap.put(symbol.getIdentifier(), symbol);
+
+        if (!symbol.isFunction()) {
+            fieldNum++;
+            fieldIndex.put(symbol.getIdentifier(), fieldNum);
+        }
     }
 
     @Override
@@ -56,15 +65,17 @@ public class ClassType extends Type implements Scope {
         return true;
     }
 
-//    public Type getType(String identifier, Position position) {
-//        Type type = syolMap.get(identifier);
-//        if (symbol == null)
-//            return fatherScope.getSymbol(identifier, position);
-//        else
-//            return symbol;
-//    }
-
     public Position getPos() {
         return define.getPosition();
+    }
+
+    // for IR
+    public int getFieldIndex(String identifier) {
+        return fieldIndex.get(identifier);
+    }
+
+    public Type getFieldType(String identifier) {
+        Symbol symbol = symbolMap.get(identifier);
+        return symbol.getType();
     }
 }

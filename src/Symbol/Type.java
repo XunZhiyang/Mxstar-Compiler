@@ -5,9 +5,19 @@ import Utils.SemanticError;
 
 public abstract class Type {
     private String identifier;
+    private int bitLen;
 
     public Type(String identifier) {
         this.identifier = identifier;
+    }
+
+    public Type(String identifier, int bitLen) {
+        this.identifier = identifier;
+        this.bitLen = bitLen;
+    }
+
+    public int getBitLen() {
+        return bitLen;
     }
 
     public String getIdentifier() {

@@ -1,16 +1,17 @@
 package IR;
 
 import IR.Instruction.Instruction;
+import Symbol.GlobalScope;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class BasicBlock {
+public class BasicBlock extends User {
     private String label;
     private List<Instruction> instructionList = new ArrayList<>();
 
     public BasicBlock(String label) {
-        this.label = label;
+        super(label, GlobalScope.voidType);
     }
 
     public void addInst(Instruction instruction) {

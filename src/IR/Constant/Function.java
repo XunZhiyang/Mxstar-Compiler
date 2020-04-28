@@ -12,4 +12,8 @@ public class Function extends Constant {
     public Function(String name, Type type) {
         super(name, type);
     }
+
+    public void add(String name) {
+        basicBlockList.add(new BasicBlock(name));
+    }
 }

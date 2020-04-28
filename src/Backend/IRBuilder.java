@@ -2,14 +2,21 @@ package Backend;
 
 import AST.*;
 import IR.*;
+import IR.Constant.BoolConst;
 import IR.Constant.Function;
+import IR.Constant.IntConst;
 import IR.Instruction.BranchInst;
+import IR.Instruction.CallInst;
+import IR.Instruction.FieldInst;
 import IR.Module;
+import Symbol.ClassType;
 import Symbol.GlobalScope;
+import Symbol.Type;
 
 public class IRBuilder implements ASTVisitor {
     Module module;
     GlobalScope globalScope;
+    ClassType curClass;
     Function curFunction;
     BasicBlock curBlock;
     boolean justScan;
@@ -38,11 +45,17 @@ public class IRBuilder implements ASTVisitor {
     public void visit(BinaryExprNode node) {
         node.getSrc1().accept(this);
         node.getSrc2().accept(this);
+        Value v1 = node.getSrc1().getValue();
+        Value v2 = node.getSrc2().getValue();
+        switch (node.getOp()) {
+            case MUL:
+                new OpInst;
+        }
     }
 
     @Override
     public void visit(BoolExprNode node) {
-
+        node.setValue(new BoolConst(node.getBoolValue()));
     }
 
     @Override
@@ -57,15 +70,13 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(CompoundStmtNode node) {
-
+        node.getStmtList().forEach(x -> x.accept(this));
     }
 
     @Override
     public void visit(ConditionalExprNode node) {
 //        Suddenly found that there is no such Expr
-//        node.getCondition().accept(this);
-//        node.getOpt1().accept(this);
-//        node.getOpt2().accept(this);
+//        Cry Cry
     }
 
     @Override
@@ -80,12 +91,16 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(ExprStmtNode node) {
-
+        node.getExpression().accept(this);
     }
 
     @Override
     public void visit(FieldExprNode node) {
-
+        node.getObject().accept(this);
+        ClassType thisClass = (ClassType) node.getObject().getValue().getType();
+        Type fieldType = thisClass.getFieldType(node.getField());
+        if
+        new FieldInst(node.getObject().getValue(), fieldType, thisClass.getFieldIndex(node.getField()), curBlock);
     }
 
     @Override
@@ -96,11 +111,20 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(FuncDeclNode node) {
-
+        String identifier = curClass == null ? node.getIdentifier()
+                : curClass.getIdentifier() + "." + node.getIdentifier();
+        curFunction = new Function(identifier, node.getSymbol().getType());
+        module.addFunction(curFunction);
+        for (int i = 0; i < node.getParams().size(); ++i) {
+            curFunction.addOperand(new Value("p", node.getSymbol().getParam().get(i)));
+        }
+        node.getStmt().accept(this);
     }
+
     @Override
     public void visit(FuncCallExprNode node) {
-
+        node.getFunction().accept(this);
+        new CallInst((Function) node.getFunction().getValue(), curBlock);
     }
 
     @Override
@@ -125,12 +149,12 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(ParamDeclList node) {
-
+        //never accessed
     }
 
     @Override
     public void visit(ParamDeclNode node) {
-
+        //never accessed
     }
 
     @Override

@@ -6,6 +6,10 @@ public class PrimitiveType extends Type{
         super(identifier);
     }
 
+    public PrimitiveType(String identifier, int bitLen) {
+        super(identifier, bitLen);
+    }
+
     @Override
     public boolean isInt() {
         return getIdentifier().equals("int");
