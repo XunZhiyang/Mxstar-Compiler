@@ -8,6 +8,7 @@ import IR.Constant.IntConst;
 import IR.Instruction.BranchInst;
 import IR.Instruction.CallInst;
 import IR.Instruction.FieldInst;
+import IR.Instruction.JumpInst;
 import IR.Module;
 import Symbol.ClassType;
 import Symbol.GlobalScope;
@@ -18,7 +19,7 @@ public class IRBuilder implements ASTVisitor {
     GlobalScope globalScope;
     ClassType curClass;
     Function curFunction;
-    BasicBlock curBlock;
+    BasicBlock curBlock, breakBlock, continueBlock;
     boolean justScan;
 
     public IRBuilder(GlobalScope globalScope) {
@@ -27,6 +28,10 @@ public class IRBuilder implements ASTVisitor {
 
     public Module getModule() {
         return module;
+    }
+
+    public String convertFuncName(String identifier) {
+        return curClass == null ? identifier : curClass.getIdentifier() + "." + identifier;
     }
 
     @Override
@@ -60,7 +65,7 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(BreakNode node) {
-
+        new JumpInst(breakBlock, curBlock);
     }
 
     @Override
@@ -81,7 +86,7 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(ContinueNode node) {
-
+        new JumpInst(continueBlock, curBlock);
     }
 
     @Override
@@ -99,20 +104,34 @@ public class IRBuilder implements ASTVisitor {
         node.getObject().accept(this);
         ClassType thisClass = (ClassType) node.getObject().getValue().getType();
         Type fieldType = thisClass.getFieldType(node.getField());
-        if
-        new FieldInst(node.getObject().getValue(), fieldType, thisClass.getFieldIndex(node.getField()), curBlock);
+        if (thisClass.getIsMethod(node.getField())) {
+            node.setValue(new Function(convertFuncName(node.getField()), fieldType));
+        }
+        else{
+            node.setValue(new FieldInst(node.getObject().getValue(), fieldType, thisClass.getFieldIndex(node.getField()), curBlock));
+        }
     }
 
     @Override
     public void visit(ForStmtNode node) {
+        BasicBlock forCond = curFunction.add("forCond");
+        BasicBlock forStep = curFunction.add("forStep");
+        BasicBlock forBody = curFunction.add("forBody");
+
+        node.getInit().accept(this);
+        new JumpInst(forCond, curBlock);
+        curBlock = forCond;
+        node.getCondition().accept(this);
+        curBlock = forStep;
+        node.getStep().accept(this);
+        new JumpInst(forCond, curBlock);
 
     }
 
 
     @Override
     public void visit(FuncDeclNode node) {
-        String identifier = curClass == null ? node.getIdentifier()
-                : curClass.getIdentifier() + "." + node.getIdentifier();
+        String identifier = convertFuncName(node.getIdentifier());
         curFunction = new Function(identifier, node.getSymbol().getType());
         module.addFunction(curFunction);
         for (int i = 0; i < node.getParams().size(); ++i) {

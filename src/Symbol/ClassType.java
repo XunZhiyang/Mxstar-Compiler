@@ -78,4 +78,8 @@ public class ClassType extends Type implements Scope {
         Symbol symbol = symbolMap.get(identifier);
         return symbol.getType();
     }
+
+    public boolean getIsMethod(String identifier) {
+        return symbolMap.get(identifier).isFunction();
+    }
 }

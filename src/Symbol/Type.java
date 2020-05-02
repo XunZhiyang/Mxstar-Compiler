@@ -20,6 +20,10 @@ public abstract class Type {
         return bitLen;
     }
 
+    public void setBitLen(int bitLen) {
+        this.bitLen = bitLen;
+    }
+
     public String getIdentifier() {
         return identifier;
     }
