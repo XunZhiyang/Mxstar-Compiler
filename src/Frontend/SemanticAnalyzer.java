@@ -338,7 +338,7 @@ public class SemanticAnalyzer implements ASTVisitor {
             throw new TypeError(node.getPosition());
         }
         node.setLvalue(true);
-        node.setType(((ArrayType) node.getArray().getType()).getMember());
+        node.setType(((PointerType) node.getArray().getType()).getMember());
     }
 
     @Override

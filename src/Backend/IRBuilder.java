@@ -5,14 +5,14 @@ import IR.*;
 import IR.Constant.BoolConst;
 import IR.Constant.Function;
 import IR.Constant.IntConst;
-import IR.Instruction.BranchInst;
-import IR.Instruction.CallInst;
-import IR.Instruction.FieldInst;
-import IR.Instruction.JumpInst;
+import IR.Instruction.*;
 import IR.Module;
 import Symbol.ClassType;
 import Symbol.GlobalScope;
 import Symbol.Type;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class IRBuilder implements ASTVisitor {
     Module module;
@@ -53,8 +53,8 @@ public class IRBuilder implements ASTVisitor {
         Value v1 = node.getSrc1().getValue();
         Value v2 = node.getSrc2().getValue();
         switch (node.getOp()) {
-            case MUL:
-                new OpInst;
+//            case MUL:
+//                new OpInst;
         }
     }
 
@@ -90,9 +90,7 @@ public class IRBuilder implements ASTVisitor {
     }
 
     @Override
-    public void visit(EmptyStmtNode node) {
-
-    }
+    public void visit(EmptyStmtNode node) {}
 
     @Override
     public void visit(ExprStmtNode node) {
@@ -117,15 +115,34 @@ public class IRBuilder implements ASTVisitor {
         BasicBlock forCond = curFunction.add("forCond");
         BasicBlock forStep = curFunction.add("forStep");
         BasicBlock forBody = curFunction.add("forBody");
+        BasicBlock forAfter = curFunction.add("forAfter");
 
-        node.getInit().accept(this);
+        if (node.getInit() != null)
+            node.getInit().accept(this);
         new JumpInst(forCond, curBlock);
+
         curBlock = forCond;
-        node.getCondition().accept(this);
+        if (node.getCondition() != null)
+            node.getCondition().accept(this);
+        new BranchInst(node.getCondition().getValue(), forBody, forAfter, curBlock);
+
+        curBlock = forBody;
+        BasicBlock tempBreak = breakBlock;
+        BasicBlock tempContinue = continueBlock;
+        breakBlock = forAfter;
+        continueBlock = forBody;
+        if (node.getStatement() != null)
+            node.getStatement().accept(this);
+        breakBlock = tempBreak;
+        continueBlock = tempContinue;
+        new JumpInst(forStep, curBlock);
+
         curBlock = forStep;
-        node.getStep().accept(this);
+        if (node.getStep() != null)
+            node.getStep().accept(this);
         new JumpInst(forCond, curBlock);
 
+        curBlock = forAfter;
     }
 
 
@@ -143,22 +160,28 @@ public class IRBuilder implements ASTVisitor {
     @Override
     public void visit(FuncCallExprNode node) {
         node.getFunction().accept(this);
-        new CallInst((Function) node.getFunction().getValue(), curBlock);
+        List<Value> arguments = new ArrayList<>();
+        for (Expr i : node.getArguments()) {
+            i.accept(this);
+            arguments.add(new LoadInst(i.getValue(), curBlock));
+        }
+        CallInst inst = new CallInst((Function) node.getFunction().getValue(), arguments, curBlock);
     }
 
     @Override
-    public void visit(IdentifierListNode node) {
-
-    }
+    public void visit(IdentifierListNode node) {}
 
     @Override
     public void visit(IntLiteralNode node) {
-
+        node.setValue(new IntConst(node.getLiteral()));
     }
+
+    private
 
     @Override
     public void visit(NewExprNode node) {
-
+        Type c = globalScope.getType(node.getNewType());
+        
     }
 
     @Override

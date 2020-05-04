@@ -74,7 +74,7 @@ public class GlobalScope extends BaseScope{
             throw new SemanticError("'" + node.getIdentifier() + "' does not name a type.", node.getPosition());
         } else {
             int d = node.getDim();
-            if (d > 0) return new ArrayType(type, d);
+            if (d > 0) return new PointerType(type, d);
             else return type;
         }
     }

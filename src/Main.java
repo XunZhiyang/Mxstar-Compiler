@@ -59,7 +59,7 @@ public class Main {
             ParseTree tree = buildCST(input);
             ASTNode ast = buildAST(tree);
             GlobalScope globalScope = analyzeSemantics(ast);
-            buildIR(globalScope);
+//            buildIR(globalScope);
 
         } catch (Exception e) {
             e.printStackTrace();
