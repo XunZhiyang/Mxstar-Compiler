@@ -20,6 +20,10 @@ public abstract class Type {
         return bitLen;
     }
 
+    public Type getPointer() {  //will be overridden by PointerType
+        return new PointerType(this, 1);
+    }
+
     public void setBitLen(int bitLen) {
         this.bitLen = bitLen;
     }
@@ -60,7 +64,7 @@ public abstract class Type {
         return false;
     }
 
-    public boolean isArray() {
+    public boolean isPointer() {
         return false;
     }
 

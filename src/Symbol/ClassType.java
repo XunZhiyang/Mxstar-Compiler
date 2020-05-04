@@ -14,6 +14,7 @@ public class ClassType extends Type implements Scope {
     private ClassDeclNode define;
     private boolean hasConstructor;
 
+
     //for IR
     int fieldNum = 0;
     private Map<String, Integer> fieldIndex = new LinkedHashMap<>();

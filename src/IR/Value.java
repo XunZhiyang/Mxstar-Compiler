@@ -2,10 +2,11 @@ package IR;
 
 import Symbol.Type;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class Value {
-    private static Map<String, Integer> freq;
+    private static Map<String, Integer> freq = new HashMap<>();
 
     private String identifier;
     private Type type;
@@ -31,5 +32,9 @@ public class Value {
 
     public Type getType() {
         return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
     }
 }

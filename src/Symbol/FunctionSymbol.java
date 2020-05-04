@@ -50,6 +50,10 @@ public class FunctionSymbol extends Symbol implements Scope {
         return param;
     }
 
+    public String IRName() {
+        return fatherScope instanceof ClassType ? ((ClassType) fatherScope).getIdentifier() + "." + getIdentifier(): getIdentifier();
+    }
+
     @Override
     public boolean ifConstructor() {
         return isConstructor;

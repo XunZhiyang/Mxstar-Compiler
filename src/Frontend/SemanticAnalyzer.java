@@ -38,14 +38,14 @@ public class SemanticAnalyzer implements ASTVisitor {
             case AND:
             case OR: {
                 if (lhs.isInt() && rhs.isInt()) {
-                    node.setType(globalScope.getIntType());
+                    node.setType(GlobalScope.getIntType());
                 }
                 else throw new TypeError(node.getPosition());
                 break;
             }
             case ADD: {
                 if (lhs.isInt() && rhs.isInt()) {
-                    node.setType(globalScope.getIntType());
+                    node.setType(GlobalScope.getIntType());
                 } else if (lhs.isString() && rhs.isString()) {
                     node.setType(globalScope.getStringType());
                 } else {
@@ -60,9 +60,9 @@ public class SemanticAnalyzer implements ASTVisitor {
             case LE:
             case GE: {
                 if (lhs.isInt() && rhs.isInt()) {
-                    node.setType(globalScope.getBoolType());
+                    node.setType(GlobalScope.getBoolType());
                 } else if (lhs.isString() && rhs.isString()) {
-                    node.setType(globalScope.getBoolType());
+                    node.setType(GlobalScope.getBoolType());
                 } else {
                     throw new TypeError(node.getPosition());
                 }
@@ -71,16 +71,16 @@ public class SemanticAnalyzer implements ASTVisitor {
             case EQ:
             case NE:
                 if (lhs.equals(rhs) || (lhs.isNullable() && rhs.isNull()) || (lhs.isNull() && rhs.isNullable()))
-                    node.setType(globalScope.getBoolType());
+                    node.setType(GlobalScope.getBoolType());
                 else {
                     throw new TypeError(node.getPosition());
                 }
                 break;
             case XOR:
                 if (lhs.isBoolean() && rhs.isBoolean()) {
-                    node.setType(globalScope.getBoolType());
+                    node.setType(GlobalScope.getBoolType());
                 } else if (lhs.isInt() && rhs.isInt()) {
-                    node.setType(globalScope.getIntType());
+                    node.setType(GlobalScope.getIntType());
                 } else {
                     throw new TypeError(node.getPosition());
                 }
@@ -88,14 +88,14 @@ public class SemanticAnalyzer implements ASTVisitor {
             case ANL:
             case ORL:
                 if (lhs.isBoolean() && rhs.isBoolean()) {
-                    node.setType(globalScope.getBoolType());
+                    node.setType(GlobalScope.getBoolType());
                 } else {
                     throw new TypeError(node.getPosition());
                 }
                 break;
             case ASSIGN:
                 if (src1.getLvalue() && (lhs.assignable(rhs))) {
-                    node.setType(globalScope.getVoidType());
+                    node.setType(GlobalScope.getVoidType());
                 } else {
                     throw new TypeError(node.getPosition());
                 }
@@ -104,7 +104,7 @@ public class SemanticAnalyzer implements ASTVisitor {
 
     @Override
     public void visit(BoolExprNode node) {
-        node.setType(globalScope.getBoolType());
+        node.setType(GlobalScope.getBoolType());
     }
 
     @Override
@@ -182,9 +182,9 @@ public class SemanticAnalyzer implements ASTVisitor {
                 node.setFunctionSymbol((FunctionSymbol) symbol);
             }
             node.setLvalue(true);
-        } else if (object.getType().isArray()) {
+        } else if (object.getType().isPointer()) {
             if (node.getField().equals("size")) {
-                node.setType(globalScope.getIntType());
+                node.setType(GlobalScope.getIntType());
                 node.setFunctionSymbol(globalScope.getSize());
             } else {
                 throw new TypeError(node.getPosition());
@@ -260,7 +260,7 @@ public class SemanticAnalyzer implements ASTVisitor {
 
     @Override
     public void visit(IntLiteralNode node) {
-        node.setType(globalScope.getIntType());
+        node.setType(GlobalScope.getIntType());
     }
 
     @Override
@@ -276,7 +276,7 @@ public class SemanticAnalyzer implements ASTVisitor {
 
     @Override
     public void visit(NullNode node) {
-        node.setType(globalScope.getNullType());
+        node.setType(GlobalScope.getNullType());
     }
 
     @Override
@@ -334,7 +334,7 @@ public class SemanticAnalyzer implements ASTVisitor {
     public void visit(SubscriptExprNode node) {
         node.getArray().accept(this);
         node.getSubscript().accept(this);
-        if (!node.getArray().getType().isArray() || !node.getSubscript().getType().isInt()) {
+        if (!node.getArray().getType().isPointer() || !node.getSubscript().getType().isInt()) {
             throw new TypeError(node.getPosition());
         }
         node.setLvalue(true);
@@ -360,14 +360,14 @@ public class SemanticAnalyzer implements ASTVisitor {
                     throw new TypeError(node.getPosition());
                 }
                 node.setLvalue(true);
-                node.setType(globalScope.getIntType());
+                node.setType(GlobalScope.getIntType());
                 break;
             case POST_INC:
             case POST_DEC:
                 if (!src.getType().isInt() || !src.getLvalue()) {
                     throw new TypeError(node.getPosition());
                 }
-                node.setType(globalScope.getIntType());
+                node.setType(GlobalScope.getIntType());
                 break;
             case POS:
             case NEG:
@@ -375,13 +375,13 @@ public class SemanticAnalyzer implements ASTVisitor {
                 if (!src.getType().isInt()) {
                     throw new TypeError(node.getPosition());
                 }
-                node.setType(globalScope.getIntType());
+                node.setType(GlobalScope.getIntType());
                 break;
             case NOTL:
                 if (!src.getType().isBoolean()) {
                     throw new TypeError(node.getPosition());
                 }
-                node.setType(globalScope.getBoolType());
+                node.setType(GlobalScope.getBoolType());
         }
     }
 

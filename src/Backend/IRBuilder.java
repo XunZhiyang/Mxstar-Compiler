@@ -5,10 +5,12 @@ import IR.*;
 import IR.Constant.BoolConst;
 import IR.Constant.Function;
 import IR.Constant.IntConst;
+import IR.Constant.NullConst;
 import IR.Instruction.*;
 import IR.Module;
 import Symbol.ClassType;
 import Symbol.GlobalScope;
+import Symbol.PointerType;
 import Symbol.Type;
 
 import java.util.ArrayList;
@@ -19,7 +21,8 @@ public class IRBuilder implements ASTVisitor {
     GlobalScope globalScope;
     ClassType curClass;
     Function curFunction;
-    BasicBlock curBlock, breakBlock, continueBlock;
+    BasicBlock curBlock, breakBlock, continueBlock, retBlock;
+    Value returnValue;
     boolean justScan;
 
     public IRBuilder(GlobalScope globalScope) {
@@ -30,9 +33,22 @@ public class IRBuilder implements ASTVisitor {
         return module;
     }
 
-    public String convertFuncName(String identifier) {
-        return curClass == null ? identifier : curClass.getIdentifier() + "." + identifier;
+//    private String convertFuncName(String identifier) {
+//        return curClass == null ? identifier : curClass.getIdentifier() + "." + identifier;
+//    }
+
+    private Value assignConvert(Value value, Type demandedType) {
+        if (value.getType() == demandedType) {
+            return value;
+        } if (value.getType().isNull()) {
+            value.setType(demandedType);
+            return value;
+        }
+        else {
+            return new LoadInst(value, curBlock);
+        }
     }
+
 
     @Override
     public void visit(ProgramNode node) {
@@ -102,10 +118,10 @@ public class IRBuilder implements ASTVisitor {
         node.getObject().accept(this);
         ClassType thisClass = (ClassType) node.getObject().getValue().getType();
         Type fieldType = thisClass.getFieldType(node.getField());
-        if (thisClass.getIsMethod(node.getField())) {
-            node.setValue(new Function(convertFuncName(node.getField()), fieldType));
-        }
-        else{
+        if (!thisClass.getIsMethod(node.getField())) {
+//            node.setValue(new Function(convertFuncName(node.getField()), fieldType));
+//        }
+//        else{
             node.setValue(new FieldInst(node.getObject().getValue(), fieldType, thisClass.getFieldIndex(node.getField()), curBlock));
         }
     }
@@ -122,9 +138,15 @@ public class IRBuilder implements ASTVisitor {
         new JumpInst(forCond, curBlock);
 
         curBlock = forCond;
-        if (node.getCondition() != null)
+        Value condValue;
+        if (node.getCondition() != null) {
             node.getCondition().accept(this);
-        new BranchInst(node.getCondition().getValue(), forBody, forAfter, curBlock);
+            condValue = assignConvert(node.getCondition().getValue(), GlobalScope.getBoolType());
+        }
+        else {
+            condValue = new BoolConst(true);
+        }
+        new BranchInst(condValue, forBody, forAfter, curBlock);
 
         curBlock = forBody;
         BasicBlock tempBreak = breakBlock;
@@ -148,24 +170,46 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(FuncDeclNode node) {
-        String identifier = convertFuncName(node.getIdentifier());
+        String identifier = node.getSymbol().IRName();
         curFunction = new Function(identifier, node.getSymbol().getType());
         module.addFunction(curFunction);
         for (int i = 0; i < node.getParams().size(); ++i) {
             curFunction.addOperand(new Value("p", node.getSymbol().getParam().get(i)));
         }
+
+        retBlock = curFunction.add("retBlock");
+        curBlock = curFunction.add("initBlock");
+
+        if (!curFunction.getType().isVoid()) {
+            returnValue = new AllocaInst(curFunction.getType(), curBlock);
+            Value loadedReturnValue = new LoadInst(returnValue, retBlock);
+            new ReturnInst(loadedReturnValue, retBlock);
+        } else {
+            new ReturnInst(retBlock);
+        }
+
         node.getStmt().accept(this);
+
+        List<BasicBlock> blocks = curFunction.getBasicBlockList();
+        for (BasicBlock block : blocks) {
+            if (!block.isTerminated()) {
+                new JumpInst(retBlock, block);
+            }
+        }
+
     }
 
     @Override
     public void visit(FuncCallExprNode node) {
         node.getFunction().accept(this);
         List<Value> arguments = new ArrayList<>();
-        for (Expr i : node.getArguments()) {
-            i.accept(this);
-            arguments.add(new LoadInst(i.getValue(), curBlock));
+        List<Type> paramList = node.getFunction().getFunctionSymbol().getParam();
+
+        for (int i = 0; i < node.getArguments().size(); ++i) {
+            Expr t = node.getArguments().get(i);
+            arguments.add(assignConvert(t.getValue(), paramList.get(i)));
         }
-        CallInst inst = new CallInst((Function) node.getFunction().getValue(), arguments, curBlock);
+        new CallInst(node.getFunction().getFunctionSymbol(), arguments, curBlock);
     }
 
     @Override
@@ -176,17 +220,17 @@ public class IRBuilder implements ASTVisitor {
         node.setValue(new IntConst(node.getLiteral()));
     }
 
-    private
+//    private
 
     @Override
     public void visit(NewExprNode node) {
-        Type c = globalScope.getType(node.getNewType());
-        
+        Type type = globalScope.getType(node.getNewType());
+//        if (type.is)
     }
 
     @Override
     public void visit(NullNode node) {
-
+        node.setValue(new NullConst());
     }
 
     @Override
@@ -201,17 +245,20 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(ParamList node) {
-
+        //never accessed
     }
 
     @Override
     public void visit(ReturnNode node) {
-
+        node.getExpression().accept(this);
+        new StoreInst(assignConvert(node.getExpression().getValue(), returnValue.getType()), returnValue, curBlock);
+        new JumpInst(retBlock, curBlock);
     }
 
     @Override
     public void visit(SelectionStmtNode node) {
-
+        node.getCond().accept(this);
+        assignConvert(node.getCond().getValue(), GlobalScope.getBoolType());
     }
 
     @Override

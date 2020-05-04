@@ -9,13 +9,21 @@ import java.util.List;
 public class BasicBlock extends User {
     private String label;
     private List<Instruction> instructionList = new ArrayList<>();
+    private boolean terminated = false;
 
     public BasicBlock(String label) {
-        super(label, GlobalScope.voidType);
+        super(label, GlobalScope.getVoidType());
     }
 
     public void addInst(Instruction instruction) {
-        instructionList.add(instruction);
+        if(!terminated) {
+            instructionList.add(instruction);
+            this.terminated = instruction.isTerminator();
+        }
+    }
+
+    public boolean isTerminated() {
+        return terminated;
     }
 
     public String getLabel() {

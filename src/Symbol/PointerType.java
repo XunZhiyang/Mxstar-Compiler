@@ -11,8 +11,8 @@ public class PointerType extends Type{
     }
 
     @Override
-    public boolean isNullable() {
-        return true;
+    public Type getPointer() {
+        return new PointerType(baseType, dim + 1);
     }
 
     public Type getMember() {
@@ -21,7 +21,12 @@ public class PointerType extends Type{
     }
 
     @Override
-    public boolean isArray() {
+    public boolean isNullable() {
+        return true;
+    }
+
+    @Override
+    public boolean isPointer() {
         return true;
     }
 }

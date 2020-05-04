@@ -18,4 +18,8 @@ public class Function extends Constant {
         basicBlockList.add(newBlock);
         return newBlock;
     }
+
+    public List<BasicBlock> getBasicBlockList() {
+        return basicBlockList;
+    }
 }

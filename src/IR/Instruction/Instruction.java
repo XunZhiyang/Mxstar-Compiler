@@ -9,4 +9,6 @@ public abstract class Instruction extends User {
         super(name, type);
         curBlock.addInst(this);
     }
+
+    public boolean isTerminator() { return false;}
 }
