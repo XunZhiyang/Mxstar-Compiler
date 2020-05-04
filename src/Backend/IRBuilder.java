@@ -15,6 +15,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static Symbol.GlobalScope.getIntType;
+
 public class IRBuilder implements ASTVisitor {
     Module module;
     GlobalScope globalScope;
@@ -284,7 +286,11 @@ public class IRBuilder implements ASTVisitor {
     @Override
     public void visit(StringLiteralNode node) {
         String s = node.getStringLiteral();
-        s.co
+
+        s = s.replace("\\\\", "\\5C");
+        s = s.replace("\\n", "\\0A");
+        s = s.replace("\\\"", "\\22");
+
         GlobalVariable res = stringLiteralMap.get(s);
         if (res == null) {
             res = new StringConst(s);
@@ -296,6 +302,9 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(SubscriptExprNode node) {
+        node.getArray().accept(this);
+        node.getSubscript().accept(this);
+        Value num = assignConvert(node.getSubscript().getValue(), GlobalScope.getIntType());
 
     }
 
