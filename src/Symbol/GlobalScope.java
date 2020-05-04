@@ -12,6 +12,7 @@ public class GlobalScope extends BaseScope{
     private static PrimitiveType intType = new PrimitiveType("int", 32);
     private static PrimitiveType boolType = new PrimitiveType("bool", 1);
     private static PrimitiveType voidType = new PrimitiveType("void");
+    private static PrimitiveType charType = new PrimitiveType("_char", 8); //for IR replacing string
     private static NullType nullType = new NullType();
     private ClassType stringType = new ClassType("string", null, this);
     private FunctionSymbol size = new FunctionSymbol(intType, "size", null, this);
@@ -98,6 +99,9 @@ public class GlobalScope extends BaseScope{
     }
     public static PrimitiveType getVoidType() {
         return voidType;
+    }
+    public static PrimitiveType getCharType() {
+        return charType;
     }
     public ClassType getStringType() {
         return stringType;

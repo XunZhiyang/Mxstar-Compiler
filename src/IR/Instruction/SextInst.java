@@ -6,7 +6,7 @@ import Symbol.Type;
 
 public class SextInst extends Instruction {
     public SextInst(Value value, Type toType, BasicBlock curBlock) {
-        super("sext", toType, curBlock);
+        super(".sext", toType, curBlock);
         addOperand(value);
     }
 }

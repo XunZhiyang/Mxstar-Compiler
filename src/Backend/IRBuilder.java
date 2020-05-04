@@ -2,10 +2,7 @@ package Backend;
 
 import AST.*;
 import IR.*;
-import IR.Constant.BoolConst;
-import IR.Constant.Function;
-import IR.Constant.IntConst;
-import IR.Constant.NullConst;
+import IR.Constant.*;
 import IR.Instruction.*;
 import IR.Module;
 import Symbol.ClassType;
@@ -14,7 +11,9 @@ import Symbol.PointerType;
 import Symbol.Type;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class IRBuilder implements ASTVisitor {
     Module module;
@@ -24,6 +23,8 @@ public class IRBuilder implements ASTVisitor {
     BasicBlock curBlock, breakBlock, continueBlock, retBlock;
     Value returnValue;
     boolean justScan;
+
+    Map<String, GlobalVariable> stringLiteralMap = new LinkedHashMap<>;
 
     public IRBuilder(GlobalScope globalScope) {
         this.globalScope = globalScope;
@@ -257,13 +258,40 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(SelectionStmtNode node) {
+        BasicBlock ifTaken = curFunction.add("ifTaken");
+        BasicBlock ifNotTaken = node.getNotTaken() == null? null : curFunction.add("ifNotTaken");
+        BasicBlock ifAfter = curFunction.add("ifAfter");
+
         node.getCond().accept(this);
-        assignConvert(node.getCond().getValue(), GlobalScope.getBoolType());
+        Value cond = assignConvert(node.getCond().getValue(), GlobalScope.getBoolType());
+        node.getTaken().accept(this);
+
+        if (node.getNotTaken() != null) {
+            new BranchInst(cond, ifTaken, ifNotTaken, curBlock);
+            curBlock = ifNotTaken;
+            node.getNotTaken().accept(this);
+            new JumpInst(ifAfter, curBlock);
+        }
+        else {
+            new BranchInst(cond, ifTaken, ifAfter, curBlock);
+        }
+
+        curBlock = ifTaken;
+        node.getTaken().accept(this);
+        new JumpInst(ifAfter, curBlock);
     }
 
     @Override
     public void visit(StringLiteralNode node) {
-
+        String s = node.getStringLiteral();
+        s.co
+        GlobalVariable res = stringLiteralMap.get(s);
+        if (res == null) {
+            res = new StringConst(s);
+            stringLiteralMap.put(s, res);
+            module.addGlobalVariable(res);
+        }
+        node.setValue(res);
     }
 
     @Override

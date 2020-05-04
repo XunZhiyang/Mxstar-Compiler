@@ -205,14 +205,14 @@ public class ASTBuilder extends MxstarBaseVisitor<ASTNode> {
     @Override
     public ASTNode visitSelectionStatement(MxstarParser.SelectionStatementContext ctx) {
         Expr cond = (Expr) visit(ctx.expression());
-        Stmt[] branch = new Stmt[2];
-        branch[0] = (Stmt) visit(ctx.opt1);
+        Stmt taken = (Stmt) visit(ctx.opt1);
+        Stmt notTaken;
         if (ctx.opt2 != null) {
-            branch[1] = (Stmt) visit(ctx.opt2);
+            notTaken = (Stmt) visit(ctx.opt2);
         } else {
-            branch[1] = new EmptyStmtNode(new Position(ctx.getStart()));
+            notTaken = null;
         }
-        return new SelectionStmtNode(cond, branch, new Position(ctx.getStart()));
+        return new SelectionStmtNode(cond, taken, notTaken, new Position(ctx.getStart()));
     }
 
     @Override

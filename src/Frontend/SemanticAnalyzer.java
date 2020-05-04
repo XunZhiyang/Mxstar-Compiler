@@ -318,10 +318,14 @@ public class SemanticAnalyzer implements ASTVisitor {
             throw new TypeError(node.getPosition());
         }
         Scope thisScope = currentScope;
-        for (Stmt i : node.getBranch()) {
+
+        currentScope = new LocalScope(currentScope);
+        node.getTaken().accept(this);
+        if (node.getNotTaken() != null) {
             currentScope = new LocalScope(currentScope);
-            i.accept(this);
+            node.getNotTaken().accept(this);
         }
+
         currentScope = thisScope;
     }
 
