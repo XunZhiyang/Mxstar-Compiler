@@ -9,7 +9,7 @@ public class IntConst extends Constant {
     int value;
 
     public IntConst(int value) {
-        super("_const", GlobalScope.intType);
+        super("_const", GlobalScope.getIntType());
         this.value = value;
     }
 }

@@ -10,12 +10,11 @@ import Symbol.GlobalScope;
 import Symbol.PointerType;
 import Symbol.Type;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import static Symbol.GlobalScope.getIntType;
 
 public class IRBuilder implements ASTVisitor {
     Module module;
@@ -119,13 +118,13 @@ public class IRBuilder implements ASTVisitor {
     @Override
     public void visit(FieldExprNode node) {
         node.getObject().accept(this);
-        ClassType thisClass = (ClassType) node.getObject().getValue().getType();
+        ClassType thisClass = (ClassType) ((PointerType) node.getObject().getValue().getType()).getMember();
         Type fieldType = thisClass.getFieldType(node.getField());
         if (!thisClass.getIsMethod(node.getField())) {
-//            node.setValue(new Function(convertFuncName(node.getField()), fieldType));
-//        }
-//        else{
-            node.setValue(new FieldInst(node.getObject().getValue(), fieldType, thisClass.getFieldIndex(node.getField()), curBlock));
+            GEPInst inst = new GEPInst(node.getObject().getValue(), fieldType, curBlock);
+            inst.addOperand(new IntConst(0), new IntConst(thisClass.getFieldIndex(node.getField())));
+        } else {
+            node.setValue(node.getObject().getValue());
         }
     }
 
@@ -176,8 +175,13 @@ public class IRBuilder implements ASTVisitor {
         String identifier = node.getSymbol().IRName();
         curFunction = new Function(identifier, node.getSymbol().getType());
         module.addFunction(curFunction);
+
+        if (curClass != null) {
+            curFunction.addOperand(new Value(".this", curClass.getPointer()));
+        }
+
         for (int i = 0; i < node.getParams().size(); ++i) {
-            curFunction.addOperand(new Value("p", node.getSymbol().getParam().get(i)));
+            curFunction.addOperand(new Value(".p", node.getSymbol().getParam().get(i)));
         }
 
         retBlock = curFunction.add("retBlock");
@@ -207,6 +211,10 @@ public class IRBuilder implements ASTVisitor {
         node.getFunction().accept(this);
         List<Value> arguments = new ArrayList<>();
         List<Type> paramList = node.getFunction().getFunctionSymbol().getParam();
+
+        if (node.getFunction().getValue() != null) {
+            arguments.add(node.getFunction().getValue());
+        }
 
         for (int i = 0; i < node.getArguments().size(); ++i) {
             Expr t = node.getArguments().get(i);
@@ -305,12 +313,13 @@ public class IRBuilder implements ASTVisitor {
         node.getArray().accept(this);
         node.getSubscript().accept(this);
         Value num = assignConvert(node.getSubscript().getValue(), GlobalScope.getIntType());
-
+        GEPInst inst = new GEPInst(node.getArray().getValue(), ((PointerType) node.getArray().getType()).getMember(), curBlock);
+        inst.addOperand(num);
     }
 
     @Override
     public void visit(ThisNode node) {
-
+        
     }
 
     @Override
