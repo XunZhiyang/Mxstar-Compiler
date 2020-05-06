@@ -1,6 +1,7 @@
 package IR.Instruction;
 
 import IR.BasicBlock;
+import IR.IRVisitor;
 import IR.Value;
 import Symbol.GlobalScope;
 import Symbol.Type;
@@ -38,6 +39,10 @@ public class BinaryOpInst extends Instruction {
         addOperand(src1, src2);
     }
 
+    @Override
+    public void accept(IRVisitor visitor) {
+        visitor.visit(this);
+    }
 //    public enum IRBinaryOp{
 //        mul, sdiv, add, sub, srem, shl, ashr, and, or, xor, slt, sle, sgt, sge, eq, ne
 

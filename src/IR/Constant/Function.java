@@ -1,6 +1,7 @@
 package IR.Constant;
 
 import IR.BasicBlock;
+import IR.IRVisitor;
 import Symbol.Type;
 
 import java.util.ArrayList;
@@ -21,5 +22,10 @@ public class Function extends Constant {
 
     public List<BasicBlock> getBasicBlockList() {
         return basicBlockList;
+    }
+
+    @Override
+    public void accept(IRVisitor visitor) {
+        visitor.visit(this);
     }
 }

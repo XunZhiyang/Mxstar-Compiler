@@ -2,6 +2,7 @@ package IR.Instruction;
 
 import IR.BasicBlock;
 import IR.Constant.Function;
+import IR.IRVisitor;
 import IR.Value;
 import Symbol.FunctionSymbol;
 import Symbol.Type;
@@ -26,5 +27,10 @@ public class CallInst extends Instruction {
         for (Value v : arguments) {
             addOperand(v);
         }
+    }
+
+    @Override
+    public void accept(IRVisitor visitor) {
+        visitor.visit(this);
     }
 }

@@ -1,6 +1,7 @@
 package IR.Instruction;
 
 import IR.BasicBlock;
+import IR.IRVisitor;
 import IR.User;
 import Symbol.Type;
 
@@ -11,4 +12,9 @@ public abstract class Instruction extends User {
     }
 
     public boolean isTerminator() { return false;}
+
+    @Override
+    public void accept(IRVisitor visitor) {
+        visitor.visit(this);
+    }
 }

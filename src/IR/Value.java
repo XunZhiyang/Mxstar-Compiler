@@ -37,4 +37,8 @@ public class Value {
     public void setType(Type type) {
         this.type = type;
     }
+
+    public void accept(IRVisitor visitor) {
+        visitor.visit(this);
+    }
 }

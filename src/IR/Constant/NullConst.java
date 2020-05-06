@@ -1,10 +1,16 @@
 package IR.Constant;
 
+import IR.IRVisitor;
 import Symbol.GlobalScope;
 import Symbol.PointerType;
 
 public class NullConst extends Constant {
     public NullConst() {
         super("_const", GlobalScope.getNullType());
+    }
+
+    @Override
+    public void accept(IRVisitor visitor) {
+        visitor.visit(this);
     }
 }

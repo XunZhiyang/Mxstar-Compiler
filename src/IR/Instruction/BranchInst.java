@@ -1,6 +1,7 @@
 package IR.Instruction;
 
 import IR.BasicBlock;
+import IR.IRVisitor;
 import IR.Value;
 import Symbol.GlobalScope;
 
@@ -12,4 +13,9 @@ public class BranchInst extends Instruction {
 
     @Override
     public boolean isTerminator() { return true;}
+
+    @Override
+    public void accept(IRVisitor visitor) {
+        visitor.visit(this);
+    }
 }

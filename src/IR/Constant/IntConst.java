@@ -1,5 +1,6 @@
 package IR.Constant;
 
+import IR.IRVisitor;
 import Symbol.GlobalScope;
 import Symbol.Type;
 
@@ -11,5 +12,10 @@ public class IntConst extends Constant {
     public IntConst(int value) {
         super("_const", GlobalScope.getIntType());
         this.value = value;
+    }
+
+    @Override
+    public void accept(IRVisitor visitor) {
+        visitor.visit(this);
     }
 }
