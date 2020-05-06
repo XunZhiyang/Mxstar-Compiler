@@ -115,6 +115,7 @@ public class FunctionScanner implements ASTVisitor {
     public void visit(ParamDeclNode node){
         VarSymbol varSymbol = new VarSymbol(globalScope.getType(node.getType()), node.getIdentifier(), node);
         currentScope.defineSymbol(varSymbol);
+        node.setVarSymbol(varSymbol);
     }
 
     @Override
@@ -158,6 +159,7 @@ public class FunctionScanner implements ASTVisitor {
         for (String i : node.getVariables()) {
             VarSymbol varSymbol = new VarSymbol(type, i, node);
             currentScope.defineSymbol(varSymbol);
+            node.setVarSymbol(varSymbol);
         }
     }
 

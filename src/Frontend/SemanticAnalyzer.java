@@ -348,6 +348,7 @@ public class SemanticAnalyzer implements ASTVisitor {
     @Override
     public void visit(ThisNode node) {
         node.setType(currentClass);
+
     }
 
     @Override
@@ -402,6 +403,7 @@ public class SemanticAnalyzer implements ASTVisitor {
         if (!(currentScope instanceof ClassType)) {
             for (String i : node.getVariables()) {
                 VarSymbol varSymbol = new VarSymbol(type, i, node);
+                node.setVarSymbol(varSymbol);
                 currentScope.defineSymbol(varSymbol);
             }
         }
@@ -419,6 +421,8 @@ public class SemanticAnalyzer implements ASTVisitor {
         node.setLvalue(true);
         if (symbol.isFunction())
             node.setFunctionSymbol((FunctionSymbol) symbol);
+        else
+            node.setVarSymbol((VarSymbol) symbol);
     }
 
     @Override

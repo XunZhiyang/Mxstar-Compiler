@@ -26,8 +26,6 @@ public class Value {
         return origName + "_" + cnt;
     }
 
-    String
-
     public String getIdentifier() {
         return identifier;
     }

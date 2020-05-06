@@ -3,12 +3,14 @@ package AST;
 import IR.Value;
 import Symbol.FunctionSymbol;
 import Symbol.Type;
+import Symbol.VarSymbol;
 import Utils.Position;
 
 public abstract class Expr extends ASTNode {
     private Type type;
     private boolean isLvalue;
     private FunctionSymbol functionSymbol;
+    private VarSymbol varSymbol;
 
     private Value value;
 
@@ -35,6 +37,14 @@ public abstract class Expr extends ASTNode {
 
     public FunctionSymbol getFunctionSymbol() {
         return functionSymbol;
+    }
+
+    public void setVarSymbol(VarSymbol varSymbol) {
+        this.varSymbol = varSymbol;
+    }
+
+    public VarSymbol getVarSymbol() {
+        return varSymbol;
     }
 
     public void setType(Type type) {

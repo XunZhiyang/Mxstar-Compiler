@@ -1,7 +1,9 @@
 package AST;
 
+import Symbol.VarSymbol;
 import Utils.Position;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class VarDeclNode extends ProgramFragment{
@@ -9,6 +11,8 @@ public class VarDeclNode extends ProgramFragment{
     private List<String> variables;
     private boolean hasInitValue;
     private Expr initValue;
+
+    private List<VarSymbol> varSymbolList = new ArrayList<>();
 
     public VarDeclNode(TypeNode type, List<String> variables, boolean hasInitValue, Expr initValue, Position position) {
         super(position);
@@ -29,6 +33,14 @@ public class VarDeclNode extends ProgramFragment{
         if (hasInitValue) {
             throw new RuntimeException("VarDeclNode Error" + position.toString());
         }
+    }
+
+    public List<VarSymbol> getVarSymbol() {
+        return varSymbolList;
+    }
+
+    public void setVarSymbol(VarSymbol varSymbol) {
+        this.varSymbolList.add(varSymbol);
     }
 
     public TypeNode getType() {

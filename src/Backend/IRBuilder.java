@@ -9,12 +9,11 @@ import Symbol.ClassType;
 import Symbol.GlobalScope;
 import Symbol.PointerType;
 import Symbol.Type;
+import Utils.TypeError;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 public class IRBuilder implements ASTVisitor {
     Module module;
@@ -22,10 +21,10 @@ public class IRBuilder implements ASTVisitor {
     ClassType curClass;
     Function curFunction;
     BasicBlock curBlock, breakBlock, continueBlock, retBlock;
-    Value returnValue;
-    boolean justScan;
+    Value returnValue, thisValue;
+    boolean scanGlobalVariable;
 
-    Map<String, GlobalVariable> stringLiteralMap = new LinkedHashMap<>;
+    Map<String, GlobalVariable> stringLiteralMap = new LinkedHashMap<>();
 
     public IRBuilder(GlobalScope globalScope) {
         this.globalScope = globalScope;
@@ -51,16 +50,26 @@ public class IRBuilder implements ASTVisitor {
         }
     }
 
+    private void addBuiltin() {
+
+    }
 
     @Override
     public void visit(ProgramNode node) {
-        justScan = true;
+        scanGlobalVariable = true;
+        curFunction = new Function("_init", GlobalScope.getVoidType());
+        module.addFunction(curFunction);
         for (ProgramFragment i : node.getList()) {
-            i.accept(this);
+            if (i instanceof VarDeclNode) {
+                i.accept(this);
+            }
         }
-        justScan = false;
+
+        scanGlobalVariable = false;
         for (ProgramFragment i : node.getList()) {
-            i.accept(this);
+            if (!(i instanceof VarDeclNode)) {
+                i.accept(this);
+            }
         }
     }
 
@@ -70,10 +79,170 @@ public class IRBuilder implements ASTVisitor {
         node.getSrc2().accept(this);
         Value v1 = node.getSrc1().getValue();
         Value v2 = node.getSrc2().getValue();
-        switch (node.getOp()) {
-//            case MUL:
-//                new OpInst;
+        Type vType = node.getSrc1().getType();
+        Value res = null;
+        switch(node.getOp()){
+            case MUL:
+                v1 = assignConvert(v1, GlobalScope.getIntType());
+                v2 = assignConvert(v2, GlobalScope.getIntType());
+                res = new BinaryOpInst("mul", v1, v2, curBlock);
+                break;
+            case DIV:
+                v1 = assignConvert(v1, GlobalScope.getIntType());
+                v2 = assignConvert(v2, GlobalScope.getIntType());
+                res = new BinaryOpInst("sdiv", v1, v2, curBlock);
+                break;
+            case MOD:
+                v1 = assignConvert(v1, GlobalScope.getIntType());
+                v2 = assignConvert(v2, GlobalScope.getIntType());
+                res = new BinaryOpInst("srem", v1, v2, curBlock);
+                break;
+            case SUB:
+                v1 = assignConvert(v1, GlobalScope.getIntType());
+                v2 = assignConvert(v2, GlobalScope.getIntType());
+                res = new BinaryOpInst("sub", v1, v2, curBlock);
+                break;
+            case SAL:
+                v1 = assignConvert(v1, GlobalScope.getIntType());
+                v2 = assignConvert(v2, GlobalScope.getIntType());
+                res = new BinaryOpInst("shl", v1, v2, curBlock);
+                break;
+            case SAR:
+                v1 = assignConvert(v1, GlobalScope.getIntType());
+                v2 = assignConvert(v2, GlobalScope.getIntType());
+                res = new BinaryOpInst("ashr", v1, v2, curBlock);
+                break;
+            case AND:
+                v1 = assignConvert(v1, GlobalScope.getIntType());
+                v2 = assignConvert(v2, GlobalScope.getIntType());
+                res = new BinaryOpInst("and", v1, v2, curBlock);
+                break;
+            case OR: {
+                v1 = assignConvert(v1, GlobalScope.getIntType());
+                v2 = assignConvert(v2, GlobalScope.getIntType());
+                res = new BinaryOpInst("or", v1, v2, curBlock);
+                break;
+            }
+            case ADD: {
+                if (vType.isInt()) {
+                    v1 = assignConvert(v1, GlobalScope.getIntType());
+                    v2 = assignConvert(v2, GlobalScope.getIntType());
+                    res = new BinaryOpInst("add", v1, v2, curBlock);
+                } else if (vType.isString()) {
+                    v1 = assignConvert(v1, GlobalScope.getCharType().getPointer());
+                    v2 = assignConvert(v2, GlobalScope.getCharType().getPointer());
+                    res = new CallInst("_string_concatenate", GlobalScope.getCharType().getPointer(),
+                            Arrays.asList(v1, v2), curBlock);
+                }
+                break;
+            }
+            case LT:
+                if (vType.isInt()) {
+                    v1 = assignConvert(v1, GlobalScope.getIntType());
+                    v2 = assignConvert(v2, GlobalScope.getIntType());
+                    res = new BinaryOpInst("slt", v1, v2, curBlock);
+                } else if (vType.isString()) {
+                    v1 = assignConvert(v1, GlobalScope.getCharType().getPointer());
+                    v2 = assignConvert(v2, GlobalScope.getCharType().getPointer());
+                    res = new CallInst("_string_lt", GlobalScope.getCharType().getPointer(),
+                            Arrays.asList(v1, v2), curBlock);
+                }
+                break;
+            case GT:
+                if (vType.isInt()) {
+                    v1 = assignConvert(v1, GlobalScope.getIntType());
+                    v2 = assignConvert(v2, GlobalScope.getIntType());
+                    res = new BinaryOpInst("sgt", v1, v2, curBlock);
+                } else if (vType.isString()) {
+                    v1 = assignConvert(v1, GlobalScope.getCharType().getPointer());
+                    v2 = assignConvert(v2, GlobalScope.getCharType().getPointer());
+                    res = new CallInst("_string_gt", GlobalScope.getCharType().getPointer(),
+                            Arrays.asList(v1, v2), curBlock);
+                }
+                break;
+            case LE:
+                if (vType.isInt()) {
+                    v1 = assignConvert(v1, GlobalScope.getIntType());
+                    v2 = assignConvert(v2, GlobalScope.getIntType());
+                    res = new BinaryOpInst("sle", v1, v2, curBlock);
+                } else if (vType.isString()) {
+                    v1 = assignConvert(v1, GlobalScope.getCharType().getPointer());
+                    v2 = assignConvert(v2, GlobalScope.getCharType().getPointer());
+                    res = new CallInst("_string_le", GlobalScope.getCharType().getPointer(),
+                            Arrays.asList(v1, v2), curBlock);
+                }
+                break;
+            case GE: {
+                if (vType.isInt()) {
+                    v1 = assignConvert(v1, GlobalScope.getIntType());
+                    v2 = assignConvert(v2, GlobalScope.getIntType());
+                    res = new BinaryOpInst("sge", v1, v2, curBlock);
+                } else if (vType.isString()) {
+                    v1 = assignConvert(v1, GlobalScope.getCharType().getPointer());
+                    v2 = assignConvert(v2, GlobalScope.getCharType().getPointer());
+                    res = new CallInst("_string_ge", GlobalScope.getCharType().getPointer(),
+                            Arrays.asList(v1, v2), curBlock);
+                }
+                break;
+            }
+            case EQ:
+                if (node.getSrc1().getType().isString() && node.getSrc2().getType().isString()) {
+                    v1 = assignConvert(v1, GlobalScope.getCharType().getPointer());
+                    v2 = assignConvert(v2, GlobalScope.getCharType().getPointer());
+                    res = new CallInst("_string_eq", GlobalScope.getCharType().getPointer(),
+                            Arrays.asList(v1, v2), curBlock);
+                } else {
+                    if (!v1.getType().isNull()) {
+                        v1 = new LoadInst(v1, curBlock);
+                    }
+                    if (!v2.getType().isNull()) {
+                        v2 = new LoadInst(v2, curBlock);
+                    }
+                    res = new BinaryOpInst("eq", v1, v2, curBlock);
+                }
+                break;
+            case NE:
+                if (node.getSrc1().getType().isString() && node.getSrc2().getType().isString()) {
+                    v1 = assignConvert(v1, GlobalScope.getCharType().getPointer());
+                    v2 = assignConvert(v2, GlobalScope.getCharType().getPointer());
+                    res = new CallInst("_string_ne", GlobalScope.getCharType().getPointer(),
+                            Arrays.asList(v1, v2), curBlock);
+                } else {
+                    if (!v1.getType().isNull()) {
+                        v1 = new LoadInst(v1, curBlock);
+                    }
+                    if (!v2.getType().isNull()) {
+                        v2 = new LoadInst(v2, curBlock);
+                    }
+                    res = new BinaryOpInst("ne", v1, v2, curBlock);
+                }
+                break;
+            case XOR:
+                if (vType.isBoolean()) {
+                    v1 = assignConvert(v1, GlobalScope.getBoolType());
+                    v2 = assignConvert(v2, GlobalScope.getBoolType());
+                } else {
+                    v1 = assignConvert(v1, GlobalScope.getIntType());
+                    v2 = assignConvert(v2, GlobalScope.getIntType());
+                }
+                res = new BinaryOpInst("xor", v1, v2, curBlock);
+                break;
+            case ANL:
+                v1 = assignConvert(v1, GlobalScope.getBoolType());
+                v2 = assignConvert(v2, GlobalScope.getBoolType());
+                res = new BinaryOpInst("and", v1, v2, curBlock);
+                break;
+            case ORL:
+                v1 = assignConvert(v1, GlobalScope.getBoolType());
+                v2 = assignConvert(v2, GlobalScope.getBoolType());
+                res = new BinaryOpInst("or", v1, v2, curBlock);
+                break;
+            case ASSIGN:
+                v2 = assignConvert(v2, ((PointerType) v1.getType()).getMember());
+                new StoreInst(v2, v1, curBlock);
+                res = v1;
         }
+        node.setValue(res);
     }
 
     @Override
@@ -154,7 +323,7 @@ public class IRBuilder implements ASTVisitor {
         BasicBlock tempBreak = breakBlock;
         BasicBlock tempContinue = continueBlock;
         breakBlock = forAfter;
-        continueBlock = forBody;
+        continueBlock = forStep;
         if (node.getStatement() != null)
             node.getStatement().accept(this);
         breakBlock = tempBreak;
@@ -177,7 +346,8 @@ public class IRBuilder implements ASTVisitor {
         module.addFunction(curFunction);
 
         if (curClass != null) {
-            curFunction.addOperand(new Value(".this", curClass.getPointer()));
+            thisValue = new Value(".this", curClass.getPointer());
+            curFunction.addOperand(thisValue);
         }
 
         for (int i = 0; i < node.getParams().size(); ++i) {
@@ -319,36 +489,111 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(ThisNode node) {
-        
+        node.setValue(thisValue);
     }
 
     @Override
-    public void visit(TypeNode node) {
-
-    }
+    public void visit(TypeNode node) {}
 
     @Override
     public void visit(UnaryExprNode node) {
-
+        node.getSrc().accept(this);
+        Value src = node.getSrc().getValue();
+        Value v, res = null;
+        switch (node.getOp()) {
+            case PRE_INC:
+                v = new BinaryOpInst("add", assignConvert(src, GlobalScope.getIntType()),
+                        new IntConst(1), curBlock);
+                new StoreInst(v, src, curBlock);
+                res = src;
+                break;
+            case PRE_DEC:
+                v = new BinaryOpInst("sub", assignConvert(src, GlobalScope.getIntType()),
+                        new IntConst(1), curBlock);
+                new StoreInst(v, src, curBlock);
+                res = src;
+                break;
+            case POST_INC:
+                v = assignConvert(src, GlobalScope.getIntType());
+                new StoreInst(new BinaryOpInst("add", v, new IntConst(1), curBlock), src, curBlock);
+                res = v;
+                break;
+            case POST_DEC:
+                v = assignConvert(src, GlobalScope.getIntType());
+                new StoreInst(new BinaryOpInst("sub", v, new IntConst(1), curBlock), src, curBlock);
+                res = v;
+                break;
+            case POS:
+                res = src;
+                break;
+            case NEG:
+                res = new BinaryOpInst("sub", new IntConst(0),
+                        assignConvert(src, GlobalScope.getIntType()), curBlock);
+                break;
+            case NOT:
+                res = new BinaryOpInst("xor", assignConvert(src, GlobalScope.getIntType()),
+                        new IntConst(-1), curBlock);
+                break;
+            case NOTL:
+                res = new BinaryOpInst("xor", assignConvert(src, GlobalScope.getBoolType()),
+                        new BoolConst(true), curBlock);
+                break;
+        }
+        node.setValue(res);
     }
 
     @Override
     public void visit(VarDeclNode node) {
-
+        // local variables
+        Value np;
+        if (scanGlobalVariable) {
+            np = new GlobalVariable(""globalScope.getType(node.getType()));
+        }
+        for (String var : node.getVariables()) {
+            np = new AllocaInst(globalScope.getType(node.getType()), curBlock);
+        }
+        node.getVarSymbol().setValue(np);
+        if (node.ifInitValue()) {
+            node.getInitValue().accept(this);
+            Value v = assignConvert(node.getInitValue().getValue(), globalScope.getType(node.getType()));
+            new StoreInst(v, np, curBlock);
+        }
     }
 
     @Override
     public void visit(VarDeclStmtNode node) {
-
+        node.getVariable().accept(this);
     }
 
     @Override
     public void visit(VarExprNode node) {
-
+        node.setValue(node.getVarSymbol().getValue());
     }
 
     @Override
     public void visit(WhileStmtNode node) {
+        BasicBlock whileCond = curFunction.add("forCond");
+        BasicBlock whileBody = curFunction.add("forBody");
+        BasicBlock whileAfter = curFunction.add("forAfter");
 
+        new JumpInst(whileCond, curBlock);
+
+        curBlock = whileCond;
+        node.getCondition().accept(this);
+        Value condValue = assignConvert(node.getCondition().getValue(), GlobalScope.getBoolType());
+        new BranchInst(condValue, whileBody, whileAfter, curBlock);
+
+        curBlock = whileBody;
+        BasicBlock tempBreak = breakBlock;
+        BasicBlock tempContinue = continueBlock;
+        breakBlock = whileAfter;
+        continueBlock = whileCond;
+        if (node.getStatement() != null)
+            node.getStatement().accept(this);
+        breakBlock = tempBreak;
+        continueBlock = tempContinue;
+        new JumpInst(whileCond, curBlock);
+
+        curBlock = whileAfter;
     }
 }

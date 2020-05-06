@@ -1,12 +1,14 @@
 package AST;
 
 import IR.Value;
+import Symbol.VarSymbol;
 import Utils.Position;
 
 public class ParamDeclNode extends ASTNode {
     private TypeNode type;
     private String identifier;
 
+    VarSymbol varSymbol;
     Value value;
 
     public ParamDeclNode(TypeNode type, String identifier, Position position) {
@@ -29,6 +31,14 @@ public class ParamDeclNode extends ASTNode {
 
     public String getIdentifier() {
         return identifier;
+    }
+
+    public VarSymbol getVarSymbol() {
+        return varSymbol;
+    }
+
+    public void setVarSymbol(VarSymbol varSymbol) {
+        this.varSymbol = varSymbol;
     }
 
     @Override
