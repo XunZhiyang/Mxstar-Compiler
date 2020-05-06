@@ -2,19 +2,43 @@ package IR.Instruction;
 
 import IR.BasicBlock;
 import IR.Value;
-import Utils.BinaryOp;
+import Symbol.GlobalScope;
+import Symbol.Type;
 
-import java.util.Map;
 
 public class BinaryOpInst extends Instruction {
+    private static Type calcType(String op, Value v) {
+        switch(op) {
+            case "mul":
+            case "sdiv":
+            case "add":
+            case "sub":
+            case "srem":
+            case "shl":
+            case "ashr":
+                return GlobalScope.getIntType();
+            case "and":
+            case "or":
+            case "xor":
+                return v.getType();
+            case "slt":
+            case "sle":
+            case "sgt":
+            case"sge":
+            case "eq":
+            case "ne":
+                return GlobalScope.getBoolType();
+            default:
+                throw new RuntimeException();
+        }
+    }
+
     public BinaryOpInst(String op, Value src1, Value src2, BasicBlock curBlock) {
-        super()
+        super(op, calcType(op, src1), curBlock);
+        addOperand(src1, src2);
     }
 
 //    public enum IRBinaryOp{
 //        mul, sdiv, add, sub, srem, shl, ashr, and, or, xor, slt, sle, sgt, sge, eq, ne
-     Map.of("<", "slt", "<=", "sle", ">", "sgt", ">=", "sge",
-             "==", "eq", "!=", "ne");
-//    }
 
 }

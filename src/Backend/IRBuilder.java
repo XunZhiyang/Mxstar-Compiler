@@ -9,7 +9,6 @@ import Symbol.ClassType;
 import Symbol.GlobalScope;
 import Symbol.PointerType;
 import Symbol.Type;
-import Utils.TypeError;
 
 import java.awt.*;
 import java.util.*;
@@ -48,10 +47,6 @@ public class IRBuilder implements ASTVisitor {
         else {
             return new LoadInst(value, curBlock);
         }
-    }
-
-    private void addBuiltin() {
-
     }
 
     @Override
@@ -357,12 +352,18 @@ public class IRBuilder implements ASTVisitor {
         retBlock = curFunction.add("retBlock");
         curBlock = curFunction.add("initBlock");
 
+
         if (!curFunction.getType().isVoid()) {
             returnValue = new AllocaInst(curFunction.getType(), curBlock);
             Value loadedReturnValue = new LoadInst(returnValue, retBlock);
             new ReturnInst(loadedReturnValue, retBlock);
         } else {
             new ReturnInst(retBlock);
+        }
+
+        if (node.getIdentifier().equals("main")) {
+            new StoreInst(new IntConst(0), returnValue, curBlock);
+            new CallInst("_init", GlobalScope.getVoidType(), new ArrayList<>(),curBlock);
         }
 
         node.getStmt().accept(this);
@@ -544,19 +545,20 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(VarDeclNode node) {
-        // local variables
         Value np;
-        if (scanGlobalVariable) {
-            np = new GlobalVariable(""globalScope.getType(node.getType()));
-        }
-        for (String var : node.getVariables()) {
-            np = new AllocaInst(globalScope.getType(node.getType()), curBlock);
-        }
-        node.getVarSymbol().setValue(np);
-        if (node.ifInitValue()) {
-            node.getInitValue().accept(this);
-            Value v = assignConvert(node.getInitValue().getValue(), globalScope.getType(node.getType()));
-            new StoreInst(v, np, curBlock);
+        for (int i = 0; i < node.getVarSymbol().size(); ++i) {
+            if (scanGlobalVariable) {
+                np = new GlobalVariable(node.getVariables().get(i), globalScope.getType(node.getType()));
+            }
+            else {
+                np = new AllocaInst(globalScope.getType(node.getType()), curBlock);
+            }
+            node.getVarSymbol().get(i).setValue(np);
+            if (node.ifInitValue()) {
+                node.getInitValue().accept(this);
+                Value v = assignConvert(node.getInitValue().getValue(), globalScope.getType(node.getType()));
+                new StoreInst(v, np, curBlock);
+            }
         }
     }
 
