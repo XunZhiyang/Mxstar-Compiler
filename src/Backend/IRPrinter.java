@@ -8,6 +8,12 @@ import IR.Value;
 import Symbol.ClassType;
 
 public class IRPrinter implements IRVisitor {
+    private String res;
+
+    public String getRes() {
+        return res;
+    }
+
     @Override
     public void visit(Value node) {
 
@@ -15,7 +21,11 @@ public class IRPrinter implements IRVisitor {
 
     @Override
     public void visit(Module node) {
+        for (Value i : node.getGlobalVariableList()) {
+            res += i.getIdentifier() + " = global " + i.getType().getMember().IR;
 
+
+        }
     }
 
     @Override
@@ -30,7 +40,7 @@ public class IRPrinter implements IRVisitor {
 
     @Override
     public void visit(GlobalVariable node) {
-
+        res += node.getIdentifier();
     }
 
     //Instruction

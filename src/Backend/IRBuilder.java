@@ -548,7 +548,7 @@ public class IRBuilder implements ASTVisitor {
         Value np;
         for (int i = 0; i < node.getVarSymbol().size(); ++i) {
             if (scanGlobalVariable) {
-                np = new GlobalVariable(node.getVariables().get(i), globalScope.getType(node.getType()));
+                np = new GlobalVariable(node.getVariables().get(i), globalScope.getType(node.getType()).getPointer());
             }
             else {
                 np = new AllocaInst(globalScope.getType(node.getType()), curBlock);

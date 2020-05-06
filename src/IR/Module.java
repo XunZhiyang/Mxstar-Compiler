@@ -11,6 +11,18 @@ public class Module {
     private List<Function> functionList = new ArrayList<>();
     private List<Value> globalVariableList = new ArrayList<>();
 
+    public List<ClassType> getClassList() {
+        return classList;
+    }
+
+    public List<Function> getFunctionList() {
+        return functionList;
+    }
+
+    public List<Value> getGlobalVariableList() {
+        return globalVariableList;
+    }
+
     public void addClass(ClassType c) {
         classList.add(c);
     }
