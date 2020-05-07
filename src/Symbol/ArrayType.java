@@ -10,4 +10,9 @@ public class ArrayType extends Type{
         this.baseType = baseType;
         this.dim = dim;
     }
+
+    @Override
+    public String IRName() {
+        return "[" + dim + " x " + baseType.IRName() + "]";
+    }
 }

@@ -36,6 +36,8 @@ public class PrimitiveType extends Type{
                 return "i8";
             case "void":
                 return "void";
+            case "_I64":
+                return "i64";
             default:
                 throw new RuntimeException();
         }

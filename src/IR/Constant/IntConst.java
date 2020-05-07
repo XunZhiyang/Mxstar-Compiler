@@ -15,6 +15,11 @@ public class IntConst extends Constant {
     }
 
     @Override
+    public String getIdentifier() {
+        return String.valueOf(value);
+    }
+
+    @Override
     public void accept(IRVisitor visitor) {
         visitor.visit(this);
     }

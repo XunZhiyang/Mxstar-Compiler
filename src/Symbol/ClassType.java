@@ -12,7 +12,7 @@ public class ClassType extends Type implements Scope {
     private Map<String, Symbol> symbolMap = new LinkedHashMap<>();
     private Scope fatherScope;
     private ClassDeclNode define;
-    private boolean hasConstructor;
+    private FunctionSymbol constructor;
 
 
     //for IR
@@ -23,14 +23,16 @@ public class ClassType extends Type implements Scope {
         super(typeName);
         this.define = define;
         this.fatherScope = fatherScope;
-        hasConstructor = false;
+        this.constructor = null;
     }
 
     @Override
     public void defineSymbol(Symbol symbol) {
-        if (hasConstructor && symbol.ifConstructor())
+        if (constructor != null && symbol.ifConstructor())
             throw new SemanticError("Duplicate constructors.", symbol.getPosition());
-        hasConstructor = symbol.ifConstructor();
+        if(symbol.ifConstructor()) {
+            this.constructor = (FunctionSymbol) symbol;
+        }
         if (symbolMap.containsKey(symbol.getIdentifier())) {
             throw new RedefError(symbol.getIdentifier(), symbol.getPos());
         }
@@ -75,6 +77,10 @@ public class ClassType extends Type implements Scope {
         return fieldIndex.get(identifier);
     }
 
+    public FunctionSymbol getConstructor() {
+        return constructor;
+    }
+
     public List<Type> getTypeList() {
         List<Type> list = new ArrayList<>();
         for (Map.Entry<String, Symbol> entry : symbolMap.entrySet()) {
@@ -83,7 +89,7 @@ public class ClassType extends Type implements Scope {
         return list;
     }
 
-    public Type getFieldType(String identifier) {
+    public Type     getFieldType(String identifier) {
         Symbol symbol = symbolMap.get(identifier);
         return symbol.getType();
     }

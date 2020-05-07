@@ -23,7 +23,7 @@ public class Value {
             cnt = times + 1;
         }
         freq.put(origName, cnt);
-        return origName + "_" + cnt;
+        return cnt == 0 ? origName : origName + "_" + cnt;
     }
 
     public String getIdentifier() {

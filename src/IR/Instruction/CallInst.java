@@ -29,6 +29,10 @@ public class CallInst extends Instruction {
         }
     }
 
+    public String getFunctionIdentifier() {
+        return functionIdentifier;
+    }
+
     @Override
     public void accept(IRVisitor visitor) {
         visitor.visit(this);

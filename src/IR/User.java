@@ -20,4 +20,8 @@ public class User extends Value {
     public List<Value> getOperands() {
         return operands;
     }
+
+    public Value getOperand(int index) {
+        return operands.get(index);
+    }
 }

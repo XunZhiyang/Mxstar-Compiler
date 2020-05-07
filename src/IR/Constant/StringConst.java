@@ -12,6 +12,10 @@ public class StringConst extends GlobalVariable {
         this.string = string;
     }
 
+    public String getString() {
+        return string;
+    }
+
     @Override
     public void accept(IRVisitor visitor) {
         visitor.visit(this);

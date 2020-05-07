@@ -7,9 +7,9 @@ import Symbol.ClassType;
 import Symbol.Type;
 
 public class GEPInst extends Instruction {
-    public GEPInst(Value classObject, Type fieldType, BasicBlock curBlock) {
+    public GEPInst(Value pointer, Type fieldType, BasicBlock curBlock) {
         super(".GEP", fieldType, curBlock);
-        addOperand(classObject);
+        addOperand(pointer);
 //        addOperand(index);
     }
 

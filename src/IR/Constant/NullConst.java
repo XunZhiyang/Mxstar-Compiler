@@ -10,6 +10,11 @@ public class NullConst extends Constant {
     }
 
     @Override
+    public String getIdentifier() {
+        return "null";
+    }
+
+    @Override
     public void accept(IRVisitor visitor) {
         visitor.visit(this);
     }

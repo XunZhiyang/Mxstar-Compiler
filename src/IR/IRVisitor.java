@@ -22,9 +22,13 @@ public interface IRVisitor {
 
     void visit(BinaryOpInst node);
 
+    void visit(BitCastInst node);
+
     void visit(BranchInst node);
 
     void visit(CallInst node);
+
+    void visit(CmpInst node);
 
     void visit(GEPInst node);
 

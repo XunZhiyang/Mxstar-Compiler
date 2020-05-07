@@ -12,6 +12,11 @@ public class BoolConst extends Constant {
     }
 
     @Override
+    public String getIdentifier() {
+        return value ? "1" : "0";
+    }
+
+    @Override
     public void accept(IRVisitor visitor) {
         visitor.visit(this);
     }
