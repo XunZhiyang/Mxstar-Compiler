@@ -15,6 +15,8 @@ public interface IRVisitor {
 
     void visit(GlobalVariable node);
 
+    void visit(BasicBlock node);
+
     //Instruction
     void visit(AllocaInst node);
 

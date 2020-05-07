@@ -16,8 +16,16 @@ public abstract class Type {
         this.bitLen = bitLen;
     }
 
+    public String IRName() {
+        return identifier;
+    }
+
     public int getBitLen() {
         return bitLen;
+    }
+
+    public int getAlignment() {
+        return (bitLen + 7) / 8;
     }
 
     public Type getPointer() {  //will be overridden by PointerType

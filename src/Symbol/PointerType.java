@@ -1,5 +1,7 @@
 package Symbol;
 
+import java.util.Collections;
+
 public class PointerType extends Type{
     private Type baseType;
     private int dim;
@@ -28,5 +30,11 @@ public class PointerType extends Type{
     @Override
     public boolean isPointer() {
         return true;
+    }
+
+    @Override
+    public String IRName() {
+        return baseType.IRName() + String.join("", Collections.nCopies(dim, "*"));
+//        return baseType.IRName() + repeatString("*", dim, "");
     }
 }

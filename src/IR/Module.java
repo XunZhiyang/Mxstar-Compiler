@@ -34,4 +34,8 @@ public class Module {
     public void addGlobalVariable(Value v) {
         globalVariableList.add(v);
     }
+
+    public void accept(IRVisitor visitor) {
+        visitor.visit(this);
+    }
 }

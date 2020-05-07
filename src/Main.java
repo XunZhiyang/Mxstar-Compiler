@@ -1,5 +1,7 @@
 import AST.ASTNode;
+import AST.ProgramNode;
 import Backend.IRBuilder;
+import Backend.IRPrinter;
 import Frontend.ASTBuilder;
 import Frontend.ClassScanner;
 import Frontend.FunctionScanner;
@@ -35,7 +37,7 @@ public class Main {
         return parser.program();
     }
 
-    private static GlobalScope analyzeSemantics(ASTNode ast) {
+    private static GlobalScope analyzeSemantics(ProgramNode ast) {
         GlobalScope globalScope = new GlobalScope();
         ast.accept(new ClassScanner(globalScope));
         ast.accept(new FunctionScanner(globalScope));
@@ -48,8 +50,14 @@ public class Main {
         return builder.visit(tree);
     }
 
-    private static Module buildIR(GlobalScope globalScope) {
-        Module module = new IRBuilder(globalScope).getModule();
+    private static Module buildIR(ProgramNode ast, GlobalScope globalScope) {
+        IRBuilder builder = new IRBuilder(globalScope);
+        builder.visit(ast);
+        Module module = builder.getModule();
+
+        IRPrinter printer = new IRPrinter();
+        printer.visit(module);
+        System.out.println(printer.getIR());
         return module;
     }
 
@@ -57,9 +65,9 @@ public class Main {
         try{
             CharStream input = readCode();
             ParseTree tree = buildCST(input);
-            ASTNode ast = buildAST(tree);
+            ProgramNode ast = (ProgramNode) buildAST(tree);
             GlobalScope globalScope = analyzeSemantics(ast);
-//            buildIR(globalScope);
+            buildIR(ast, globalScope);
 
         } catch (Exception e) {
             e.printStackTrace();

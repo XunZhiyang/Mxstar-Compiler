@@ -11,7 +11,7 @@ public class Function extends Constant {
     List<BasicBlock> basicBlockList = new ArrayList<>();
 
     public Function(String name, Type type) {
-        super(name, type);
+        super("@" + name, type);
     }
 
     public BasicBlock add(String identifier) {

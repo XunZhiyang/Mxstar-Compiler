@@ -16,4 +16,8 @@ public class User extends Value {
     public void addOperand(Value... values) {
         operands.addAll(Arrays.asList(values));
     }
+
+    public List<Value> getOperands() {
+        return operands;
+    }
 }

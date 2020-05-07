@@ -1,12 +1,12 @@
 package Symbol;
 
 import AST.ClassDeclNode;
+import IR.IRVisitor;
 import Utils.Position;
 import Utils.RedefError;
 import Utils.SemanticError;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ClassType extends Type implements Scope {
     private Map<String, Symbol> symbolMap = new LinkedHashMap<>();
@@ -75,6 +75,14 @@ public class ClassType extends Type implements Scope {
         return fieldIndex.get(identifier);
     }
 
+    public List<Type> getTypeList() {
+        List<Type> list = new ArrayList<>();
+        for (Map.Entry<String, Symbol> entry : symbolMap.entrySet()) {
+            list.add(entry.getValue().getType());
+        }
+        return list;
+    }
+
     public Type getFieldType(String identifier) {
         Symbol symbol = symbolMap.get(identifier);
         return symbol.getType();
@@ -82,5 +90,19 @@ public class ClassType extends Type implements Scope {
 
     public boolean getIsMethod(String identifier) {
         return symbolMap.get(identifier).isFunction();
+    }
+
+    @Override
+    public String IRName() {
+        if (getIdentifier().equals("string")) {
+            return "i8*";
+        }
+        else {
+            return "%struct." + getIdentifier();
+        }
+    }
+
+    public void accept(IRVisitor visitor) {
+        visitor.visit(this);
     }
 }

@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BasicBlock extends User {
-    private String label;
     private List<Instruction> instructionList = new ArrayList<>();
     private boolean terminated = false;
 
@@ -26,7 +25,17 @@ public class BasicBlock extends User {
         return terminated;
     }
 
-    public String getLabel() {
-        return label;
+    public List<Instruction> getInstructionList() {
+        return instructionList;
+    }
+
+    @Override
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    @Override
+    public void accept(IRVisitor visitor) {
+        visitor.visit(this);
     }
 }

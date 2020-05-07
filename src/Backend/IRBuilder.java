@@ -15,7 +15,7 @@ import java.util.*;
 import java.util.List;
 
 public class IRBuilder implements ASTVisitor {
-    Module module;
+    Module module = new Module();
     GlobalScope globalScope;
     ClassType curClass;
     Function curFunction;
@@ -135,7 +135,7 @@ public class IRBuilder implements ASTVisitor {
                 if (vType.isInt()) {
                     v1 = assignConvert(v1, GlobalScope.getIntType());
                     v2 = assignConvert(v2, GlobalScope.getIntType());
-                    res = new BinaryOpInst("slt", v1, v2, curBlock);
+                    res = new CmpInst("slt", v1, v2, curBlock);
                 } else if (vType.isString()) {
                     v1 = assignConvert(v1, GlobalScope.getCharType().getPointer());
                     v2 = assignConvert(v2, GlobalScope.getCharType().getPointer());
@@ -147,7 +147,7 @@ public class IRBuilder implements ASTVisitor {
                 if (vType.isInt()) {
                     v1 = assignConvert(v1, GlobalScope.getIntType());
                     v2 = assignConvert(v2, GlobalScope.getIntType());
-                    res = new BinaryOpInst("sgt", v1, v2, curBlock);
+                    res = new CmpInst("sgt", v1, v2, curBlock);
                 } else if (vType.isString()) {
                     v1 = assignConvert(v1, GlobalScope.getCharType().getPointer());
                     v2 = assignConvert(v2, GlobalScope.getCharType().getPointer());
@@ -159,7 +159,7 @@ public class IRBuilder implements ASTVisitor {
                 if (vType.isInt()) {
                     v1 = assignConvert(v1, GlobalScope.getIntType());
                     v2 = assignConvert(v2, GlobalScope.getIntType());
-                    res = new BinaryOpInst("sle", v1, v2, curBlock);
+                    res = new CmpInst("sle", v1, v2, curBlock);
                 } else if (vType.isString()) {
                     v1 = assignConvert(v1, GlobalScope.getCharType().getPointer());
                     v2 = assignConvert(v2, GlobalScope.getCharType().getPointer());
@@ -171,7 +171,7 @@ public class IRBuilder implements ASTVisitor {
                 if (vType.isInt()) {
                     v1 = assignConvert(v1, GlobalScope.getIntType());
                     v2 = assignConvert(v2, GlobalScope.getIntType());
-                    res = new BinaryOpInst("sge", v1, v2, curBlock);
+                    res = new CmpInst("sge", v1, v2, curBlock);
                 } else if (vType.isString()) {
                     v1 = assignConvert(v1, GlobalScope.getCharType().getPointer());
                     v2 = assignConvert(v2, GlobalScope.getCharType().getPointer());
@@ -189,11 +189,15 @@ public class IRBuilder implements ASTVisitor {
                 } else {
                     if (!v1.getType().isNull()) {
                         v1 = new LoadInst(v1, curBlock);
+                    } else {
+                        v1.setType(((PointerType) v2.getType()).getMember());
                     }
                     if (!v2.getType().isNull()) {
                         v2 = new LoadInst(v2, curBlock);
+                    } else {
+                        v2.setType(((PointerType) v1.getType()).getMember());
                     }
-                    res = new BinaryOpInst("eq", v1, v2, curBlock);
+                    res = new CmpInst("eq", v1, v2, curBlock);
                 }
                 break;
             case NE:
@@ -209,7 +213,7 @@ public class IRBuilder implements ASTVisitor {
                     if (!v2.getType().isNull()) {
                         v2 = new LoadInst(v2, curBlock);
                     }
-                    res = new BinaryOpInst("ne", v1, v2, curBlock);
+                    res = new CmpInst("ne", v1, v2, curBlock);
                 }
                 break;
             case XOR:
@@ -339,19 +343,22 @@ public class IRBuilder implements ASTVisitor {
         String identifier = node.getSymbol().IRName();
         curFunction = new Function(identifier, node.getSymbol().getType());
         module.addFunction(curFunction);
+        retBlock = curFunction.add("retBlock");
+        curBlock = curFunction.add("initBlock");
 
         if (curClass != null) {
-            thisValue = new Value(".this", curClass.getPointer());
+            thisValue = new Value("this", curClass.getPointer());
             curFunction.addOperand(thisValue);
         }
 
         for (int i = 0; i < node.getParams().size(); ++i) {
-            curFunction.addOperand(new Value(".p", node.getSymbol().getParam().get(i)));
+            Type type = node.getSymbol().getParam().get(i);
+            Value p = new Value("p", type);
+            curFunction.addOperand(p);
+            Value al = new AllocaInst(type, curBlock);
+            new StoreInst(p, al, curBlock);
+            node.getParams().get(i).getVarSymbol().setValue(al);
         }
-
-        retBlock = curFunction.add("retBlock");
-        curBlock = curFunction.add("initBlock");
-
 
         if (!curFunction.getType().isVoid()) {
             returnValue = new AllocaInst(curFunction.getType(), curBlock);
@@ -432,8 +439,10 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(ReturnNode node) {
-        node.getExpression().accept(this);
-        new StoreInst(assignConvert(node.getExpression().getValue(), returnValue.getType()), returnValue, curBlock);
+        if (node.getExpression() != null) {
+            node.getExpression().accept(this);
+            new StoreInst(assignConvert(node.getExpression().getValue(), returnValue.getType()), returnValue, curBlock);
+        }
         new JumpInst(retBlock, curBlock);
     }
 
@@ -546,9 +555,11 @@ public class IRBuilder implements ASTVisitor {
     @Override
     public void visit(VarDeclNode node) {
         Value np;
+        System.out.println("ha?");
         for (int i = 0; i < node.getVarSymbol().size(); ++i) {
             if (scanGlobalVariable) {
                 np = new GlobalVariable(node.getVariables().get(i), globalScope.getType(node.getType()).getPointer());
+                module.addGlobalVariable(np);
             }
             else {
                 np = new AllocaInst(globalScope.getType(node.getType()), curBlock);

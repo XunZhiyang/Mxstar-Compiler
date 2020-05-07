@@ -8,7 +8,7 @@ import java.util.Map;
 public class Value {
     private static Map<String, Integer> freq = new HashMap<>();
 
-    private String identifier;
+    protected String identifier;
     private Type type;
 
     public Value(String origName, Type type) {
@@ -17,7 +17,7 @@ public class Value {
     }
 
     String rename(String origName) {
-        Integer cnt = 0;
+        int cnt = 0;
         Integer times = freq.get(origName);
         if (times != null) {
             cnt = times + 1;
@@ -27,7 +27,7 @@ public class Value {
     }
 
     public String getIdentifier() {
-        return identifier;
+        return "%" + identifier;
     }
 
     public Type getType() {

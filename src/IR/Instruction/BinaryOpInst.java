@@ -22,13 +22,6 @@ public class BinaryOpInst extends Instruction {
             case "or":
             case "xor":
                 return v.getType();
-            case "slt":
-            case "sle":
-            case "sgt":
-            case"sge":
-            case "eq":
-            case "ne":
-                return GlobalScope.getBoolType();
             default:
                 throw new RuntimeException();
         }

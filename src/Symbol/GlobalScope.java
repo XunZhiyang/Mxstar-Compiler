@@ -14,7 +14,7 @@ public class GlobalScope extends BaseScope{
     private static PrimitiveType voidType = new PrimitiveType("void");
     private static PrimitiveType charType = new PrimitiveType("_char", 8); //for IR replacing string
     private static NullType nullType = new NullType();
-    private ClassType stringType = new ClassType("string", null, this);
+    private ClassType stringType = new ClassType("string", null, this){{setBitLen(64);}};
     private FunctionSymbol size = new FunctionSymbol(intType, "size", null, this);
 
     public GlobalScope() {
