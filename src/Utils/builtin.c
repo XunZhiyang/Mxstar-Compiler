@@ -33,8 +33,9 @@ int getInt() {
 char* toString(int n) {
     int len = 0;
     len += n == 0 ? 1 : 0;
-    while (n > 0) {
-        n /= 10;
+    int t = n;
+    while (t > 0) {
+        t /= 10;
         len++;
     }
     len += n < 0 ? 1 : 0;

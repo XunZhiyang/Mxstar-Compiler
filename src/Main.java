@@ -13,8 +13,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
 
 import Parser.MxstarLexer;
 import Parser.MxstarParser;
@@ -50,14 +49,21 @@ public class Main {
         return builder.visit(tree);
     }
 
-    private static Module buildIR(ProgramNode ast, GlobalScope globalScope) {
+    private static Module buildIR(ProgramNode ast, GlobalScope globalScope) throws Exception {
         IRBuilder builder = new IRBuilder(globalScope);
         builder.visit(ast);
         Module module = builder.getModule();
 
         IRPrinter printer = new IRPrinter();
         printer.visit(module);
-        System.out.println(printer.getIR());
+        String generatedIR = printer.getIR(true);
+
+        File file =new File("code.ll");
+        FileWriter fileWriter = new FileWriter(file.getName());
+        BufferedWriter bufferWriter = new BufferedWriter(fileWriter);
+        bufferWriter.write(generatedIR);
+        bufferWriter.close();
+
         return module;
     }
 

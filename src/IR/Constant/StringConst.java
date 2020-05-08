@@ -7,8 +7,8 @@ import Symbol.GlobalScope;
 
 public class StringConst extends GlobalVariable {
     String string;
-    public StringConst(String string) {
-        super(".stringConst", (new ArrayType(GlobalScope.getCharType(), string.length() + 1)).getPointer());
+    public StringConst(String string, int length) {
+        super(".stringConst", (new ArrayType(GlobalScope.getCharType(), length + 1)).getPointer());
         this.string = string;
     }
 
