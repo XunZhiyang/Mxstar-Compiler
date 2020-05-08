@@ -24,7 +24,7 @@ public abstract class Type {
         return bitLen;
     }
 
-    public int getAlignment() {
+    public int getByteNum() {
         return (bitLen + 7) / 8;
     }
 
@@ -41,7 +41,9 @@ public abstract class Type {
     }
 
     public boolean equals(Type type) {
-        return identifier.equals(type.getIdentifier());
+        return identifier.equals(type.getIdentifier()) ||
+                (this.isString() && type.getIdentifier().equals("_char+1")) ||
+                (type.isString() && this.getIdentifier().equals("_char+1"));
     }
 
     public boolean assignable(Type rhs) {
@@ -78,6 +80,14 @@ public abstract class Type {
 
     public boolean isVoid() {
         return false;
+    }
+
+    public boolean isNonStringClass() {
+        return isClass() && !isString();
+    }
+
+    public boolean derivesFromClass() {
+        return isNonStringClass() || (isPointer() && ((PointerType) this).getBaseType().isNonStringClass());
     }
 }
 

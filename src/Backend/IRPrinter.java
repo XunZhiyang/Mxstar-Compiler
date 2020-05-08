@@ -8,7 +8,6 @@ import IR.Module;
 import IR.Value;
 import Symbol.ClassType;
 import Symbol.PointerType;
-import Symbol.Symbol;
 import Symbol.Type;
 
 import java.io.BufferedReader;
@@ -16,9 +15,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public class IRPrinter implements IRVisitor {
     private List<String> IRList = new ArrayList<>();
@@ -29,7 +26,7 @@ public class IRPrinter implements IRVisitor {
         File filename = new File(addBuiltin ? "src/Utils/builtin.ll" : "src/Utils/header.ll");
         InputStreamReader reader = new InputStreamReader(new FileInputStream(filename));
         BufferedReader br = new BufferedReader(reader);
-        String line = "";
+        String line;
         line = br.readLine();
         while (line != null) {
             resBuilder.append(line).append("\n");
@@ -58,11 +55,10 @@ public class IRPrinter implements IRVisitor {
             } else {
                 Type type = ((PointerType) i.getType()).getMember();
                 str += i.getIdentifier() + " = global ";
-
                 if ((type.isInt() || type.isBoolean())) {
                     str += type.IRName() + " 0, ";
                 } else {
-                    str += (type.isPointer() ? type.IRName() : i.getType().IRName()) + " null, ";
+                    str += (type.isPointer() || type.isString() ? type.IRName() : i.getType().IRName()) + " null, ";
                 }
                 str += "align 8";
             }
@@ -80,7 +76,8 @@ public class IRPrinter implements IRVisitor {
         StringBuilder paramsBuilder = new StringBuilder();
         for (int i = 0; i < params.size(); i++) {
             Value v = params.get(i);
-            paramsBuilder.append(v.getType().IRName())
+            Type type = v.getType();
+            paramsBuilder.append(type.IRName())
                          .append(" ")
                          .append(v.getIdentifier())
                          .append(i == params.size() - 1 ? "" : ", ");
@@ -101,7 +98,8 @@ public class IRPrinter implements IRVisitor {
         builder.append(node.IRName()).append(" = type { ");
         List<Type> types = node.getTypeList();
         for (int i = 0; i < types.size(); ++i) {
-            builder.append(types.get(i).IRName())
+            Type type = types.get(i);
+            builder.append(type.derivesFromClass() ? type.getPointer().IRName() : type.IRName())
                     .append(i == types.size() - 1 ? " " : ", ");
         }
         builder.append("}");
@@ -126,7 +124,7 @@ public class IRPrinter implements IRVisitor {
     public void visit(AllocaInst node) {
         String str = node.getIdentifier() + " = alloca ";
         Type type = ((PointerType) node.getType()).getMember();
-        str += type.IRName() + ", align " + type.getAlignment();
+        str += type.IRName() + ", align " + type.getByteNum();
         IRList.add(str);
     }
 

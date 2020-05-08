@@ -26,7 +26,7 @@ char* getString() {
 
 int getInt() {
     int res;
-    scanf("%d", res);
+    scanf("%d", &res);
     return res;
 }
 

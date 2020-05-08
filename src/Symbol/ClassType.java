@@ -39,8 +39,8 @@ public class ClassType extends Type implements Scope {
         symbolMap.put(symbol.getIdentifier(), symbol);
 
         if (!symbol.isFunction()) {
-            fieldNum++;
             fieldIndex.put(symbol.getIdentifier(), fieldNum);
+            fieldNum++;
             int symbolBitLen = symbol.getType().getBitLen();
             bitLen += (symbolBitLen - bitLen % symbolBitLen) % symbolBitLen + symbolBitLen;
         }
@@ -93,7 +93,11 @@ public class ClassType extends Type implements Scope {
 
     public Type getFieldType(String identifier) {
         Symbol symbol = symbolMap.get(identifier);
-        return symbol.getType();
+        Type type = symbol.getType();
+        if (type.derivesFromClass()) {
+            type = type.getPointer();
+        }
+        return type;
     }
 
     public boolean getIsMethod(String identifier) {

@@ -5,7 +5,7 @@ import Symbol.Type;
 
 public class GlobalVariable extends Constant {
     public GlobalVariable(String identifier, Type type) {
-        super(identifier, type);
+        super(identifier, type.derivesFromClass() ? type.getPointer() : type);
     }
 
     @Override

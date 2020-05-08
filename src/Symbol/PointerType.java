@@ -22,6 +22,10 @@ public class PointerType extends Type{
         else return new PointerType(baseType, dim - 1);
     }
 
+    public Type getBaseType() {
+        return baseType;
+    }
+
     @Override
     public boolean isNullable() {
         return true;
@@ -30,6 +34,11 @@ public class PointerType extends Type{
     @Override
     public boolean isPointer() {
         return true;
+    }
+
+    @Override
+    public boolean isString() {
+        return getIdentifier().equals("_char+1");
     }
 
     @Override
