@@ -23,7 +23,7 @@ public class CallInst extends Instruction {
     //specially for utility functions
     public CallInst(String identifier, Type type, List<Value> arguments, BasicBlock curBlock) {
         super(identifier + "_call", type, curBlock);
-        functionIdentifier = identifier;
+        functionIdentifier = "@" + identifier;
         for (Value v : arguments) {
             addOperand(v);
         }

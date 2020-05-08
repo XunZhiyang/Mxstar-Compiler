@@ -5,7 +5,7 @@ import Utils.SemanticError;
 
 public abstract class Type {
     private String identifier;
-    private int bitLen;
+    protected int bitLen;
 
     public Type(String identifier) {
         this.identifier = identifier;

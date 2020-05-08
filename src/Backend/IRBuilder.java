@@ -39,7 +39,7 @@ public class IRBuilder implements ASTVisitor {
             return new GEPInst(value, GlobalScope.getCharType().getPointer(), curBlock){{
                 addOperand(new IntConst(0), new IntConst(0));
             }};
-        } if (value.getType() == demandedType) {
+        } if (value.getType().equals(demandedType)) {
             return value;
         } if (value.getType().isNull()) {
             value.setType(demandedType);
@@ -131,7 +131,7 @@ public class IRBuilder implements ASTVisitor {
                 } else if (vType.isString()) {
                     v1 = assignConvert(v1, GlobalScope.getCharType().getPointer());
                     v2 = assignConvert(v2, GlobalScope.getCharType().getPointer());
-                    res = new CallInst("@_string_concatenate", GlobalScope.getCharType().getPointer(),
+                    res = new CallInst("_string_concatenate", GlobalScope.getCharType().getPointer(),
                             Arrays.asList(v1, v2), curBlock);
                 }
                 break;
@@ -144,7 +144,7 @@ public class IRBuilder implements ASTVisitor {
                 } else if (vType.isString()) {
                     v1 = assignConvert(v1, GlobalScope.getCharType().getPointer());
                     v2 = assignConvert(v2, GlobalScope.getCharType().getPointer());
-                    res = new CallInst("@_string_lt", GlobalScope.getCharType().getPointer(),
+                    res = new CallInst("_string_lt", GlobalScope.getCharType().getPointer(),
                             Arrays.asList(v1, v2), curBlock);
                 }
                 break;
@@ -156,7 +156,7 @@ public class IRBuilder implements ASTVisitor {
                 } else if (vType.isString()) {
                     v1 = assignConvert(v1, GlobalScope.getCharType().getPointer());
                     v2 = assignConvert(v2, GlobalScope.getCharType().getPointer());
-                    res = new CallInst("@_string_gt", GlobalScope.getCharType().getPointer(),
+                    res = new CallInst("_string_gt", GlobalScope.getCharType().getPointer(),
                             Arrays.asList(v1, v2), curBlock);
                 }
                 break;
@@ -168,7 +168,7 @@ public class IRBuilder implements ASTVisitor {
                 } else if (vType.isString()) {
                     v1 = assignConvert(v1, GlobalScope.getCharType().getPointer());
                     v2 = assignConvert(v2, GlobalScope.getCharType().getPointer());
-                    res = new CallInst("@_string_le", GlobalScope.getCharType().getPointer(),
+                    res = new CallInst("_string_le", GlobalScope.getCharType().getPointer(),
                             Arrays.asList(v1, v2), curBlock);
                 }
                 break;
@@ -180,7 +180,7 @@ public class IRBuilder implements ASTVisitor {
                 } else if (vType.isString()) {
                     v1 = assignConvert(v1, GlobalScope.getCharType().getPointer());
                     v2 = assignConvert(v2, GlobalScope.getCharType().getPointer());
-                    res = new CallInst("@_string_ge", GlobalScope.getCharType().getPointer(),
+                    res = new CallInst("_string_ge", GlobalScope.getCharType().getPointer(),
                             Arrays.asList(v1, v2), curBlock);
                 }
                 break;
@@ -189,18 +189,23 @@ public class IRBuilder implements ASTVisitor {
                 if (node.getSrc1().getType().isString() && node.getSrc2().getType().isString()) {
                     v1 = assignConvert(v1, GlobalScope.getCharType().getPointer());
                     v2 = assignConvert(v2, GlobalScope.getCharType().getPointer());
-                    res = new CallInst("@_string_eq", GlobalScope.getCharType().getPointer(),
+                    res = new CallInst("_string_eq", GlobalScope.getCharType().getPointer(),
                             Arrays.asList(v1, v2), curBlock);
                 } else {
-                    if (!v1.getType().isNull()) {
+//                    if (!v1.getType().isNull()) {
+//                        v1 = new LoadInst(v1, curBlock);
+//                    } else {
+//                        v1.setType(((PointerType) v2.getType()).getMember());
+//                    }
+//                    if (!v2.getType().isNull()) {
+//                        v2 = new LoadInst(v2, curBlock);
+//                    } else {
+//                        System.out.println(v2.getType().isNull());
+//                        v2.setType(((PointerType) v1.getType().get).getMember());
+//                    }
+                    if (!v1.getType().isNull() && !v2.getType().isNull()) {
                         v1 = new LoadInst(v1, curBlock);
-                    } else {
-                        v1.setType(((PointerType) v2.getType()).getMember());
-                    }
-                    if (!v2.getType().isNull()) {
                         v2 = new LoadInst(v2, curBlock);
-                    } else {
-                        v2.setType(((PointerType) v1.getType()).getMember());
                     }
                     res = new CmpInst("eq", v1, v2, curBlock);
                 }
@@ -209,7 +214,7 @@ public class IRBuilder implements ASTVisitor {
                 if (node.getSrc1().getType().isString() && node.getSrc2().getType().isString()) {
                     v1 = assignConvert(v1, GlobalScope.getCharType().getPointer());
                     v2 = assignConvert(v2, GlobalScope.getCharType().getPointer());
-                    res = new CallInst("@_string_ne", GlobalScope.getCharType().getPointer(),
+                    res = new CallInst("_string_ne", GlobalScope.getCharType().getPointer(),
                             Arrays.asList(v1, v2), curBlock);
                 } else {
                     if (!v1.getType().isNull()) {
@@ -384,7 +389,7 @@ public class IRBuilder implements ASTVisitor {
 
         if (node.getIdentifier().equals("main")) {
             new StoreInst(new IntConst(0), returnValue, curBlock);
-            new CallInst("@_init", GlobalScope.getVoidType(), new ArrayList<>(),curBlock);
+            new CallInst("_init", GlobalScope.getVoidType(), new ArrayList<>(),curBlock);
         }
 
         node.getStmt().accept(this);
@@ -405,11 +410,12 @@ public class IRBuilder implements ASTVisitor {
         List<Type> paramList = node.getFunction().getFunctionSymbol().getParam();
 
         if (node.getFunction().getValue() != null) {
-            arguments.add(node.getFunction().getValue());
+            arguments.add(new LoadInst(node.getFunction().getValue(), curBlock));
         }
 
         for (int i = 0; i < node.getArguments().size(); ++i) {
             Expr t = node.getArguments().get(i);
+            t.accept(this);
             arguments.add(assignConvert(t.getValue(), paramList.get(i)));
         }
         node.setValue(new CallInst(node.getFunction().getFunctionSymbol(), arguments, curBlock));
@@ -429,7 +435,7 @@ public class IRBuilder implements ASTVisitor {
         Value size = new BinaryOpInst("mul", new IntConst(type.getAlignment()), shape.get(dimIndex), curBlock);
         size = new BinaryOpInst("add", size, new IntConst(GlobalScope.getIntType().getAlignment()), curBlock);
         size = new SextInst(size, GlobalScope.getI64Type(), curBlock);
-        Value pointer = new CallInst("_malloc", GlobalScope.getCharType().getPointer(),
+        Value pointer = new CallInst("malloc", GlobalScope.getCharType().getPointer(),
                 Collections.singletonList(size), curBlock);
         pointer = new BitCastInst(pointer, GlobalScope.getIntType().getPointer(), curBlock);
         new StoreInst(shape.get(dimIndex), pointer, curBlock);
@@ -474,7 +480,7 @@ public class IRBuilder implements ASTVisitor {
         if (!type.isPointer()) {
             Value size = new IntConst(type.getAlignment());
             size = new SextInst(size, GlobalScope.getI64Type(), curBlock);
-            Value pointer = new CallInst("_malloc", GlobalScope.getCharType().getPointer(),
+            Value pointer = new CallInst("malloc", GlobalScope.getCharType().getPointer(),
                     Collections.singletonList(size), curBlock);
             pointer = new BitCastInst(pointer, type.getPointer(), curBlock);
             node.setValue(pointer);

@@ -140,7 +140,7 @@ public class IRPrinter implements IRVisitor {
              sb.append(node.getIdentifier()).append(" = ");
         sb.append("call ").append(node.getType().IRName()).append(" ").append(node.getFunctionIdentifier()).append("(");
         for (int i = 0; i < node.getOperands().size(); i++) {
-            sb.append(node.getOperands().get(i).getType())
+            sb.append(node.getOperands().get(i).getType().IRName())
                     .append(" ")
                     .append(node.getOperands().get(i).getIdentifier())
                     .append(i == node.getOperands().size() - 1 ? "" : ", ");
@@ -205,6 +205,7 @@ public class IRPrinter implements IRVisitor {
         //%M.3 = sext i32 %T.6 to i64
         String str = node.getIdentifier() + "= sext " + node.getOperand(0).getType().IRName() + " " +
                 node.getOperand(0).getIdentifier() + " to " + node.getType().IRName();
+        IRList.add(str);
     }
 
     @Override
