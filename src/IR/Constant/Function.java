@@ -2,6 +2,7 @@ package IR.Constant;
 
 import IR.BasicBlock;
 import IR.IRVisitor;
+import Symbol.GlobalScope;
 import Symbol.Type;
 
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ public class Function extends Constant {
     List<BasicBlock> basicBlockList = new ArrayList<>();
 
     public Function(String name, Type type) {
-        super(name, type);
+        super(name, type == null ? GlobalScope.getVoidType() : (type.derivesFromClass() ? type.getPointer() : type));
     }
 
     public BasicBlock add(String identifier) {

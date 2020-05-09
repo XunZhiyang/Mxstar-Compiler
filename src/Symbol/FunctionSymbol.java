@@ -65,6 +65,10 @@ public class FunctionSymbol extends Symbol implements Scope {
         return true;
     }
 
+    public boolean inClass() {
+        return fatherScope instanceof ClassType;
+    }
+
     public void setConstructor(boolean isConstructor) {
         this.isConstructor = isConstructor;
     }

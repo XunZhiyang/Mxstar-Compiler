@@ -65,96 +65,106 @@ define i8* @toString(i32 %0) {
   %4 = alloca i32, align 4
   %5 = alloca i8*, align 8
   %6 = alloca i32, align 4
+  %7 = alloca i32, align 4
   store i32 %0, i32* %2, align 4
   store i32 0, i32* %3, align 4
-  %7 = load i32, i32* %2, align 4
-  %8 = icmp eq i32 %7, 0
-  %9 = zext i1 %8 to i64
-  %10 = select i1 %8, i32 1, i32 0
-  %11 = load i32, i32* %3, align 4
-  %12 = add nsw i32 %11, %10
-  store i32 %12, i32* %3, align 4
-  %13 = load i32, i32* %2, align 4
-  store i32 %13, i32* %4, align 4
-  br label %14
+  %8 = load i32, i32* %2, align 4
+  %9 = icmp eq i32 %8, 0
+  %10 = zext i1 %9 to i64
+  %11 = select i1 %9, i32 1, i32 0
+  %12 = load i32, i32* %3, align 4
+  %13 = add nsw i32 %12, %11
+  store i32 %13, i32* %3, align 4
+  %14 = load i32, i32* %2, align 4
+  store i32 %14, i32* %4, align 4
+  br label %15
 
-14:
-  %15 = load i32, i32* %4, align 4
-  %16 = icmp sgt i32 %15, 0
-  br i1 %16, label %17, label %22
+15:
+  %16 = load i32, i32* %4, align 4
+  %17 = icmp ne i32 %16, 0
+  br i1 %17, label %18, label %23
 
-17:
-  %18 = load i32, i32* %4, align 4
-  %19 = sdiv i32 %18, 10
-  store i32 %19, i32* %4, align 4
-  %20 = load i32, i32* %3, align 4
-  %21 = add nsw i32 %20, 1
-  store i32 %21, i32* %3, align 4
-  br label %14
+18:
+  %19 = load i32, i32* %4, align 4
+  %20 = sdiv i32 %19, 10
+  store i32 %20, i32* %4, align 4
+  %21 = load i32, i32* %3, align 4
+  %22 = add nsw i32 %21, 1
+  store i32 %22, i32* %3, align 4
+  br label %15
 
-22:
-  %23 = load i32, i32* %2, align 4
-  %24 = icmp slt i32 %23, 0
-  %25 = zext i1 %24 to i64
-  %26 = select i1 %24, i32 1, i32 0
-  %27 = load i32, i32* %3, align 4
-  %28 = add nsw i32 %27, %26
-  store i32 %28, i32* %3, align 4
-  %29 = load i32, i32* %3, align 4
-  %30 = add nsw i32 %29, 1
-  %31 = sext i32 %30 to i64
-  %32 = call noalias i8* @malloc(i64 %31) #4
-  store i8* %32, i8** %5, align 8
-  %33 = load i8*, i8** %5, align 8
-  %34 = load i32, i32* %3, align 4
-  %35 = sext i32 %34 to i64
-  %36 = getelementptr inbounds i8, i8* %33, i64 %35
-  store i8 0, i8* %36, align 1
-  %37 = load i32, i32* %2, align 4
-  %38 = icmp slt i32 %37, 0
-  br i1 %38, label %39, label %42
+23:
+  %24 = load i32, i32* %2, align 4
+  %25 = icmp slt i32 %24, 0
+  %26 = zext i1 %25 to i64
+  %27 = select i1 %25, i32 1, i32 0
+  %28 = load i32, i32* %3, align 4
+  %29 = add nsw i32 %28, %27
+  store i32 %29, i32* %3, align 4
+  %30 = load i32, i32* %3, align 4
+  %31 = add nsw i32 %30, 1
+  %32 = sext i32 %31 to i64
+  %33 = call noalias i8* @malloc(i64 %32) #4
+  store i8* %33, i8** %5, align 8
+  %34 = load i8*, i8** %5, align 8
+  %35 = load i32, i32* %3, align 4
+  %36 = sext i32 %35 to i64
+  %37 = getelementptr inbounds i8, i8* %34, i64 %36
+  store i8 0, i8* %37, align 1
+  store i32 0, i32* %6, align 4
+  %38 = load i32, i32* %2, align 4
+  %39 = icmp slt i32 %38, 0
+  br i1 %39, label %40, label %48
 
-39:
-  %40 = load i8*, i8** %5, align 8
-  %41 = getelementptr inbounds i8, i8* %40, i64 0
-  store i8 45, i8* %41, align 1
-  br label %42
-
-42:
-  %43 = load i32, i32* %3, align 4
-  %44 = sub nsw i32 %43, 1
-  store i32 %44, i32* %6, align 4
-  br label %45
-
-45:
-  %46 = load i32, i32* %6, align 4
-  %47 = icmp sge i32 %46, 0
-  br i1 %47, label %48, label %62
+40:
+  %41 = load i32, i32* %2, align 4
+  %42 = sub nsw i32 0, %41
+  store i32 %42, i32* %2, align 4
+  %43 = load i8*, i8** %5, align 8
+  %44 = load i32, i32* %6, align 4
+  %45 = add nsw i32 %44, 1
+  store i32 %45, i32* %6, align 4
+  %46 = sext i32 %44 to i64
+  %47 = getelementptr inbounds i8, i8* %43, i64 %46
+  store i8 45, i8* %47, align 1
+  br label %48
 
 48:
-  %49 = load i32, i32* %2, align 4
-  %50 = srem i32 %49, 10
-  %51 = add nsw i32 %50, 48
-  %52 = trunc i32 %51 to i8
-  %53 = load i8*, i8** %5, align 8
-  %54 = load i32, i32* %6, align 4
-  %55 = sext i32 %54 to i64
-  %56 = getelementptr inbounds i8, i8* %53, i64 %55
-  store i8 %52, i8* %56, align 1
-  %57 = load i32, i32* %2, align 4
-  %58 = sdiv i32 %57, 10
-  store i32 %58, i32* %2, align 4
-  br label %59
+  %49 = load i32, i32* %3, align 4
+  %50 = sub nsw i32 %49, 1
+  store i32 %50, i32* %7, align 4
+  br label %51
 
-59:
-  %60 = load i32, i32* %6, align 4
-  %61 = add nsw i32 %60, -1
-  store i32 %61, i32* %6, align 4
-  br label %45
+51:
+  %52 = load i32, i32* %7, align 4
+  %53 = load i32, i32* %6, align 4
+  %54 = icmp sge i32 %52, %53
+  br i1 %54, label %55, label %69
 
-62:
-  %63 = load i8*, i8** %5, align 8
-  ret i8* %63
+55:
+  %56 = load i32, i32* %2, align 4
+  %57 = srem i32 %56, 10
+  %58 = add nsw i32 %57, 48
+  %59 = trunc i32 %58 to i8
+  %60 = load i8*, i8** %5, align 8
+  %61 = load i32, i32* %7, align 4
+  %62 = sext i32 %61 to i64
+  %63 = getelementptr inbounds i8, i8* %60, i64 %62
+  store i8 %59, i8* %63, align 1
+  %64 = load i32, i32* %2, align 4
+  %65 = sdiv i32 %64, 10
+  store i32 %65, i32* %2, align 4
+  br label %66
+
+66:
+  %67 = load i32, i32* %7, align 4
+  %68 = add nsw i32 %67, -1
+  store i32 %68, i32* %7, align 4
+  br label %51
+
+69:
+  %70 = load i8*, i8** %5, align 8
+  ret i8* %70
 }
 
 

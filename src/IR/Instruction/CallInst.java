@@ -5,6 +5,7 @@ import IR.Constant.Function;
 import IR.IRVisitor;
 import IR.Value;
 import Symbol.FunctionSymbol;
+import Symbol.GlobalScope;
 import Symbol.Type;
 
 import java.util.List;
@@ -13,7 +14,8 @@ public class CallInst extends Instruction {
     String functionIdentifier;
 
     public CallInst(FunctionSymbol function, List<Value> arguments, BasicBlock curBlock) {
-        super(function.getIdentifier() + "_call", function.getType(), curBlock);
+        super(function.getIdentifier() + "_call", function.getType() == null ? GlobalScope.getVoidType() :
+                (function.getType().derivesFromClass() ? function.getType().getPointer() : function.getType()), curBlock);
         functionIdentifier = function.IRName();
         for (Value v : arguments) {
             addOperand(v);

@@ -86,7 +86,7 @@ public class ClassType extends Type implements Scope {
     public List<Type> getTypeList() {
         List<Type> list = new ArrayList<>();
         for (Map.Entry<String, Symbol> entry : symbolMap.entrySet()) {
-            list.add(entry.getValue().getType());
+            if (!entry.getValue().isFunction()) list.add(entry.getValue().getType());
         }
         return list;
     }

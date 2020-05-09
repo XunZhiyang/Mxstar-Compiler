@@ -10,6 +10,10 @@ public class AllocaInst extends Instruction {
         super("alloca", type.derivesFromClass() ? type.getPointer().getPointer() : type.getPointer(), curBlock);
     }
 
+    public AllocaInst(Type type, BasicBlock curBlock, boolean convert) {
+        super("alloca", type.getPointer(), curBlock);
+    }
+
     @Override
     public void accept(IRVisitor visitor) {
         visitor.visit(this);
