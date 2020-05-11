@@ -48,12 +48,11 @@ public class IRPrinter implements IRVisitor {
 
         for (Value i : node.getGlobalVariableList()) {
             String str = "";
+            Type type = ((PointerType) i.getType()).getMember();
             if (i instanceof StringConst) {
-                Type type = ((PointerType) i.getType()).getMember();
                 str += i.getIdentifier() + " = constant " + type.IRName() + " ";
                 str += "c\"" + ((StringConst) i).getString() + "\\00\", align 1";
             } else {
-                Type type = ((PointerType) i.getType()).getMember();
                 str += i.getIdentifier() + " = global ";
                 if ((type.isInt() || type.isBoolean())) {
                     str += type.IRName() + " 0, ";
@@ -93,13 +92,12 @@ public class IRPrinter implements IRVisitor {
 
     @Override
     public void visit(ClassType node) {
-        String str = "";
         StringBuilder builder = new StringBuilder();
         builder.append(node.IRName()).append(" = type { ");
         List<Type> types = node.getTypeList();
         for (int i = 0; i < types.size(); ++i) {
             Type type = types.get(i);
-            builder.append(type.derivesFromClass() ? type.getPointer().IRName() : type.IRName())
+            builder.append(type.IRName())
                     .append(i == types.size() - 1 ? " " : ", ");
         }
         builder.append("}");
