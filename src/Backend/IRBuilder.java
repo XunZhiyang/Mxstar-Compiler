@@ -428,17 +428,29 @@ public class IRBuilder implements ASTVisitor {
 
         if (node.getIdentifier().equals("main")) {
             new StoreInst(new IntConst(0), returnValue, curBlock);
-            new CallInst("_init", GlobalScope.getVoidType(), new ArrayList<>(),curBlock);
+            new CallInst("_init", GlobalScope.getVoidType(), new ArrayList<>(), curBlock);
         }
 
         node.getStmt().accept(this);
 
         List<BasicBlock> blocks = curFunction.getBasicBlockList();
+
+        for (int i = 1; i < blocks.size(); i++) {
+            BasicBlock block = blocks.get(i);
+            for (Instruction instruction : block.getInstructionList()) {
+                if (instruction instanceof AllocaInst) {
+                    blocks.get(0).addFront(instruction);
+                }
+            }
+            block.getInstructionList().removeIf(inst -> inst instanceof AllocaInst);
+        }
+
         for (BasicBlock block : blocks) {
             if (!block.isTerminated()) {
                 new JumpInst(retBlock, block);
             }
         }
+
         curFunction = null;
     }
 

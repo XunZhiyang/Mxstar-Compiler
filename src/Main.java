@@ -2,7 +2,7 @@ import AST.ASTNode;
 import AST.ProgramNode;
 import Backend.IRBuilder;
 import Backend.IRPrinter;
-import Backend.IROptimizer;
+//import Backend.IROptimizer;
 import Frontend.ASTBuilder;
 import Frontend.ClassScanner;
 import Frontend.FunctionScanner;
@@ -68,10 +68,10 @@ public class Main {
         return module;
     }
 
-    private static void optimize(Module module) {
-        IROptimizer optimizer = new IROptimizer(module);
-        optimizer.optimize();
-    }
+//    private static void optimize(Module module) {
+//        IROptimizer optimizer = new IROptimizer(module);
+//        optimizer.optimize();
+//    }
 
     public static void main(String[] args) {
         try{
@@ -80,7 +80,7 @@ public class Main {
             ProgramNode ast = (ProgramNode) buildAST(tree);
             GlobalScope globalScope = analyzeSemantics(ast);
             Module module = buildIR(ast, globalScope);
-            optimize(module);
+//            optimize(module);
         } catch (Exception e) {
             e.printStackTrace();
             java.lang.System.exit(1);

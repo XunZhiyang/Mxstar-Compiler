@@ -6,9 +6,15 @@ import IR.User;
 import Symbol.Type;
 
 public abstract class Instruction extends User {
+    private BasicBlock fromBlock;
+
     Instruction(String name, Type type, BasicBlock curBlock) {
         super(name, type);
         curBlock.addInst(this);
+    }
+
+    public void setFromBlock(BasicBlock fromBlock) {
+        this.fromBlock = fromBlock;
     }
 
     public boolean isTerminator() { return false;}

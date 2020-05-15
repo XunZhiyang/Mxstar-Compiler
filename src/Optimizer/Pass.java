@@ -13,8 +13,6 @@ public abstract class Pass {
     abstract void optimizeFunction(Function function);
 
     public void optimize() {
-        module.getFunctionList().forEach(function -> {
-            optimizeFunction(function);
-        });
+        module.getFunctionList().forEach(this::optimizeFunction);
     }
 }
