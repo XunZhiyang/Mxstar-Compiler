@@ -40,7 +40,7 @@ public class IRPrinter implements IRVisitor {
     }
 
     @Override
-    public void visit(Value node) {    }
+    public void visit(Value node) {}
 
     @Override
     public void visit(Module node) {
@@ -232,6 +232,26 @@ public class IRPrinter implements IRVisitor {
         String str = "store " + list.get(0).getType().IRName() + " " + list.get(0).getIdentifier() + ", " +
                 list.get(1).getType().IRName() + " " + list.get(1).getIdentifier();
         IRList.add(str);
+    }
+
+    @Override
+    public void visit(PhiInst node) {
+        //%i = phi i32 [0, %for_after_1], [%T.67, %for_step_2]
+        StringBuilder sb = new StringBuilder();
+        sb.append(node.getIdentifier())
+                .append(" = phi ")
+                .append(node.getType().IRName());
+
+        List<Value> list = node.getOperands();
+        for (int i = 0; i < list.size(); i += 2) {
+            sb.append(" [")
+                    .append(list.get(i) == null ? "undef" : list.get(i).getIdentifier())
+                    .append(", %")
+                    .append(list.get(i + 1).getIdentifier())
+                    .append("]")
+                    .append(i == list.size() - 2 ? "" : ",");
+        }
+        IRList.add(sb.toString());
     }
 
     //Constant

@@ -37,10 +37,6 @@ public class BasicBlock extends User {
         return instructionList;
     }
 
-    public void removeInstruction(Instruction instruction) {
-        instructionList.remove(instruction);
-    }
-
     @Override
     public String getIdentifier() {
         return identifier;

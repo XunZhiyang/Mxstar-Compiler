@@ -14,6 +14,10 @@ public class User extends Value {
     }
 
     public void addOperand(Value... values) {
+        for (Value value : values) {
+            if (value != null)
+                value.addUse(this);
+        }
         operands.addAll(Arrays.asList(values));
     }
 

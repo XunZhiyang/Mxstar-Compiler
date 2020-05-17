@@ -10,8 +10,9 @@ import java.util.*;
 
 class CFGNode {
     BasicBlock block;
-    List<CFGNode> in;
-    List<CFGNode> out;
+    List<CFGNode> in = new ArrayList<>();
+    List<CFGNode> out = new ArrayList<>();
+    boolean visit = false;
 
     CFGNode(BasicBlock block) {
         this.block = block;
@@ -21,8 +22,7 @@ class CFGNode {
 
 public class CFG {
     private Map<BasicBlock, CFGNode> nodes = new HashMap<>();
-    private Set<CFGNode> visit;
-    List<BasicBlock> RPO;
+    List<BasicBlock> RPO = new ArrayList<>();
 
     void addEdge(CFGNode from, CFGNode to) {
         from.out.add(to);
@@ -44,9 +44,9 @@ public class CFG {
     }
 
     void buildRPO(CFGNode node) {
-        visit.add(node);
+        node.visit = true;
         for (CFGNode successor : node.out) {
-            if (!visit.contains(successor)) {
+            if (!successor.visit) {
                 buildRPO(successor);
             }
         }
@@ -65,7 +65,7 @@ public class CFG {
 
     public CFG(Function function, BasicBlock root, boolean reverse) {
         dfs(function.getBasicBlockList().get(0));
-        removeUnreachable(function);
+//        removeUnreachable(function);
         if (reverse) {
             for (CFGNode node : nodes.values()) {
                 var tmp = node.out;
@@ -79,5 +79,11 @@ public class CFG {
 
     public List<BasicBlock> getRPO() {
         return RPO;
+    }
+
+    public List<BasicBlock> getPredecessors(BasicBlock block) {
+        List<BasicBlock> predecessors = new ArrayList<>();
+        nodes.get(block).in.forEach(x -> predecessors.add(x.block));
+        return predecessors;
     }
 }

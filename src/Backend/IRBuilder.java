@@ -332,7 +332,12 @@ public class IRBuilder implements ASTVisitor {
     @Override
     public void visit(FieldExprNode node) {
         node.getObject().accept(this);
-        Type type = ((PointerType) node.getObject().getValue().getType()).getMember();
+        System.out.println(node.getObject().getValue().getIdentifier());
+        System.out.println(node.getObject().getValue().getType().IRName());
+        Type type = node.getObject().getValue().getType();
+        if (type.isPointer())
+             type = ((PointerType) type).getMember();
+
         if (type.isString()) {
             node.setValue(node.getObject().getValue());
         } else if (type.isClass() || (((PointerType) type).getMember()).isClass()) {
@@ -744,9 +749,9 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(WhileStmtNode node) {
-        BasicBlock whileCond = curFunction.add("forCond");
-        BasicBlock whileBody = curFunction.add("forBody");
-        BasicBlock whileAfter = curFunction.add("forAfter");
+        BasicBlock whileCond = curFunction.add("whileCond");
+        BasicBlock whileBody = curFunction.add("whileBody");
+        BasicBlock whileAfter = curFunction.add("whileAfter");
 
         new JumpInst(whileCond, curBlock);
 

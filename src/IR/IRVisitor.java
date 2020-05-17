@@ -42,6 +42,8 @@ public interface IRVisitor {
 
     void visit(StoreInst node);
 
+    void visit(PhiInst node);
+
     //Constant
     void visit(BoolConst node);
 
@@ -50,8 +52,4 @@ public interface IRVisitor {
     void visit(NullConst node);
 
     void visit(StringConst node);
-
-    //Normal value
-
-//    void visit(Value node);
 }

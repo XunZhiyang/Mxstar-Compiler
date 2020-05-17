@@ -2,6 +2,8 @@ package Backend;
 
 import Optimizer.Mem2Reg;
 
+import IR.Module;
+
 public class IROptimizer {
     private Mem2Reg mem2Reg;
     public IROptimizer(Module module) {

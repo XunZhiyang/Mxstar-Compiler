@@ -2,7 +2,9 @@ package IR;
 
 import Symbol.Type;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Value {
@@ -10,6 +12,8 @@ public class Value {
 
     protected String identifier;
     private Type type;
+
+    private List<User> uses = new ArrayList<>();
 
     public Value(String origName, Type type) {
         this.identifier = rename(origName);
@@ -36,6 +40,27 @@ public class Value {
 
     public void setType(Type type) {
         this.type = type;
+    }
+
+    public List<User> getUses() {
+        return uses;
+    }
+
+    public void addUse(User user) {
+        uses.add(user);
+    }
+
+    public void replaceAllUsesWith(Value value) {
+        for (User user : uses) {
+            List<Value> list = user.getOperands();
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i) == this) {
+                    list.set(i, value);
+                }
+            }
+            value.addUse(user);
+        }
+        uses.clear();
     }
 
     public void accept(IRVisitor visitor) {

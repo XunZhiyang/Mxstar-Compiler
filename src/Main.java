@@ -1,6 +1,7 @@
 import AST.ASTNode;
 import AST.ProgramNode;
 import Backend.IRBuilder;
+import Backend.IROptimizer;
 import Backend.IRPrinter;
 //import Backend.IROptimizer;
 import Frontend.ASTBuilder;
@@ -22,7 +23,15 @@ import Parser.MxstarParser;
 import Symbol.GlobalScope;
 
 public class Main {
-    private static CharStream readCode() throws Exception{
+    private static void print(String pathname, String content) throws IOException {
+        File file =new File(pathname);
+        FileWriter fileWriter = new FileWriter(file.getName());
+        BufferedWriter bufferWriter = new BufferedWriter(fileWriter);
+        bufferWriter.write(content);
+        bufferWriter.close();
+    }
+
+    private static CharStream readCode() throws Exception {
         String inputFile = "code.mx";
         InputStream is = new FileInputStream(inputFile);
         return CharStreams.fromStream(is);
@@ -59,19 +68,21 @@ public class Main {
         printer.visit(module);
         String generatedIR = printer.getIR(true);
 
-        File file =new File("code.ll");
-        FileWriter fileWriter = new FileWriter(file.getName());
-        BufferedWriter bufferWriter = new BufferedWriter(fileWriter);
-        bufferWriter.write(generatedIR);
-        bufferWriter.close();
+        print("code.ll", generatedIR);
 
         return module;
     }
 
-//    private static void optimize(Module module) {
-//        IROptimizer optimizer = new IROptimizer(module);
-//        optimizer.optimize();
-//    }
+    private static void optimize(Module module) throws Exception {
+        IROptimizer optimizer = new IROptimizer(module);
+        optimizer.optimize();
+
+        IRPrinter printer = new IRPrinter();
+        printer.visit(module);
+        String generatedIR = printer.getIR(true);
+
+        print("code_opt.ll", generatedIR);
+    }
 
     public static void main(String[] args) {
         try{
@@ -80,7 +91,7 @@ public class Main {
             ProgramNode ast = (ProgramNode) buildAST(tree);
             GlobalScope globalScope = analyzeSemantics(ast);
             Module module = buildIR(ast, globalScope);
-//            optimize(module);
+            optimize(module);
         } catch (Exception e) {
             e.printStackTrace();
             java.lang.System.exit(1);
