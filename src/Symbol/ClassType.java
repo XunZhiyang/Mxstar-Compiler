@@ -41,7 +41,9 @@ public class ClassType extends Type implements Scope {
         if (!symbol.isFunction()) {
             fieldIndex.put(symbol.getIdentifier(), fieldNum);
             fieldNum++;
-            int symbolBitLen = symbol.getType().getBitLen();
+            Type type = symbol.getType();
+            if (type.derivesFromClass()) type = type.getPointer();
+            int symbolBitLen = type.getBitLen();
             bitLen += (symbolBitLen - bitLen % symbolBitLen) % symbolBitLen + symbolBitLen;
         }
     }
