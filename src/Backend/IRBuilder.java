@@ -277,6 +277,7 @@ public class IRBuilder implements ASTVisitor {
                 curBlock = circuitAfter;
                 break;
             case ASSIGN:
+                System.out.println(v1.getType().IRName());
                 node.getSrc2().accept(this);
                 v2 = node.getSrc2().getValue();
                 v2 = assignConvert(v2, ((PointerType) v1.getType()).getMember());
@@ -659,7 +660,8 @@ public class IRBuilder implements ASTVisitor {
     public void visit(SubscriptExprNode node) {
         node.getArray().accept(this);
         node.getSubscript().accept(this);
-        Value array = new LoadInst(node.getArray().getValue(), curBlock);
+//        Value array = new LoadInst(node.getArray().getValue(), curBlock);
+        Value array = assignConvert(node.getArray().getValue(), node.getType().getPointer().getPointer());
         Value num = assignConvert(node.getSubscript().getValue(), getIntType());
         GEPInst inst = new GEPInst(array, array.getType(), curBlock);
         inst.addOperand(num);
