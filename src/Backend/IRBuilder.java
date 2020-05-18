@@ -752,6 +752,7 @@ public class IRBuilder implements ASTVisitor {
         if (node.getVarSymbol() == null)
             node.setValue(null);
         else if(node.getVarSymbol().getValue() == null) {
+            System.out.println(node.getIdentifier());
             Type fieldType = curClass.getFieldType(node.getIdentifier());
             GEPInst inst = new GEPInst(thisValue, fieldType.getPointer(), curBlock);
             inst.addOperand(new IntConst(0), new IntConst(curClass.getFieldIndex(node.getIdentifier())));
