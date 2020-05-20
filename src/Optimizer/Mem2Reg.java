@@ -29,7 +29,8 @@ public class Mem2Reg extends Pass {
         List<Instruction> storeList = new ArrayList<>();
         storeList.add(instruction);
         for (User useInst : instruction.getUses()) {
-            if (useInst instanceof StoreInst && useInst.getOperand(1) == instruction) {
+            if (useInst instanceof StoreInst && useInst.getOperand(1) == instruction &&
+                    ((StoreInst) useInst).getFromBlock() != null) {
                 storeList.add((StoreInst) useInst);
             }
         }
@@ -48,7 +49,10 @@ public class Mem2Reg extends Pass {
                 String identifier = instruction.getOperand(0).getIdentifier();
                 if (workList.get(identifier) != null) {
                     iterator.remove();
-                    instruction.replaceAllUsesWith(curValue.get(identifier).lastElement());
+                    Stack<Value> curStack = curValue.get(identifier);
+                    if (curStack != null && !curStack.isEmpty()) {
+                        instruction.replaceAllUsesWith(curStack.lastElement());
+                    }
                 }
             } else if (instruction instanceof StoreInst || instruction instanceof PhiInst) {
                 Value newValue;

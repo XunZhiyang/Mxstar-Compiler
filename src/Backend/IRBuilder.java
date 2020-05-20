@@ -277,7 +277,7 @@ public class IRBuilder implements ASTVisitor {
                 curBlock = circuitAfter;
                 break;
             case ASSIGN:
-                System.out.println(v1.getType().IRName());
+//                System.out.println(v1.getType().IRName());
                 node.getSrc2().accept(this);
                 v2 = node.getSrc2().getValue();
                 v2 = assignConvert(v2, ((PointerType) v1.getType()).getMember());
@@ -333,8 +333,8 @@ public class IRBuilder implements ASTVisitor {
     @Override
     public void visit(FieldExprNode node) {
         node.getObject().accept(this);
-        System.out.println(node.getObject().getValue().getIdentifier());
-        System.out.println(node.getObject().getValue().getType().IRName());
+//        System.out.println(node.getObject().getValue().getIdentifier());
+//        System.out.println(node.getObject().getValue().getType().IRName());
         Value nowValue = node.getObject().getValue();
         Type type = node.getObject().getValue().getType();
         if (type.isPointer() && !type.isString()) {
@@ -359,6 +359,7 @@ public class IRBuilder implements ASTVisitor {
                 node.setValue(nowValue);
             }
         } else {
+            System.err.println(type.IRName());
             Value p = new LoadInst(nowValue, curBlock);
             p = new BitCastInst(p, getIntType().getPointer(), curBlock);
             p = new GEPInst(p, p.getType(), curBlock) {{addOperand(new IntConst(-1));}};
@@ -661,7 +662,9 @@ public class IRBuilder implements ASTVisitor {
         node.getArray().accept(this);
         node.getSubscript().accept(this);
 //        Value array = new LoadInst(node.getArray().getValue(), curBlock);
-        Value array = assignConvert(node.getArray().getValue(), node.getType().getPointer().getPointer());
+        Type nodeType = node.getType();
+        nodeType = nodeType.derivesFromClass() ? nodeType.getPointer() : nodeType;
+        Value array = assignConvert(node.getArray().getValue(), nodeType.getPointer());
         Value num = assignConvert(node.getSubscript().getValue(), getIntType());
         GEPInst inst = new GEPInst(array, array.getType(), curBlock);
         inst.addOperand(num);
@@ -752,7 +755,7 @@ public class IRBuilder implements ASTVisitor {
         if (node.getVarSymbol() == null)
             node.setValue(null);
         else if(node.getVarSymbol().getValue() == null) {
-            System.out.println(node.getIdentifier());
+//            System.out.println(node.getIdentifier());
             Type fieldType = curClass.getFieldType(node.getIdentifier());
             GEPInst inst = new GEPInst(thisValue, fieldType.getPointer(), curBlock);
             inst.addOperand(new IntConst(0), new IntConst(curClass.getFieldIndex(node.getIdentifier())));

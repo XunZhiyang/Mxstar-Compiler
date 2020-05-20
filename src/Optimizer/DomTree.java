@@ -29,8 +29,6 @@ public class DomTree {
 
     public DomTree(Function function, BasicBlock rootBlock, boolean reverse) {
         cfg = new CFG(function, rootBlock, reverse);
-//        System.out.println(rootBlock.getIdentifier());
-//        cfg.getRPO().forEach(x -> System.out.println(x.getIdentifier()));
 
         for (int i = 0; i < cfg.getRPO().size(); ++i) {
             BasicBlock block = cfg.getRPO().get(i);
@@ -41,12 +39,12 @@ public class DomTree {
         buildTree();
         calcDF();
         //Print IDom
-        for (BasicBlock block : cfg.getRPO()) {
-            if (nodes.get(block).IDom != null)
-            System.out.println(block.getIdentifier() + " IDOM: " + nodes.get(block).IDom.block.getIdentifier());
+//        for (BasicBlock block : cfg.getRPO()) {
+//            if (nodes.get(block).IDom != null)
+//            System.out.println(block.getIdentifier() + " IDom: " + nodes.get(block).IDom.block.getIdentifier());
 //            System.out.println(block.getIdentifier());
 //            nodes.get(block).DF.forEach(x -> System.out.println("     " + x.getIdentifier()));
-        }
+//        }
     }
 
     private Node calcLCA(Node u, Node v) {
@@ -63,9 +61,7 @@ public class DomTree {
         root.IDom = root;
 
         boolean changed = true;
-        int cnt = 0;
         while (changed) {
-            cnt++;
             changed = false;
             for (BasicBlock block : cfg.getRPO()) {
                 Node now = nodes.get(block);

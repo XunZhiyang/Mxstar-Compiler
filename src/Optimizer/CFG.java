@@ -55,6 +55,16 @@ public class CFG {
 
     void removeUnreachable(Function function) {
         List<BasicBlock> toDelete = new ArrayList<>();
+        var iterator = function.getBasicBlockList().listIterator();
+        while (iterator.hasNext()) {
+            BasicBlock block = iterator.next();
+            if (nodes.get(block) == null) {
+                iterator.remove();
+                for (Instruction instruction : block.getInstructionList()) {
+                    instruction.setFromBlock(null);
+                }
+            }
+        }
         for (BasicBlock block : function.getBasicBlockList()) {
             if (nodes.get(block) == null) {
                 toDelete.add(block);
@@ -65,7 +75,7 @@ public class CFG {
 
     public CFG(Function function, BasicBlock root, boolean reverse) {
         dfs(function.getBasicBlockList().get(0));
-//        removeUnreachable(function);
+        removeUnreachable(function);
         if (reverse) {
             for (CFGNode node : nodes.values()) {
                 var tmp = node.out;

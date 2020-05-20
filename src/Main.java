@@ -91,7 +91,7 @@ public class Main {
             ProgramNode ast = (ProgramNode) buildAST(tree);
             GlobalScope globalScope = analyzeSemantics(ast);
             Module module = buildIR(ast, globalScope);
-//            optimize(module);
+            optimize(module);
         } catch (Exception e) {
             e.printStackTrace();
             java.lang.System.exit(1);
