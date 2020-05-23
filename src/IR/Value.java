@@ -1,5 +1,7 @@
 package IR;
 
+import OperandRV.OperandRV;
+import OperandRV.Register;
 import Symbol.Type;
 
 import java.util.ArrayList;
@@ -14,6 +16,8 @@ public class Value {
     private Type type;
 
     private List<User> uses = new ArrayList<>();
+
+    private OperandRV corRV;
 
     public Value(String origName, Type type) {
         this.identifier = rename(origName);
@@ -65,5 +69,13 @@ public class Value {
 
     public void accept(IRVisitor visitor) {
         visitor.visit(this);
+    }
+
+    public void setCorRV(OperandRV corRV) {
+        this.corRV = corRV;
+    }
+
+    public OperandRV getCorRV() {
+        return corRV;
     }
 }

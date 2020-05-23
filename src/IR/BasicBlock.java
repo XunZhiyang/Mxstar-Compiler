@@ -3,6 +3,7 @@ package IR;
 import IR.Instruction.BranchInst;
 import IR.Instruction.Instruction;
 import IR.Instruction.JumpInst;
+import OperandRV.BlockRV;
 import Symbol.GlobalScope;
 
 import java.util.ArrayList;
@@ -11,6 +12,8 @@ import java.util.List;
 public class BasicBlock extends User {
     private List<Instruction> instructionList = new ArrayList<>();
     private boolean terminated = false;
+
+    private BlockRV corRV;
 
     public BasicBlock(String label) {
         super(label, GlobalScope.getVoidType());
