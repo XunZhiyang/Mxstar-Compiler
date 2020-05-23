@@ -62,4 +62,21 @@ public class BasicBlock extends User {
         }
         return successors;
     }
+
+    public void redirect(BasicBlock from, BasicBlock to) {
+        Instruction instruction = instructionList.get(instructionList.size() - 1);
+        if (instruction instanceof JumpInst) {
+            assert instruction.getOperand(0) == from;
+            instruction.setOperand(0, to);
+        }
+        if (instruction instanceof BranchInst) {
+            if (instruction.getOperand(0) == from) {
+                instruction.setOperand(0, to);
+            } else if (instruction.getOperand(1) == from) {
+                instruction.setOperand(1, to);
+            } else {
+                throw new RuntimeException();
+            }
+        }
+    }
 }

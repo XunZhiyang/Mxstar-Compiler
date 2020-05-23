@@ -54,6 +54,10 @@ public class Value {
         uses.add(user);
     }
 
+    public void deleteUse(User user) {
+        uses.remove(user);
+    }
+
     public void replaceAllUsesWith(Value value) {
         for (User user : uses) {
             List<Value> list = user.getOperands();
@@ -77,5 +81,9 @@ public class Value {
 
     public OperandRV getCorRV() {
         return corRV;
+    }
+
+    public static Value genPrime(Value value) {
+        return new Value(value.identifier + "_prime", value.type);
     }
 }

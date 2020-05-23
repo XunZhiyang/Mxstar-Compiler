@@ -4,6 +4,7 @@ import Backend.IRBuilder;
 import Backend.IROptimizer;
 import Backend.IRPrinter;
 //import Backend.IROptimizer;
+import Backend.SSADestructor;
 import Frontend.ASTBuilder;
 import Frontend.ClassScanner;
 import Frontend.FunctionScanner;
@@ -84,6 +85,10 @@ public class Main {
         print("code_opt.ll", generatedIR);
     }
 
+    private static void codeGen(Module module) {
+        new SSADestructor().destruct(module);
+    }
+
     public static void main(String[] args) {
         try{
             CharStream input = readCode();
@@ -92,6 +97,7 @@ public class Main {
             GlobalScope globalScope = analyzeSemantics(ast);
             Module module = buildIR(ast, globalScope);
             optimize(module);
+            codeGen(module);
         } catch (Exception e) {
             e.printStackTrace();
             java.lang.System.exit(1);

@@ -41,6 +41,16 @@ public class Function extends Constant {
         return basicBlockList.get(min(1, basicBlockList.size() - 1));
     }
 
+    public List<BasicBlock> predecessorsOf(BasicBlock successor) {
+        List<BasicBlock> ret = new ArrayList<>();
+        for (BasicBlock block : basicBlockList) {
+            if (block.getSuccessors().contains(successor)) {
+                ret.add(block);
+            }
+        }
+        return ret;
+    }
+
     @Override
     public void accept(IRVisitor visitor) {
         visitor.visit(this);
