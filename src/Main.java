@@ -1,15 +1,13 @@
 import AST.ASTNode;
 import AST.ProgramNode;
-import Backend.IRBuilder;
-import Backend.IROptimizer;
-import Backend.IRPrinter;
+import Backend.*;
 //import Backend.IROptimizer;
-import Backend.SSADestructor;
 import Frontend.ASTBuilder;
 import Frontend.ClassScanner;
 import Frontend.FunctionScanner;
 import Frontend.SemanticAnalyzer;
 import IR.Module;
+import OperandRV.ModuleRV;
 import Parser.MxstarErrorListener;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -80,13 +78,23 @@ public class Main {
 
         IRPrinter printer = new IRPrinter();
         printer.visit(module);
-        String generatedIR = printer.getIR(true);
+        String generatedIR = printer.getIR(false);
 
         print("code_opt.ll", generatedIR);
     }
 
-    private static void codeGen(Module module) {
+    private static void codeGen(Module module) throws Exception {
         new SSADestructor().destruct(module);
+
+//        IRPrinter printer = new IRPrinter();
+//        printer.visit(module);
+//        String generatedIR = printer.getIR(false);
+//
+//        print("code_destruct.ll", generatedIR);
+
+        InstSelector instSelector = new InstSelector();
+        instSelector.visit(module);
+        ModuleRV moduleRV = instSelector.getModule();
     }
 
     public static void main(String[] args) {

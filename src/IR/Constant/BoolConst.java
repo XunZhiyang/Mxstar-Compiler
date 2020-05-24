@@ -4,11 +4,15 @@ import IR.IRVisitor;
 import Symbol.GlobalScope;
 
 public class BoolConst extends Constant {
-    boolean value;
+    private boolean value;
 
     public BoolConst(boolean value) {
         super("_const", GlobalScope.getBoolType());
         this.value = value;
+    }
+
+    public boolean getValue() {
+        return value;
     }
 
     @Override

@@ -75,8 +75,8 @@ public class Value {
         visitor.visit(this);
     }
 
-    public void setCorRV(OperandRV corRV) {
-        this.corRV = corRV;
+    public OperandRV setCorRV(OperandRV corRV) {
+        return this.corRV = corRV;
     }
 
     public OperandRV getCorRV() {

@@ -4,17 +4,14 @@ import OperandRV.BlockRV;
 import OperandRV.Immediate;
 import OperandRV.Register;
 
-public class ITypeInst extends InstRV {
-    private String op;
+public class CmpZeroInst extends InstRV{
+    private String op;             // seqz, snez
     private Register rd, rs;
-    private Immediate immediate;
 
-    public ITypeInst(String op, Register rd, Register rs, Immediate immediate, BlockRV curBlock) {
+    public CmpZeroInst(String op, Register rd, Register rs, BlockRV curBlock) {
         super(curBlock);
         this.op = op;
         this.rd = rd;
         this.rs = rs;
-        this.immediate = immediate;
     }
-
 }

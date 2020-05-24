@@ -3,14 +3,15 @@ package OperandRV;
 import java.util.*;
 
 public class RV32 {
-    public static List<String> callerSave = new ArrayList<>() {
+    public static final int argNum = 8;
+    public static final List<String> callerSave = new ArrayList<>() {
         {
             for (int i = 0; i < 7; ++i) add("t" + i);
-            for (int i = 0; i < 8; ++i) add("a" + i);
+            for (int i = 0; i < argNum; ++i) add("a" + i);
             add("ra");
         }
     };
-    public static List<String> calleeSave = new ArrayList<>() {
+    public static final List<String> calleeSave = new ArrayList<>() {
         {
             for (int i = 0; i < 12; ++i) add("s" + i);
         }

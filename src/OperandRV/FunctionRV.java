@@ -6,11 +6,13 @@ import IR.Constant.Function;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Integer.max;
 import static java.lang.Integer.min;
 
 public class FunctionRV extends OperandRV {
     private List<BlockRV> blocks = new ArrayList<>();
     private List<Register> params = new ArrayList<>();
+    private int regNum, maxParamBytes;
 
     public FunctionRV(Function function) {
         this.identifier = function.getIdentifier();
@@ -31,5 +33,17 @@ public class FunctionRV extends OperandRV {
 
     public BlockRV exitBlock() {
         return blocks.get(min(1, blocks.size() - 1));
+    }
+
+    public void setRegNum(int regNum) {
+        this.regNum = regNum;
+    }
+
+    public int getRegNum() {
+        return regNum;
+    }
+
+    public void updateParamBytes(int value) {
+        maxParamBytes = max(maxParamBytes, value);
     }
 }

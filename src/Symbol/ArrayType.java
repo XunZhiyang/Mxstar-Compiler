@@ -9,6 +9,7 @@ public class ArrayType extends Type{
         super("_arrayType");
         this.baseType = baseType;
         this.dim = dim;
+        this.bitLen = baseType.bitLen;
     }
 
     @Override

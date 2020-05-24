@@ -254,25 +254,11 @@ public class IRPrinter implements IRVisitor {
         IRList.add(sb.toString());
     }
 
-    //Constant
     @Override
-    public void visit(BoolConst node) {
-
+    public void visit(MoveInst node) {
+        //move %rs to %rd
+        String str = "move " + (node.getOperand(0) == null ? "undef" : node.getOperand(0).getIdentifier()) + " to "
+                + node.getOperand(1).getIdentifier();
+        IRList.add(str);
     }
-
-    @Override
-    public void visit(IntConst node) {
-
-    }
-
-    @Override
-    public void visit(NullConst node) {
-
-    }
-
-    @Override
-    public void visit(StringConst node) {
-
-    }
-
 }

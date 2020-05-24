@@ -70,11 +70,13 @@ public class BasicBlock extends User {
             instruction.setOperand(0, to);
         }
         if (instruction instanceof BranchInst) {
-            if (instruction.getOperand(0) == from) {
-                instruction.setOperand(0, to);
-            } else if (instruction.getOperand(1) == from) {
+            if (instruction.getOperand(1) == from) {
                 instruction.setOperand(1, to);
+            } else if (instruction.getOperand(2) == from) {
+                instruction.setOperand(2, to);
             } else {
+                System.err.println(this.identifier + instruction.getOperand(0) + " " +
+                        instruction.getOperand(1) + " " + from.identifier + " " + to.identifier);
                 throw new RuntimeException();
             }
         }

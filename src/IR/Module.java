@@ -35,6 +35,13 @@ public class Module {
         globalVariableList.add(v);
     }
 
+    public Function getFunction(String identifier) {
+        for (Function function : functionList) {
+            if (function.getIdentifier().equals(identifier)) return function;
+        }
+        throw new RuntimeException();
+    }
+
     public void accept(IRVisitor visitor) {
         visitor.visit(this);
     }

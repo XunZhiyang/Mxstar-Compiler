@@ -4,7 +4,7 @@ import OperandRV.BlockRV;
 
 public class InstRV {
 
-    public InstRV(BlockRV block) {
-        block.add(this);
+    public InstRV(BlockRV curBlock) {
+        curBlock.add(this);
     }
 }

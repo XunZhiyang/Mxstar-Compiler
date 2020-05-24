@@ -44,12 +44,5 @@ public interface IRVisitor {
 
     void visit(PhiInst node);
 
-    //Constant
-    void visit(BoolConst node);
-
-    void visit(IntConst node);
-
-    void visit(NullConst node);
-
-    void visit(StringConst node);
+    void visit(MoveInst node);
 }

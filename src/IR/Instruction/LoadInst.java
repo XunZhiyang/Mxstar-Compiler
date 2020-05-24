@@ -8,7 +8,6 @@ import Symbol.Type;
 
 public class LoadInst extends Instruction {
     public static Type f(Value value) {
-//        System.out.println(value);
         return ((PointerType) value.getType()).getMember();
     }
 
