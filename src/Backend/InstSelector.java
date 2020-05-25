@@ -13,6 +13,7 @@ import OperandRV.InstRV.MoveInst;
 import OperandRV.InstRV.ReturnInst;
 import Symbol.ClassType;
 import Symbol.PointerType;
+import Symbol.Type;
 
 import java.util.*;
 
@@ -180,6 +181,13 @@ public class InstSelector implements IRVisitor {
             for (BasicBlock block : function.getBasicBlockList()) {
                 functionRV.addBlock(new BlockRV(block));
             }
+
+            for (BasicBlock block : function.getBasicBlockList()) {
+                BlockRV blockRV = (BlockRV) block.getCorRV();
+                function.predecessorsOf(block).forEach(b -> blockRV.addPredecessor((BlockRV) b.getCorRV()));
+                block.getSuccessors().forEach(b -> blockRV.addSuccessor((BlockRV) b.getCorRV()));
+            }
+
             function.getOperands().forEach(v -> functionRV.getParams().add(regFor(v)));
             function.accept(this);
         }
@@ -370,13 +378,32 @@ public class InstSelector implements IRVisitor {
 
     @Override
     public void visit(IR.Instruction.GEPInst node) {
-//        Value offset = node.getOperand(node.getOperands().size() - 1);
-//        if (offset instanceof IntConst) {
-//            int value = ((IntConst) offset).getValue();
-//            if (value != 0) {
-//                genBinaryOpInst()
-//            }
-//        }
+        Register dest;
+        Value pointer = node.getOperand(0);
+        Value offset = node.getOperand(node.getOperands().size() - 1);
+        Type pointTo = ((PointerType) pointer.getType()).getMember();
+        int step = pointTo.isClass() ? 4 : pointTo.getByteNum();
+        if (offset instanceof IntConst) {
+            int index = ((IntConst) offset).getValue();
+            if (index != 0) {
+                dest = new VRegister(regCnt++);
+                genBinaryOpInst("add", dest, pointer, new IntConst(step * index));
+            } else {
+                Register ptr = regFor(pointer);
+                if (ptr.isGlobal()) {
+                    dest = new VRegister(regCnt++);
+                    new LaInst(dest, ptr, curBlock);
+                } else {
+                    dest = ptr;
+                }
+            }
+        } else {
+            Register offsetByte = new VRegister(regCnt++);
+            genBinaryOpInst("mul", offsetByte, offset, new IntConst(step));
+            dest = new VRegister(regCnt++);
+            new RTypeInst("add", dest, regFor(pointer), offsetByte, curBlock);
+        }
+        new MoveInst(regFor(node), dest, curBlock);
     }
 
     @Override
@@ -407,7 +434,6 @@ public class InstSelector implements IRVisitor {
     @Override
     public void visit(IR.Instruction.SextInst node) {
         new MoveInst(regFor(node), regFor(node.getOperand(0)), curBlock);
-//        assert node.getUses().size() == 1;
     }
 
     @Override

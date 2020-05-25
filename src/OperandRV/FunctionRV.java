@@ -23,6 +23,10 @@ public class FunctionRV extends OperandRV {
         blocks.add(block);
     }
 
+    public List<BlockRV> getBlocks() {
+        return blocks;
+    }
+
     public List<Register> getParams() {
         return params;
     }

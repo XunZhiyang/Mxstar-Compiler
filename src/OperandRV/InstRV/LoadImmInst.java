@@ -11,4 +11,8 @@ public class LoadImmInst extends InstRV {
         this.rd = rd;
         this.value = value;
     }
+
+    public Register getDef() {
+        return rd;
+    }
 }

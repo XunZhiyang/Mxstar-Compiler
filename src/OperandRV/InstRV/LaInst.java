@@ -8,4 +8,8 @@ public class LaInst extends InstRV {
     public LaInst(Register rd, Register symbol, BlockRV curBlock) {
         super(curBlock);
     }
+
+    public Register getDef() {
+        return rd;
+    }
 }

@@ -14,6 +14,7 @@ public class ModuleRV {
     private Map<VRegister, String> stringConst = new HashMap<>();
 
     public ModuleRV() {
+
     }
 
     public void addGlobalVariable(VRegister register) {
@@ -26,5 +27,9 @@ public class ModuleRV {
 
     public List<FunctionRV> getFunctions() {
         return functions;
+    }
+
+    public List<VRegister> getGlobalVariables() {
+        return globalVariables;
     }
 }

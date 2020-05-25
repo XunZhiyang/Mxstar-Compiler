@@ -16,7 +16,7 @@ public class RV32 {
             for (int i = 0; i < 12; ++i) add("s" + i);
         }
     };
-    static List<String> normal = new ArrayList<>(callerSave) {{addAll(calleeSave);}};
+    public static List<String> normal = new ArrayList<>(callerSave) {{addAll(calleeSave);}};
     static List<String> special = Arrays.asList("zero", "sp", "gp", "tp");
 //    public static Register zero = new Register();
 //    public static Register sp = new Register();

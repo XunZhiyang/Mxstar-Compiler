@@ -4,6 +4,11 @@ import OperandRV.BlockRV;
 import OperandRV.Immediate;
 import OperandRV.Register;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public class RTypeInst extends InstRV{
     private String op;
     private Register rd, rs1, rs2;
@@ -16,4 +21,11 @@ public class RTypeInst extends InstRV{
         this.rs2 = rs2;
     }
 
+    public List<Register> getUses() {
+        return new ArrayList<>(Arrays.asList(rs1, rs2));
+    }
+
+    public Register getDef() {
+        return rd;
+    }
 }

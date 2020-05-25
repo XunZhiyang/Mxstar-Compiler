@@ -95,6 +95,7 @@ public class Main {
         InstSelector instSelector = new InstSelector();
         instSelector.visit(module);
         ModuleRV moduleRV = instSelector.getModule();
+        new RegisterAllocator(moduleRV);
     }
 
     public static void main(String[] args) {
