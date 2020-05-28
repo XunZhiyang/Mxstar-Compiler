@@ -108,9 +108,11 @@ public class Main {
             ParseTree tree = buildCST(input);
             ProgramNode ast = (ProgramNode) buildAST(tree);
             GlobalScope globalScope = analyzeSemantics(ast);
-            Module module = buildIR(ast, globalScope);
-            optimize(module);
-            codeGen(module);
+            if (args.length == 0 || args[0].equals("--codegen")) {
+                Module module = buildIR(ast, globalScope);
+                optimize(module);
+                codeGen(module);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             java.lang.System.exit(1);
