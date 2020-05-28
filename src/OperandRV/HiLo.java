@@ -9,4 +9,9 @@ public class HiLo extends Immediate {
         this.high = high;
     }
 
+    @Override
+    public String toString() {
+        return "%" + (high ? "hi" : "lo") + "(" + reg.getIdentifier() + ")";
+    }
+
 }

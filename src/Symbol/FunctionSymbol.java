@@ -52,7 +52,7 @@ public class FunctionSymbol extends Symbol implements Scope {
 
     public String IRName() {
         return "@" +  (fatherScope instanceof ClassType ? ((ClassType) fatherScope).getIdentifier() +
-                "." + getIdentifier(): getIdentifier());
+                "__" + getIdentifier(): getIdentifier());
     }
 
     @Override

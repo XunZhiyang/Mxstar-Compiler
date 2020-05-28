@@ -9,8 +9,8 @@ import OperandRV.Register;
 import java.util.*;
 
 public class LivenessAnalyzer {
-    private Map<BlockRV, Set<Register>> use;
-    private Map<BlockRV, Set<Register>> def;
+    private Map<BlockRV, Set<Register>> use = new HashMap<>();
+    private Map<BlockRV, Set<Register>> def = new HashMap<>();
 
     public LivenessAnalyzer(ModuleRV module) {
         module.getFunctions().forEach(this::analyzeFunction);
@@ -32,11 +32,12 @@ public class LivenessAnalyzer {
             List<Register> instUses = inst.getUses();
             instUses.removeAll(blockDef);
             blockUse.addAll(instUses);
-            blockDef.add(inst.getDef());
+            blockDef.addAll(inst.getDef());
         }
-        blockDef.remove(null);
         use.put(block, blockUse);
         def.put(block, blockDef);
+        block.getLiveIn().clear();
+        block.getLiveOut().clear();
     }
 
     Set<BlockRV> visit = new HashSet<>();
@@ -52,7 +53,7 @@ public class LivenessAnalyzer {
         nLiveIn.addAll(use.get(block));
         if (!block.getLiveIn().equals(nLiveIn) || !block.getLiveOut().equals(nLiveOut)) {
             block.getLiveIn().addAll(nLiveIn);
-            block.getLiveIn().addAll(nLiveOut);
+            block.getLiveOut().addAll(nLiveOut);
             visit.removeAll(block.getPredecessors());
         }
         block.getPredecessors().forEach(this::iterateInOut);

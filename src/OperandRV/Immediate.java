@@ -24,4 +24,11 @@ public class Immediate extends OperandRV {
         }
     }
 
+    public int getValue() {
+        return value;
+    }
+
+    public String toString() {
+        return String.valueOf(value);
+    }
 }

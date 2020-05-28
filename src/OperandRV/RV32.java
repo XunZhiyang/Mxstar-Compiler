@@ -18,14 +18,10 @@ public class RV32 {
     };
     public static List<String> normal = new ArrayList<>(callerSave) {{addAll(calleeSave);}};
     static List<String> special = Arrays.asList("zero", "sp", "gp", "tp");
-//    public static Register zero = new Register();
-//    public static Register sp = new Register();
-//    public static Register gp = new Register();
-//    public static Register tp = new Register();
-    private static Map<String, Register> registers = new HashMap<>() {
+    public static Map<String, Register>     registers = new HashMap<>() {
         {
-            normal.forEach(reg -> registers.put(reg, new Register()));
-            special.forEach(reg -> registers.put(reg, new Register()));
+            normal.forEach(reg -> put(reg, new Register(reg)));
+            special.forEach(reg -> put(reg, new Register(reg)));
         }
     };
 

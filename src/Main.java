@@ -86,16 +86,20 @@ public class Main {
     private static void codeGen(Module module) throws Exception {
         new SSADestructor().destruct(module);
 
-//        IRPrinter printer = new IRPrinter();
-//        printer.visit(module);
-//        String generatedIR = printer.getIR(false);
-//
-//        print("code_destruct.ll", generatedIR);
+        IRPrinter printer = new IRPrinter();
+        printer.visit(module);
+        String generatedIR = printer.getIR(false);
+
+        print("code_destruct.ll", generatedIR);
 
         InstSelector instSelector = new InstSelector();
         instSelector.visit(module);
+
         ModuleRV moduleRV = instSelector.getModule();
+//        print("nonAllocate.s", (new RVPrinter(moduleRV)).getRV());
+
         new RegisterAllocator(moduleRV);
+        print("output.s", (new RVPrinter(moduleRV)).getRV());
     }
 
     public static void main(String[] args) {

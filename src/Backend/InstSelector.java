@@ -80,6 +80,7 @@ public class InstSelector implements IRVisitor {
         } else if (value instanceof IntConst) {
             VRegister ret = new VRegister(regCnt++);
             new LoadImmInst(ret, ((IntConst) value).getValue(), curBlock);    //may be problematic
+            return ret;
         } else if (value instanceof GlobalVariable) {
             int byteNum = ((PointerType) value.getType()).getMember().getByteNum(); //may be problematic
             VRegister ret = (VRegister) value.setCorRV(new VRegister(value.getIdentifier(), byteNum));
@@ -109,7 +110,17 @@ public class InstSelector implements IRVisitor {
     }
 
     private void genBinaryOpInst(String op, Register rd, Value rs1, Value rs2) {
-        if (isZero(rs1)) {
+        if (isZero(rs2)) {
+            switch (op) {
+                case "mul":
+                case "and":
+                    new MoveInst(rd, RV32.get("zero"), curBlock);
+                    break;
+                default:
+                    new MoveInst(rd, regFor(rs1), curBlock);
+            }
+            return;
+        } else if (isZero(rs1)) {
             switch (op) {
                 case "add":
                 case "sub":
@@ -120,20 +131,12 @@ public class InstSelector implements IRVisitor {
                 default:
                     new MoveInst(rd, RV32.get("zero"), curBlock);
             }
-        } else if (isZero(rs2)) {
-            switch (op) {
-                case "mul":
-                case "and":
-                    new MoveInst(rd, RV32.get("zero"), curBlock);
-                    break;
-                default:
-                    new MoveInst(rd, regFor(rs1), curBlock);
-            }
+            return;
         } else if (hasI.contains(op)) {
             if (op.equals("sub")) {
                 Immediate immediate = immFor(rs2, false);
                 if (immediate != null) {
-                    new ITypeInst("sub", rd, regFor(rs1), immediate, curBlock);
+                    new ITypeInst("add", rd, regFor(rs1), immediate, curBlock);
                     return;
                 }
             } else {
@@ -166,8 +169,8 @@ public class InstSelector implements IRVisitor {
                 }
             }
         }
-
         new RTypeInst(op, rd, regFor(rs1), regFor(rs2), curBlock);
+
     }
 
     @Override
@@ -175,6 +178,7 @@ public class InstSelector implements IRVisitor {
         this.module = module;
         moduleRV = new ModuleRV();
         for (Function function : module.getFunctionList()) {
+            regCnt = 0;
             FunctionRV functionRV = new FunctionRV(function);
             moduleRV.getFunctions().add(functionRV);
 
@@ -195,7 +199,6 @@ public class InstSelector implements IRVisitor {
 
     @Override
     public void visit(Function function) {
-        regCnt = 0;
         FunctionRV functionRV = (FunctionRV) function.getCorRV();
         curFunction = functionRV;
         new ITypeInst("add", RV32.get("sp"), RV32.get("sp"),
@@ -225,7 +228,7 @@ public class InstSelector implements IRVisitor {
         function.getBasicBlockList().forEach(block -> block.accept(this));
 
         for (int i = 0; i < calleeSave.size(); i++) {
-            new MoveInst(RV32.get(RV32.calleeSave.get(i)), calleeSave.get(i), functionRV.entryBlock());
+            new MoveInst(RV32.get(RV32.calleeSave.get(i)), calleeSave.get(i), functionRV.exitBlock());
         }
         new MoveInst(RV32.get("ra"), ra, functionRV.exitBlock());
         new ITypeInst("add", RV32.get("sp"), RV32.get("sp"),
@@ -257,8 +260,8 @@ public class InstSelector implements IRVisitor {
         BlockRV notTaken = (BlockRV) node.getOperand(2).getCorRV();
         if (cond instanceof IR.Instruction.CmpInst && onlyForBranch((IR.Instruction.CmpInst) cond)) {
             String op = ((CmpInst) cond).getOp();
-            Value cmp1 = node.getOperand(1);
-            Value cmp2 = node.getOperand(2);
+            Value cmp1 = ((CmpInst) cond).getOperand(0);
+            Value cmp2 = ((CmpInst) cond).getOperand(1);
             String opRV;
             Value tmp;
             switch (op) {
@@ -309,7 +312,7 @@ public class InstSelector implements IRVisitor {
             offset += 4;
         }
         curFunction.updateParamBytes(offset);
-        new CallInst((FunctionRV) module.getFunction(node.getFunctionIdentifier()).getCorRV(), curBlock);
+        new CallInst(node.getFunctionIdentifier(), curBlock);
         if (!node.getType().isVoid()) {
             new MoveInst(regFor(node), RV32.get("a0"), curBlock);
         }
@@ -419,6 +422,8 @@ public class InstSelector implements IRVisitor {
 
     @Override
     public void visit(IR.Instruction.ReturnInst node) {
+        if (node.getOperands().size() == 0) return;
+
         Value retValue = node.getOperand(0);
         if (isZero(retValue)) {
             new MoveInst(RV32.get("a0"), RV32.get("zero"), curBlock);

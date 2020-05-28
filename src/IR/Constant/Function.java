@@ -38,7 +38,7 @@ public class Function extends Constant {
     }
 
     public BasicBlock exitBlock() {
-        return basicBlockList.get(min(1, basicBlockList.size() - 1));
+        return basicBlockList.get(basicBlockList.size() - 1);
     }
 
     public List<BasicBlock> predecessorsOf(BasicBlock successor) {

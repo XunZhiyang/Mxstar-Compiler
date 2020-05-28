@@ -32,4 +32,8 @@ public class ModuleRV {
     public List<VRegister> getGlobalVariables() {
         return globalVariables;
     }
+
+    public Map<VRegister, String> getStringConst() {
+        return stringConst;
+    }
 }

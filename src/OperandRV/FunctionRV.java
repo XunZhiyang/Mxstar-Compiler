@@ -15,7 +15,7 @@ public class FunctionRV extends OperandRV {
     private int regNum, maxParamBytes;
 
     public FunctionRV(Function function) {
-        this.identifier = function.getIdentifier();
+        this.identifier = function.getIdentifier().substring(1);
         function.setCorRV(this);
     }
 
@@ -45,6 +45,10 @@ public class FunctionRV extends OperandRV {
 
     public int getRegNum() {
         return regNum;
+    }
+
+    public int getMaxParamBytes() {
+        return maxParamBytes;
     }
 
     public void updateParamBytes(int value) {

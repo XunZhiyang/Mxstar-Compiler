@@ -34,29 +34,35 @@ char* toString(int n) {
     int len = 0;
     len += n == 0 ? 1 : 0;
     int t = n;
-    while (t > 0) {
+    while (t != 0) {
         t /= 10;
         len++;
     }
+
     len += n < 0 ? 1 : 0;
 
     char *s = (char *) malloc(len + 1);
     s[len] = '\0';
+
+    int beg = 0;
     if (n < 0) {
-        s[0] = '-';
+        n = -n;
+        s[beg++] = '-';
     }
-    for (int i = len - 1; i >= 0; i--) {
+
+	int i;
+    for (i = len - 1; i >= beg; i--) {
         s[i] = n % 10 + '0';
         n /= 10;
     }
     return s;
 }
 
-int string.length(char *this) {
+int string__length(char *this) {
     return strlen(this);
 }
 
-char* string.substring(char *this, int left, int right) {
+char* string__substring(char *this, int left, int right) {
     char *substring = (char *) malloc(right - left + 1);
     for (int i = left; i < right; ++i) {
         substring[i - left] = this[i];
@@ -65,7 +71,7 @@ char* string.substring(char *this, int left, int right) {
     return substring;
 }
 
-int string.parseInt(char *this) {
+int string__parseInt(char *this) {
     int sgn = 1, i = 0, res = 0;
     if (this[0] == '-') {
         sgn = -1;
@@ -77,7 +83,7 @@ int string.parseInt(char *this) {
     return sgn * res;
 }
 
-int string.ord(char *this, int pos) {
+int string__ord(char *this, int pos) {
     return this[pos];
 }
 
@@ -92,7 +98,7 @@ char* _string_concatenate(char *s1, char *s2) {
         res[l1 + i] = s2[i];
     }
     res[l1 + l2] = '\0';
-    return ret;
+    return res;
 }
 
 char _string_eq(char *a, char *b) {

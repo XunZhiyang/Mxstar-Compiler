@@ -10,7 +10,7 @@ public class PhiInst extends Instruction {
     public PhiInst(String name, Type type, BasicBlock curBlock) {
         super("phi_" + name.substring(1) + ".", type, curBlock, true);
         origName = name;
-        System.err.println("new Phi node for " + name + " at " + curBlock.getIdentifier());
+//        System.err.println("new Phi node for " + name + " at " + curBlock.getIdentifier());
     }
 
     public String getOrigName() {

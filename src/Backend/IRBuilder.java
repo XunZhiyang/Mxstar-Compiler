@@ -61,6 +61,7 @@ public class IRBuilder implements ASTVisitor {
         curFunction = new Function("@_init", GlobalScope.getVoidType());
         module.addFunction(curFunction);
         curBlock = curFunction.add("initBlock");
+        retBlock = curFunction.add("retBlock");
 
         for (ProgramFragment i : node.getList()) {
             if (i instanceof VarDeclNode) {
@@ -68,7 +69,13 @@ public class IRBuilder implements ASTVisitor {
             }
         }
 
-        new ReturnInst(curBlock);
+        new ReturnInst(retBlock);
+
+        for (BasicBlock block : curFunction.getBasicBlockList()) {
+            if (!block.isTerminated()) {
+                new JumpInst(retBlock, block);
+            }
+        }
 
         scanGlobalVariable = false;
         for (ProgramFragment i : node.getList()) {
@@ -76,6 +83,7 @@ public class IRBuilder implements ASTVisitor {
                 i.accept(this);
             }
         }
+
     }
 
     @Override
@@ -359,7 +367,7 @@ public class IRBuilder implements ASTVisitor {
                 node.setValue(nowValue);
             }
         } else {
-            System.err.println(type.IRName());
+//            System.err.println(type.IRName());
             Value p = new LoadInst(nowValue, curBlock);
             p = new BitCastInst(p, getIntType().getPointer(), curBlock);
             p = new GEPInst(p, p.getType(), curBlock) {{addOperand(new IntConst(-1));}};
