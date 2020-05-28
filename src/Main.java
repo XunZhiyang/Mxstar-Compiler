@@ -67,7 +67,7 @@ public class Main {
         printer.visit(module);
         String generatedIR = printer.getIR(true);
 
-        print("code.ll", generatedIR);
+//        print("code.ll", generatedIR);
 
         return module;
     }
@@ -80,7 +80,7 @@ public class Main {
         printer.visit(module);
         String generatedIR = printer.getIR(false);
 
-        print("code_opt.ll", generatedIR);
+//        print("code_opt.ll", generatedIR);
     }
 
     private static void codeGen(Module module) throws Exception {
@@ -90,7 +90,7 @@ public class Main {
         printer.visit(module);
         String generatedIR = printer.getIR(false);
 
-        print("code_destruct.ll", generatedIR);
+//        print("code_destruct.ll", generatedIR);
 
         InstSelector instSelector = new InstSelector();
         instSelector.visit(module);
