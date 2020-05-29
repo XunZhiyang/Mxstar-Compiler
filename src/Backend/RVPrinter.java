@@ -98,7 +98,7 @@ public class RVPrinter {
     }
 
     public void print(ITypeInst inst) {
-        write(String.format("%s %s, %s %s", inst.getOp(), inst.getRdStr(), inst.getRs1(), inst.getImmediate()));
+        write(String.format("%s %s, %s, %s", inst.getOp(), inst.getRdStr(), inst.getRs1(), inst.getImmediate()));
     }
 
     public void print(JumpInst inst) {
