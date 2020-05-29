@@ -37,7 +37,7 @@ public class RegisterAllocator {
 //    Map<Register, Register> colour = new HashMap<>();
 
     Map<Register, Immediate> framePos = new HashMap<>();
-    Map<Register, Double> priority = new HashMap<>();
+//    Map<Register, Double> priority = new HashMap<>();
     Set<Register> oldTemps = new HashSet<>();
     int stackSize;
 
@@ -105,7 +105,7 @@ public class RegisterAllocator {
         alias = new HashMap<>();
         RV32.registers.values().forEach(reg -> degree.put(reg, Integer.MAX_VALUE / 2));
 
-        priority = new HashMap<>();
+//        priority = new HashMap<>();
 
         for (BlockRV block : curFunction.getBlocks()) {
             for (InstRV inst : block.getInstructions()) {
@@ -180,18 +180,18 @@ public class RegisterAllocator {
     }
 
     private void calcPriority() {
-        initial.forEach(reg -> priority.put(reg, 0.0));
-        oldTemps.forEach(reg -> priority.put(reg, pow(10, 50)));
-
-        for (BlockRV block : curFunction.getBlocks()) {
-            Double weight = pow(10, min(block.getPredecessors().size(), block.getSuccessors().size()));
-            for (InstRV inst : block.getInstructions()) {
-                inst.getDef().forEach(reg ->
-                        priority.put(reg, priority.getOrDefault(reg, 666666.666) + weight));
-                inst.getUses().forEach(reg ->
-                        priority.put(reg, priority.getOrDefault(reg, 666666.666) + weight));
-            }
-        }
+//        initial.forEach(reg -> priority.put(reg, 0.0));
+//        oldTemps.forEach(reg -> priority.put(reg, pow(10, 50)));
+//
+//        for (BlockRV block : curFunction.getBlocks()) {
+//            Double weight = pow(10, min(block.getPredecessors().size(), block.getSuccessors().size()));
+//            for (InstRV inst : block.getInstructions()) {
+//                inst.getDef().forEach(reg ->
+//                        priority.put(reg, priority.getOrDefault(reg, 666666.666) + weight));
+//                inst.getUses().forEach(reg ->
+//                        priority.put(reg, priority.getOrDefault(reg, 666666.666) + weight));
+//            }
+//        }
     }
 
     private void build() {
@@ -455,18 +455,27 @@ public class RegisterAllocator {
     }
 
     private void selectSpill() {
-        Register m = null;
-        double min = Double.POSITIVE_INFINITY;
-        for (Register reg : spillWorkList) {
-            double p = priority.get(reg) / degree.get(reg);
-            if (p < min) {
-                min = p;
-                m = reg;
-            }
-        }
+        var iterator = spillWorkList.iterator();
+        Register m = iterator.next();
+        iterator.remove();
+
+//        Register m = null;
+//        double min = Double.POSITIVE_INFINITY;
+
+//        System.err.println(spillWorkList.size());
+
+//        for (Register reg : spillWorkList) {
+//            double p = priority.get(reg) / degree.get(reg);
+//            if (p < min) {
+//                min = p;
+//                m = reg;
+//            }
+//        }
+
 //        System.err.println(min);
 //        System.err.println(m.getIdentifier());
-        spillWorkList.remove(m);
+
+//        spillWorkList.remove(m);
         simplifyWorkList.add(m);
         freezeMoves(m);
     }
