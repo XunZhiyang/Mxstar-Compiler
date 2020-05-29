@@ -22,12 +22,18 @@ import Parser.MxstarParser;
 import Symbol.GlobalScope;
 
 public class Main {
-    private static void print(String pathname, String content) throws IOException {
-        File file =new File(pathname);
-        FileWriter fileWriter = new FileWriter(file.getName());
-        BufferedWriter bufferWriter = new BufferedWriter(fileWriter);
-        bufferWriter.write(content);
-        bufferWriter.close();
+    private static void print(String pathname, String content) {
+        try {
+            File file = new File(pathname);
+            FileWriter fileWriter = new FileWriter(file.getName());
+            BufferedWriter bufferWriter = new BufferedWriter(fileWriter);
+            bufferWriter.write(content);
+            bufferWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            java.lang.System.exit(1);
+        }
+
     }
 
     private static CharStream readCode() throws Exception {
@@ -58,37 +64,37 @@ public class Main {
         return builder.visit(tree);
     }
 
-    private static Module buildIR(ProgramNode ast, GlobalScope globalScope) throws Exception {
+    private static Module buildIR(ProgramNode ast, GlobalScope globalScope) {
         IRBuilder builder = new IRBuilder(globalScope);
         builder.visit(ast);
         Module module = builder.getModule();
 
-        IRPrinter printer = new IRPrinter();
-        printer.visit(module);
-        String generatedIR = printer.getIR(true);
+//        IRPrinter printer = new IRPrinter();
+//        printer.visit(module);
+//        String generatedIR = printer.getIR(true);
 
 //        print("code.ll", generatedIR);
 
         return module;
     }
 
-    private static void optimize(Module module) throws Exception {
+    private static void optimize(Module module) {
         IROptimizer optimizer = new IROptimizer(module);
         optimizer.optimize();
 
-        IRPrinter printer = new IRPrinter();
-        printer.visit(module);
-        String generatedIR = printer.getIR(false);
+//        IRPrinter printer = new IRPrinter();
+//        printer.visit(module);
+//        String generatedIR = printer.getIR(false);
 
 //        print("code_opt.ll", generatedIR);
     }
 
-    private static void codeGen(Module module) throws Exception {
+    private static void codeGen(Module module) {
         new SSADestructor().destruct(module);
 
-        IRPrinter printer = new IRPrinter();
-        printer.visit(module);
-        String generatedIR = printer.getIR(false);
+//        IRPrinter printer = new IRPrinter();
+//        printer.visit(module);
+//        String generatedIR = printer.getIR(false);
 
 //        print("code_destruct.ll", generatedIR);
 
@@ -103,19 +109,22 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        ProgramNode ast = null;
+        GlobalScope globalScope = null;
         try{
             CharStream input = readCode();
             ParseTree tree = buildCST(input);
-            ProgramNode ast = (ProgramNode) buildAST(tree);
-            GlobalScope globalScope = analyzeSemantics(ast);
-            if (args.length == 0 || args[0].equals("--codegen")) {
-                Module module = buildIR(ast, globalScope);
-                optimize(module);
-                codeGen(module);
-            }
+            ast = (ProgramNode) buildAST(tree);
+            globalScope = analyzeSemantics(ast);
         } catch (Exception e) {
             e.printStackTrace();
             java.lang.System.exit(1);
+        }
+
+        if (args.length == 0 || args[0].equals("--codegen")) {
+            Module module = buildIR(ast, globalScope);
+            optimize(module);
+            codeGen(module);
         }
     }
 }

@@ -13,67 +13,68 @@ public class RegisterAllocator {
     ModuleRV module;
     FunctionRV curFunction;
 
-    Set<Register> preColored = new LinkedHashSet<>();
-    Set<Register> initial = new LinkedHashSet<>();
-    Set<Register> simplifyWorkList = new LinkedHashSet<>();
-    Set<Register> freezeWorkList = new LinkedHashSet<>();
-    Set<Register> spillWorkList = new LinkedHashSet<>();
-    Set<Register> spilledNodes = new LinkedHashSet<>();
-    Set<Register> coalescedNodes = new LinkedHashSet<>();
-    Set<Register> coloredNodes = new LinkedHashSet<>();
+    Set<Register> preColored = new HashSet<>();
+    Set<Register> initial = new HashSet<>();
+    Set<Register> simplifyWorkList = new HashSet<>();
+    Set<Register> freezeWorkList = new HashSet<>();
+    Set<Register> spillWorkList = new HashSet<>();
+    Set<Register> spilledNodes = new HashSet<>();
+    Set<Register> coalescedNodes = new HashSet<>();
+    Set<Register> coloredNodes = new HashSet<>();
     Stack<Register> selectStack = new Stack<>();
 
-    Set<MoveInst> coalescedMoves = new LinkedHashSet<>();
-    Set<MoveInst> constrainedMoves = new LinkedHashSet<>();
-    Set<MoveInst> frozenMoves = new LinkedHashSet<>();
-    Set<MoveInst> workListMoves = new LinkedHashSet<>();
-    Set<MoveInst> activeMoves = new LinkedHashSet<>();
+    Set<MoveInst> coalescedMoves = new HashSet<>();
+    Set<MoveInst> constrainedMoves = new HashSet<>();
+    Set<MoveInst> frozenMoves = new HashSet<>();
+    Set<MoveInst> workListMoves = new HashSet<>();
+    Set<MoveInst> activeMoves = new HashSet<>();
 
-    Set<Map.Entry<Register, Register>> adjSet = new LinkedHashSet<>();
-    Map<Register, Set<Register>> adjList = new LinkedHashMap<>();
-    Map<Register, Integer> degree = new LinkedHashMap<>();
-    Map<Register, Set<MoveInst>> moveList = new LinkedHashMap<>();
-    Map<Register, Register> alias = new LinkedHashMap<>();
-    Map<Register, Register> colour = new LinkedHashMap<>();
+    Set<Map.Entry<Register, Register>> adjSet = new HashSet<>();
+    Map<Register, Set<Register>> adjList = new HashMap<>();
+    Map<Register, Integer> degree = new HashMap<>();
+    Map<Register, Set<MoveInst>> moveList = new HashMap<>();
+    Map<Register, Register> alias = new HashMap<>();
+//    Map<Register, Register> colour = new HashMap<>();
 
-    Map<Register, Immediate> framePos = new LinkedHashMap<>();
-    Map<Register, Double> priority = new LinkedHashMap<>();
-    Set<Register> oldTemps = new LinkedHashSet<>();
+    Map<Register, Immediate> framePos = new HashMap<>();
+    Map<Register, Double> priority = new HashMap<>();
+    Set<Register> oldTemps = new HashSet<>();
     int stackSize;
 
     public RegisterAllocator(ModuleRV module) {
         this.module = module;
         preColored.addAll(RV32.registers.values());
-        Set<Register> gotcha = new LinkedHashSet<>();
+        RV32.registers.values().forEach(reg -> reg.colour = reg);
+//        Set<Register> gotcha = new HashSet<>();
         for (FunctionRV function : module.getFunctions()) {
-            Set<Register> tmpGotcha = new LinkedHashSet<>();
-            function.getBlocks().forEach(block -> block.getInstructions().forEach(i ->{
-                for (Register reg : i.getDef()) {
-                    if (gotcha.contains(reg) && !reg.isGlobal() && reg instanceof VRegister) {
-                        throw new RuntimeException();
-                    } else {
-                        tmpGotcha.add(reg);
-                    }
-                }
-                for (Register reg : i.getUses()) {
-                    if (gotcha.contains(reg) && !reg.isGlobal() && reg instanceof VRegister) {
-                        throw new RuntimeException();
-                    } else {
-                        tmpGotcha.add(reg);
-                    }
-                }
-            }));
-            gotcha.addAll(tmpGotcha);
+//            Set<Register> tmpGotcha = new HashSet<>();
+//            function.getBlocks().forEach(block -> block.getInstructions().forEach(i ->{
+    //                for (Register reg : i.getDef()) {
+    //                    if (gotcha.contains(reg) && !reg.isGlobal() && reg instanceof VRegister) {
+    //                        throw new RuntimeException();
+    //                    } else {
+    //                        tmpGotcha.add(reg);
+//                    }
+//                }
+//                for (Register reg : i.getUses()) {
+//                    if (gotcha.contains(reg) && !reg.isGlobal() && reg instanceof VRegister) {
+//                        throw new RuntimeException();
+//                    } else {
+//                        tmpGotcha.add(reg);
+//                    }
+//                }
+//            }));
+//            gotcha.addAll(tmpGotcha);
             run(function);
             stackSize += function.getMaxParamBytes();
             stackSize = (stackSize + 15) / 16 * 16;
             function.getBlocks().forEach(b -> b.getInstructions().forEach(i -> i.adjustImmediate(stackSize)));
 
-            colour.forEach((reg, colour) -> {
-//                System.err.println("_" + reg.getIdentifier());
-//                System.err.println("__" + colour.getIdentifier());
-                reg.setIdentifier(colour.getIdentifier());
-            });
+//            colour.forEach((reg, colour) -> {
+////                System.err.println("_" + reg.getIdentifier());
+////                System.err.println("__" + colour.getIdentifier());
+//                reg.setIdentifier(colour.getIdentifier());
+//            });
 //            if (function.getIdentifier().equals("check")) {
 //                break;
 //            }
@@ -82,31 +83,30 @@ public class RegisterAllocator {
     }
 
     void init() {
-        initial = new LinkedHashSet<>();
-        simplifyWorkList = new LinkedHashSet<>();
-        freezeWorkList = new LinkedHashSet<>();
-        spillWorkList = new LinkedHashSet<>();
-        spilledNodes = new LinkedHashSet<>();
-        coalescedNodes = new LinkedHashSet<>();
-        coloredNodes = new LinkedHashSet<>();
+        initial = new HashSet<>();
+        simplifyWorkList = new HashSet<>();
+        freezeWorkList = new HashSet<>();
+        spillWorkList = new HashSet<>();
+        spilledNodes = new HashSet<>();
+        coalescedNodes = new HashSet<>();
+        coloredNodes = new HashSet<>();
         selectStack = new Stack<>();
 
-        coalescedMoves = new LinkedHashSet<>();
-        constrainedMoves = new LinkedHashSet<>();
-        frozenMoves = new LinkedHashSet<>();
-        workListMoves = new LinkedHashSet<>();
-        activeMoves = new LinkedHashSet<>();
+        coalescedMoves = new HashSet<>();
+        constrainedMoves = new HashSet<>();
+        frozenMoves = new HashSet<>();
+        workListMoves = new HashSet<>();
+        activeMoves = new HashSet<>();
 
-        adjSet = new LinkedHashSet<>();
-        adjList = new LinkedHashMap<>();
-        degree = new LinkedHashMap<>();
-        moveList = new LinkedHashMap<>();
-        alias = new LinkedHashMap<>();
-        colour = new LinkedHashMap<>();
-        RV32.registers.values().forEach(reg -> colour.put(reg, reg));
+        adjSet = new HashSet<>();
+        adjList = new HashMap<>();
+        degree = new HashMap<>();
+        moveList = new HashMap<>();
+        alias = new HashMap<>();
+//        colour = new HashMap<>();
         RV32.registers.values().forEach(reg -> degree.put(reg, Integer.MAX_VALUE / 2));
 
-        priority = new LinkedHashMap<>();
+        priority = new HashMap<>();
 
         for (BlockRV block : curFunction.getBlocks()) {
             for (InstRV inst : block.getInstructions()) {
@@ -115,6 +115,7 @@ public class RegisterAllocator {
             }
         }
         initial.removeAll(preColored);
+        initial.forEach(reg -> reg.colour = null);
     }
 
     private void run(FunctionRV function) {
@@ -122,6 +123,7 @@ public class RegisterAllocator {
         stackSize = 0;
         oldTemps.clear();
         for (;;) {
+//            int cnt = 0;
             init();
             calcPriority();
             new LivenessAnalyzer(function);
@@ -139,13 +141,18 @@ public class RegisterAllocator {
 //                }
 //            }
             do {
+//                System.err.println(cnt++);
                 if (!simplifyWorkList.isEmpty()) {
+//                    System.err.println("*");
                     simplify();
                 } else if (!workListMoves.isEmpty()) {
+//                    System.err.println("**");
                     coalesce();
                 } else if (!freezeWorkList.isEmpty()) {
+//                    System.err.println("***");
                     freeze();
                 } else if (!spillWorkList.isEmpty()) {
+//                    System.err.println("****");
                     selectSpill();
                 }
             } while (!simplifyWorkList.isEmpty() || !workListMoves.isEmpty()
@@ -189,7 +196,7 @@ public class RegisterAllocator {
 
     private void build() {
         for (BlockRV block : curFunction.getBlocks()) {
-            Set<Register> live = new LinkedHashSet<>(block.getLiveOut());
+            Set<Register> live = new HashSet<>(block.getLiveOut());
             live.add(RV32.get("zero"));
             List<InstRV> instructions = block.getInstructions();
             for (int i = instructions.size() - 1; i >= 0; --i) {
@@ -197,11 +204,11 @@ public class RegisterAllocator {
                 if (inst instanceof MoveInst) {
                     live.removeAll(inst.getUses());
                     for (Register r : inst.getUses()) {
-                        moveList.putIfAbsent(r, new LinkedHashSet<>());
+                        moveList.putIfAbsent(r, new HashSet<>());
                         moveList.get(r).add((MoveInst) inst);
                     }
                     for (Register def : inst.getDef()) {
-                        moveList.putIfAbsent(def, new LinkedHashSet<>());
+                        moveList.putIfAbsent(def, new HashSet<>());
                         moveList.get(def).add((MoveInst) inst);
                     }
                     workListMoves.add((MoveInst) inst);
@@ -223,12 +230,12 @@ public class RegisterAllocator {
             adjSet.add(Map.entry(u, v));
             adjSet.add(Map.entry(v, u));
             if (!preColored.contains(u)) {
-                adjList.putIfAbsent(u, new LinkedHashSet<>());
+                adjList.putIfAbsent(u, new HashSet<>());
                 adjList.get(u).add(v);
                 degree.put(u, degree.getOrDefault(u, 0) + 1);
             }
             if (!preColored.contains(v)) {
-                adjList.putIfAbsent(v, new LinkedHashSet<>());
+                adjList.putIfAbsent(v, new HashSet<>());
                 adjList.get(v).add(u);
                 degree.put(v, degree.getOrDefault(v, 0) + 1);
             }
@@ -253,7 +260,7 @@ public class RegisterAllocator {
     }
 
     private Set<Register> adjacent(Register n) {
-        adjList.putIfAbsent(n, new LinkedHashSet<>());
+        adjList.putIfAbsent(n, new HashSet<>());
         Set<Register> ret = adjList.get(n);
         ret.removeAll(selectStack);
         ret.removeAll(coalescedNodes);
@@ -261,9 +268,9 @@ public class RegisterAllocator {
     }
 
     private Set<MoveInst> nodeMoves(Register n) {
-        Set<MoveInst> ret = new LinkedHashSet<>(activeMoves);
+        Set<MoveInst> ret = new HashSet<>(activeMoves);
         ret.addAll(workListMoves);
-        moveList.putIfAbsent(n, new LinkedHashSet<>());
+        moveList.putIfAbsent(n, new HashSet<>());
         ret.retainAll(moveList.get(n));
         return ret;
     }
@@ -286,7 +293,7 @@ public class RegisterAllocator {
         Integer d = degree.getOrDefault(m, 0);
         degree.put(m, d - 1);
         if (d == K) {
-            enableMoves(new LinkedHashSet<>(adjacent(m)) {{add(m);}});
+            enableMoves(new HashSet<>(adjacent(m)) {{add(m);}});
             spillWorkList.remove(m);
             if (moveRelated(m)) {
                 freezeWorkList.add(m);
@@ -335,6 +342,7 @@ public class RegisterAllocator {
     }
 
     private void coalesce() {
+//        System.err.println("coalescing...");
         var iterator = workListMoves.iterator();
         MoveInst m = iterator.next();
         iterator.remove();
@@ -349,21 +357,28 @@ public class RegisterAllocator {
             v = y;
         }
         if (u == v) {
+//            System.err.println("coalescing...1");
             coalescedMoves.add(m);
             addWorkList(u);
         } else if (preColored.contains(v) || adjSet.contains(Map.entry(u, v))) {
+//            System.err.println("coalescing...2");
             constrainedMoves.add(m);
             addWorkList(u);
             addWorkList(v);
         } else {
-            Set<Register> tmp = new LinkedHashSet<>(adjacent(u));
+//            System.err.println("coalescing...3");
+            Set<Register> tmp = new HashSet<>(adjacent(u));
             tmp.addAll(adjacent(v));
             if ((preColored.contains(u) && OK(adjacent(v), u))
                     || (!preColored.contains(u) && conservative(tmp))) {
 //                System.err.println(u)
+//                System.err.println("coalescing...4");
                 coalescedMoves.add(m);
+//                System.err.println("coalescing...5");
                 combine(u, v);
+//                System.err.println("coalescing...6");
                 addWorkList(u);
+//                System.err.println("coalescing...7");
             } else {
                 activeMoves.add(m);
             }
@@ -371,25 +386,35 @@ public class RegisterAllocator {
     }
 
     private void combine(Register u, Register v) {
+//        System.err.println("combining...");
         if (freezeWorkList.contains(v)) {
             freezeWorkList.remove(v);
         } else {
             spillWorkList.remove(v);
         }
         coalescedNodes.add(v);
+//        System.err.println("combining...1");
 //        System.err.println("##" + v.getIdentifier());
 //        System.err.println("####" + u.getIdentifier());
         alias.put(v, u);
         moveList.get(u).addAll(moveList.get(v));
         enableMoves(Collections.singleton(v));
-        for (Register t : adjacent(v)) {
+//        System.err.println("combining...2");
+        var tmp = adjacent(v);
+//        System.err.println(tmp.size());
+//        System.err.println(v.getIdentifier());
+        for (Register t : tmp) {
+//            System.err.println("hey");
             addEdge(t, u);
+//            System.err.println("ha");
             decrementDegree(t);
         }
+//        System.err.println("combining...3");
         if (degree.getOrDefault(u, 0) >= K && freezeWorkList.contains(u)) {
             freezeWorkList.remove(u);
             spillWorkList.add(u);
         }
+//        System.err.println("combining...4");
     }
 
     private Register getAlias(Register n) {
@@ -449,12 +474,12 @@ public class RegisterAllocator {
     private void assignColours() {
         while(!selectStack.isEmpty()) {
             Register n = selectStack.pop();
-            Set<Register> okColours = new LinkedHashSet<>();
+            Set<Register> okColours = new HashSet<>();
             RV32.normal.forEach(reg -> okColours.add(RV32.get(reg)));
             for (Register w : adjList.get(n)) {
                 Register alias = getAlias(w);
                 if (coloredNodes.contains(alias) || preColored.contains(alias)) {
-                    okColours.remove(colour.get(alias));
+                    okColours.remove(alias.colour);
                 }
             }
             if (okColours.isEmpty()) {
@@ -464,13 +489,15 @@ public class RegisterAllocator {
 //                System.err.println("&&&" + adjList.get(n).size());
             } else {
                 coloredNodes.add(n);
-                colour.put(n, okColours.iterator().next());
+//                colour.put(n, okColours.iterator().next());
+                n.colour = okColours.iterator().next();
 //                System.err.println("**" + n.getIdentifier());
 //                System.err.println("****" + colour.get(n).getIdentifier());
             }
         }
         for (Register n : coalescedNodes) {
-            colour.put(n, colour.get(getAlias(n)));
+//            colour.put(n, colour.get(getAlias(n)));
+            n.colour = getAlias(n).colour;
 //            System.err.println("**" + n.getIdentifier());
 //            System.err.println("**" + getAlias(n).getIdentifier());
 //            System.err.println("****" + colour.get(n).getIdentifier());
@@ -480,22 +507,12 @@ public class RegisterAllocator {
     private void rewriteProgram() {
 //        System.err.println("\n\nRewriting...\n\n");
 
-        Set<Register> newTemps = new LinkedHashSet<>();
+        Set<Register> newTemps = new HashSet<>();
 
         for (Register reg : spilledNodes) {
             stackSize += 4;
             framePos.put(reg, new Immediate(-stackSize, false));
         }
-
-//        for (BlockRV block : curFunction.getBlocks()) {
-//            for (InstRV inst : block.getInstructions()) {
-//                if (inst.getDef().size() == 1) {
-//                    if () {
-//
-//                    }
-//                }
-//            }
-//        }
 
         for (BlockRV block : curFunction.getBlocks()) {
             var iterator = block.getInstructions().listIterator();
