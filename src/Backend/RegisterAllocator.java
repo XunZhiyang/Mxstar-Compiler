@@ -103,7 +103,6 @@ public class RegisterAllocator {
         degree = new HashMap<>();
         moveList = new HashMap<>();
         alias = new HashMap<>();
-//        colour = new HashMap<>();
         RV32.registers.values().forEach(reg -> degree.put(reg, Integer.MAX_VALUE / 2));
 
         priority = new HashMap<>();
@@ -128,6 +127,7 @@ public class RegisterAllocator {
             calcPriority();
             new LivenessAnalyzer(function);
             build();
+//            System.err.println(adjSet.size());
             makeWorkList();
 //            if (function.getIdentifier().equals("check")) {
 //                for (var q : adjList.entrySet()) {
@@ -345,7 +345,6 @@ public class RegisterAllocator {
 //        System.err.println("coalescing...");
         var iterator = workListMoves.iterator();
         MoveInst m = iterator.next();
-        iterator.remove();
         Register x = getAlias(m.getRd());
         Register y = getAlias(m.getRs());
         Register u, v;
@@ -356,6 +355,7 @@ public class RegisterAllocator {
             u = x;
             v = y;
         }
+        iterator.remove();
         if (u == v) {
 //            System.err.println("coalescing...1");
             coalescedMoves.add(m);

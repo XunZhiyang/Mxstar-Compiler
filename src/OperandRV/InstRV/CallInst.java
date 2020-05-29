@@ -28,7 +28,7 @@ public class CallInst extends InstRV {
 
     public List<Register> getUses() {
         List<Register> ret = new ArrayList<>();
-        RV32.calleeSave.forEach(reg -> ret.add(RV32.get(reg)));
+//        RV32.calleeSave.forEach(reg -> ret.add(RV32.get(reg)));
         return ret;
     }
 
