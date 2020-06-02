@@ -8,6 +8,7 @@ import Frontend.FunctionScanner;
 import Frontend.SemanticAnalyzer;
 import IR.Module;
 import OperandRV.ModuleRV;
+import Optimizer.Mem2Reg;
 import Parser.MxstarErrorListener;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -71,8 +72,8 @@ public class Main {
 
 //        IRPrinter printer = new IRPrinter();
 //        printer.visit(module);
-//        String generatedIR = printer.getIR(true);
-
+//        String generatedIR = printer.getIR(false);
+//
 //        print("code.ll", generatedIR);
 
         return module;
@@ -85,7 +86,7 @@ public class Main {
 //        IRPrinter printer = new IRPrinter();
 //        printer.visit(module);
 //        String generatedIR = printer.getIR(false);
-
+//
 //        print("code_opt.ll", generatedIR);
     }
 
@@ -95,7 +96,7 @@ public class Main {
 //        IRPrinter printer = new IRPrinter();
 //        printer.visit(module);
 //        String generatedIR = printer.getIR(false);
-
+//
 //        print("code_destruct.ll", generatedIR);
 
         InstSelector instSelector = new InstSelector();

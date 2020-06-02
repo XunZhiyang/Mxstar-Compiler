@@ -27,17 +27,26 @@ public class BasicBlock extends User {
         }
     }
 
+    public void strongAddInst(Instruction instruction) {
+        instruction.setFromBlock(this);
+        instructionList.add(instruction);
+    }
+
     public void addFront(Instruction instruction) {
         instructionList.add(0, instruction);
         instruction.setFromBlock(this);
     }
 
-    public boolean isTerminated() {
-        return terminated;
+    public boolean isNotTerminated() {
+        return !terminated;
     }
 
     public List<Instruction> getInstructionList() {
         return instructionList;
+    }
+
+    public Instruction getLastInstruction() {
+        return instructionList.get(instructionList.size() - 1);
     }
 
     @Override
@@ -72,13 +81,15 @@ public class BasicBlock extends User {
         if (instruction instanceof BranchInst) {
             if (instruction.getOperand(1) == from) {
                 instruction.setOperand(1, to);
-            } else if (instruction.getOperand(2) == from) {
+            }
+            if (instruction.getOperand(2) == from) {
                 instruction.setOperand(2, to);
-            } else {
-                System.err.println(this.identifier + instruction.getOperand(0) + " " +
-                        instruction.getOperand(1) + " " + from.identifier + " " + to.identifier);
-                throw new RuntimeException();
             }
         }
+//        if (flag) {
+//            System.err.println(this.identifier + " " + instruction.getOperand(1) + " " +
+//                    instruction.getOperand(2) + " " + from.identifier + " " + to.identifier);
+//            throw new RuntimeException();
+//        }
     }
 }

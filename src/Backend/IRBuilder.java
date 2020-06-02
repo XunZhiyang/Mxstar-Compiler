@@ -72,7 +72,7 @@ public class IRBuilder implements ASTVisitor {
         new ReturnInst(retBlock);
 
         for (BasicBlock block : curFunction.getBasicBlockList()) {
-            if (!block.isTerminated()) {
+            if (block.isNotTerminated()) {
                 new JumpInst(retBlock, block);
             }
         }
@@ -467,7 +467,7 @@ public class IRBuilder implements ASTVisitor {
         }
 
         for (BasicBlock block : blocks) {
-            if (!block.isTerminated()) {
+            if (block.isNotTerminated()) {
                 new JumpInst(retBlock, block);
             }
         }

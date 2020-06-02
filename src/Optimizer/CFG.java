@@ -8,19 +8,18 @@ import IR.Instruction.JumpInst;
 
 import java.util.*;
 
-class CFGNode {
-    BasicBlock block;
-    List<CFGNode> in = new ArrayList<>();
-    List<CFGNode> out = new ArrayList<>();
-    boolean visit = false;
-
-    CFGNode(BasicBlock block) {
-        this.block = block;
-    }
-}
-
-
 public class CFG {
+    static class CFGNode {
+        BasicBlock block;
+        List<CFGNode> in = new ArrayList<>();
+        List<CFGNode> out = new ArrayList<>();
+        boolean visit = false;
+
+        CFGNode(BasicBlock block) {
+            this.block = block;
+        }
+    }
+
     private Map<BasicBlock, CFGNode> nodes = new HashMap<>();
     List<BasicBlock> RPO = new ArrayList<>();
 
@@ -74,7 +73,7 @@ public class CFG {
     }
 
     public CFG(Function function, BasicBlock root, boolean reverse) {
-        dfs(function.getBasicBlockList().get(0));
+        dfs(function.entryBlock());
         removeUnreachable(function);
         if (reverse) {
             for (CFGNode node : nodes.values()) {

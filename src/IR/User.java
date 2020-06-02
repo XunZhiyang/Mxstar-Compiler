@@ -28,7 +28,8 @@ public class User extends Value {
     public void setOperand(int index, Value value) {
         operands.get(index).deleteUse(this);
         operands.set(index, value);
-        value.addUse(this);
+        if (value != null)
+           value.addUse(this);
     }
 
     public Value getOperand(int index) {

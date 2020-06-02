@@ -96,7 +96,7 @@ public class Mem2Reg extends Pass {
 
     @Override
     protected void optimizeFunction(Function function) {
-        DomTree domTree = new DomTree(function, function.getBasicBlockList().get(0), false);
+        DomTree domTree = new DomTree(function, function.entryBlock(), false);
 
         for (BasicBlock block : function.getBasicBlockList()) {
             for (Instruction instruction : block.getInstructionList()) {

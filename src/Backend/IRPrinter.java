@@ -10,27 +10,27 @@ import Symbol.ClassType;
 import Symbol.PointerType;
 import Symbol.Type;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class IRPrinter implements IRVisitor {
     private List<String> IRList = new ArrayList<>();
 
-    public String getIR(boolean addBuiltin) throws Exception {
+    public String getIR(boolean addBuiltin) {
         StringBuilder resBuilder = new StringBuilder();
-
-        File filename = new File(addBuiltin ? "src/Utils/builtin.ll" : "src/Utils/header.ll");
-        InputStreamReader reader = new InputStreamReader(new FileInputStream(filename));
-        BufferedReader br = new BufferedReader(reader);
-        String line;
-        line = br.readLine();
-        while (line != null) {
-            resBuilder.append(line).append("\n");
+        try {
+            File filename = new File(addBuiltin ? "src/Utils/builtin.ll" : "src/Utils/header.ll");
+            InputStreamReader reader = new InputStreamReader(new FileInputStream(filename));
+            BufferedReader br = new BufferedReader(reader);
+            String line;
             line = br.readLine();
+            while (line != null) {
+                resBuilder.append(line).append("\n");
+                line = br.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         for (String str : IRList) {
