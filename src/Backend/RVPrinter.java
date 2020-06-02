@@ -54,7 +54,7 @@ public class RVPrinter {
         InstRV lastInst = block.getInstructions().get(block.getInstructions().size() - 1);
         if (lastInst instanceof JumpInst) {
             if (dfs(((JumpInst) lastInst).getDest(), false)) {
-//                block.getInstructions().remove(lastInst);
+                block.getInstructions().remove(lastInst);
             }
         }
         block.getSuccessors().forEach(b -> dfs(b, false));

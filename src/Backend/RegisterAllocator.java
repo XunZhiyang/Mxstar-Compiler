@@ -37,7 +37,7 @@ public class RegisterAllocator {
 //    Map<Register, Register> colour = new HashMap<>();
 
     Map<Register, Immediate> framePos = new HashMap<>();
-//    Map<Register, Double> priority = new HashMap<>();
+    Map<Register, Double> priority = new HashMap<>();
     Set<Register> oldTemps = new HashSet<>();
     int stackSize;
 
@@ -461,9 +461,9 @@ public class RegisterAllocator {
 
 //        Register m = null;
 //        double min = Double.POSITIVE_INFINITY;
-
+//
 //        System.err.println(spillWorkList.size());
-
+//
 //        for (Register reg : spillWorkList) {
 //            double p = priority.get(reg) / degree.get(reg);
 //            if (p < min) {
@@ -472,7 +472,7 @@ public class RegisterAllocator {
 //            }
 //        }
 
-//        System.err.println(min);
+//        System.err.println(priority.get(m));
 //        System.err.println(m.getIdentifier());
 
 //        spillWorkList.remove(m);
