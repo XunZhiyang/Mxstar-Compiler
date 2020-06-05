@@ -110,6 +110,10 @@ public class DomTree {
         return nodes.get(block).DF;
     }
 
+    public BasicBlock getIDom(BasicBlock basicBlock) {
+        return nodes.get(basicBlock).IDom.block;
+    }
+
     public Node getRoot() {
         return root;
     }

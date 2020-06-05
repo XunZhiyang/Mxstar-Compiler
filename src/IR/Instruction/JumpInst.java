@@ -11,6 +11,11 @@ public class JumpInst extends Instruction {
         addOperand(jumpTo);
     }
 
+    public JumpInst(BasicBlock jumpTo) {
+        super("", GlobalScope.getVoidType());
+        addOperand(jumpTo);
+    }
+
     @Override
     public boolean isTerminator() {return true;}
 

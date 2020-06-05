@@ -3,10 +3,15 @@ package IR.Instruction;
 import IR.BasicBlock;
 import IR.IRVisitor;
 import IR.User;
+import IR.Value;
 import Symbol.Type;
 
 public abstract class Instruction extends User {
     private BasicBlock fromBlock;
+
+    Instruction(String name, Type type) {
+        super(name, type);
+    }
 
     Instruction(String name, Type type, BasicBlock curBlock) {
         super(name, type);
@@ -24,6 +29,13 @@ public abstract class Instruction extends User {
 
     public BasicBlock getFromBlock() {
         return fromBlock;
+    }
+
+    public void collapse() {
+        for (Value value : getOperands()) {
+            if (value != null)
+                value.deleteUse(this);
+        }
     }
 
     public boolean isTerminator() { return false;}
