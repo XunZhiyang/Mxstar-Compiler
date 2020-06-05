@@ -18,8 +18,8 @@ public class IROptimizer {
 
     public void optimize() {
         mem2Reg.optimize();
-        exterminator.optimize();
-        dead.optimize();
-        exterminator.optimize();
+//        exterminator.optimize();
+//        dead.optimize();
+//        exterminator.optimize();
     }
 }
