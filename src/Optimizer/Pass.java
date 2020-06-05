@@ -4,7 +4,7 @@ import IR.Constant.Function;
 import IR.Module;
 
 public abstract class Pass {
-    private Module module;
+    protected Module module;
 
     public Pass(Module module) {
         this.module = module;

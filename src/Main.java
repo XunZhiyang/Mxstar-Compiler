@@ -8,8 +8,10 @@ import Frontend.FunctionScanner;
 import Frontend.SemanticAnalyzer;
 import IR.Module;
 import OperandRV.ModuleRV;
+import Optimizer.Dead;
 import Optimizer.Mem2Reg;
 import Parser.MxstarErrorListener;
+import Utils.StringPrinter;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -23,20 +25,6 @@ import Parser.MxstarParser;
 import Symbol.GlobalScope;
 
 public class Main {
-    private static void print(String pathname, String content) {
-        try {
-            File file = new File(pathname);
-            FileWriter fileWriter = new FileWriter(file.getName());
-            BufferedWriter bufferWriter = new BufferedWriter(fileWriter);
-            bufferWriter.write(content);
-            bufferWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            java.lang.System.exit(1);
-        }
-
-    }
-
     private static CharStream readCode() throws Exception {
         String inputFile = "code.mx";
         InputStream is = new FileInputStream(inputFile);
@@ -70,11 +58,10 @@ public class Main {
         builder.visit(ast);
         Module module = builder.getModule();
 
-//        IRPrinter printer = new IRPrinter();
-//        printer.visit(module);
-//        String generatedIR = printer.getIR(false);
-//
-//        print("code.ll", generatedIR);
+//        new Mem2Reg(module).optimize();
+//        new Dead(module).optimize();
+
+//        StringPrinter.print("code.ll", (new IRPrinter() {{visit(module);}}).getIR(false));
 
         return module;
     }
@@ -83,30 +70,23 @@ public class Main {
         IROptimizer optimizer = new IROptimizer(module);
         optimizer.optimize();
 
-//        IRPrinter printer = new IRPrinter();
-//        printer.visit(module);
-//        String generatedIR = printer.getIR(false);
-//
-//        print("code_opt.ll", generatedIR);
+//        StringPrinter.print("code_opt.ll", (new IRPrinter() {{visit(module);}}).getIR(false));
+
     }
 
     private static void codeGen(Module module) {
         new SSADestructor().destruct(module);
 
-//        IRPrinter printer = new IRPrinter();
-//        printer.visit(module);
-//        String generatedIR = printer.getIR(false);
-//
-//        print("code_destruct.ll", generatedIR);
+//        StringPrinter.print("code_destruct.ll", (new IRPrinter() {{visit(module);}}).getIR(false));
 
         InstSelector instSelector = new InstSelector();
         instSelector.visit(module);
 
         ModuleRV moduleRV = instSelector.getModule();
-//        print("nonAllocate.s", (new RVPrinter(moduleRV)).getRV());
+//        StringPrinter.print("nonAllocate.s", (new RVPrinter(moduleRV)).getRV());
 
         new RegisterAllocator(moduleRV);
-        print("output.s", (new RVPrinter(moduleRV)).getRV());
+        StringPrinter.print("output.s", (new RVPrinter(moduleRV)).getRV());
     }
 
     public static void main(String[] args) {

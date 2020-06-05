@@ -1,14 +1,16 @@
 package Optimizer;
 
+import Backend.IRPrinter;
 import IR.BasicBlock;
 import IR.Constant.Function;
-import IR.Instruction.BranchInst;
-import IR.Instruction.Instruction;
-import IR.Instruction.JumpInst;
-import IR.Instruction.PhiInst;
+import IR.Instruction.*;
 import IR.Module;
 import IR.Value;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
 public class Exterminator extends Pass {
@@ -22,8 +24,10 @@ public class Exterminator extends Pass {
     private boolean transfer(BasicBlock from, BasicBlock to) {
         List<BasicBlock> predecessors = cfg.getPredecessors(from);
 
+        int phiCnt = 0;
         for (Instruction inst : to.getInstructionList()) {
             if (inst instanceof PhiInst) {
+                phiCnt++;
                 for (int i = 1; i < inst.getOperands().size(); i += 2) {
                     BasicBlock fromBlock = (BasicBlock) inst.getOperand(i);
                     if (predecessors.contains(fromBlock)) {
@@ -33,17 +37,16 @@ public class Exterminator extends Pass {
             }
         }
 
-        Value value = null;
+        if (phiCnt > 0 && predecessors.size() > 1) return false;
+        BasicBlock pred = predecessors.get(0);
+        assert pred != null;
+
         for (Instruction inst : to.getInstructionList()) {
             if (inst instanceof PhiInst) {
                 for (int i = 1; i < inst.getOperands().size(); i += 2) {
                     if (inst.getOperand(i) == from) {
-                        inst.setOperand(i, predecessors.get(0));
-                        value = inst.getOperand(i - 1);
+                        inst.setOperand(i, pred);
                     }
-                }
-                for (int i = 1; i < predecessors.size(); i++) {
-                    inst.addOperand(value, predecessors.get(i));
                 }
             }
         }
@@ -54,9 +57,22 @@ public class Exterminator extends Pass {
 
     private void merge(BasicBlock block, BasicBlock rhs) {
         block.getInstructionList().remove(block.getLastInstruction());
+        block.cancelTermination();
         for(Instruction inst : rhs.getInstructionList()) {
-            block.strongAddInst(inst);
+            if (inst instanceof PhiInst) {
+                Value value = null;
+                for (int i = 1; i < inst.getOperands().size(); i += 2) {
+                    if (inst.getOperand(i) == block) {
+                        value = inst.getOperand(i - 1);
+                    }
+                }
+                assert value != null;
+                inst.replaceAllUsesWith(value);
+            } else {
+                block.addInst(inst);
+            }
         }
+        rhs.getInstructionList().clear();
 //        transfer(rhs, block);
         rhs.replaceAllUsesWith(block);
     }
@@ -64,6 +80,7 @@ public class Exterminator extends Pass {
     private void overwriteJumpOf(BasicBlock block) {
         BasicBlock to = (BasicBlock) block.getLastInstruction().getOperand(0);
         block.getInstructionList().remove(block.getLastInstruction());
+        block.cancelTermination();
         block.addInst(to.getLastInstruction());
     }
 
@@ -75,9 +92,11 @@ public class Exterminator extends Pass {
                 BasicBlock br1 = (BasicBlock) last.getOperand(1);
                 BasicBlock br2 = (BasicBlock) last.getOperand(2);
                 if (br1 == br2) {
+                    last.collapse();
                     block.getInstructionList().remove(last);
+                    block.cancelTermination();
                     new JumpInst(br1, block);
-//                    System.err.println("jump Exterminate " + block.getIdentifier());
+//                    System.err.println("br Exterminate " + block.getIdentifier());
                     return true;
                 }
             }
@@ -85,9 +104,10 @@ public class Exterminator extends Pass {
             //we should not delete entryBlock and exitBlock
             if (last instanceof JumpInst) {
                 BasicBlock to = (BasicBlock) last.getOperand(0);
+                if (to == block) continue;
                 if (block.getInstructionList().size() == 1 && block != curFunction.entryBlock()) {
                     if (transfer(block, to)) {
-//                        System.err.println("br Exterminate " + block.getIdentifier());
+//                        System.err.println("jump Exterminate " + block.getIdentifier());
                         return true;
                     }
                 }
@@ -97,7 +117,8 @@ public class Exterminator extends Pass {
 //                    System.err.println("Merge " + block.getIdentifier() + " with " + to.getIdentifier());
                     return true;
                 }
-                if (to.getInstructionList().size() == 1 && to.getLastInstruction() instanceof BranchInst) {
+                if (to.getInstructionList().size() == 1 && to.getLastInstruction() instanceof BranchInst
+                        && !to.getLastInstruction().getOperands().contains(to)) {
                     overwriteJumpOf(block);
 //                    System.err.println("Overwrote " + block.getIdentifier());
                     return true;
@@ -110,7 +131,9 @@ public class Exterminator extends Pass {
     void optimizeFunction(Function function) {
         curFunction = function;
         cfg = new CFG(function, function.entryBlock(), false);
+        int cnt = 0;
         while(onePass()) {
+//            print("code_" + cnt++ + ".ll", (new IRPrinter() {{visit(module);}}).getIR(false));
             cfg = new CFG(function, function.entryBlock(), false);
         }
     }

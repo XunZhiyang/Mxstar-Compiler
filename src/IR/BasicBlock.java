@@ -27,10 +27,10 @@ public class BasicBlock extends User {
         }
     }
 
-    public void strongAddInst(Instruction instruction) {
-        instruction.setFromBlock(this);
-        instructionList.add(instruction);
-    }
+//    public void strongAddInst(Instruction instruction) {
+//        instruction.setFromBlock(this);
+//        instructionList.add(instruction);
+//    }
 
     public void addFront(Instruction instruction) {
         instructionList.add(0, instruction);
@@ -39,6 +39,10 @@ public class BasicBlock extends User {
 
     public boolean isNotTerminated() {
         return !terminated;
+    }
+
+    public void cancelTermination() {
+        terminated = false;
     }
 
     public List<Instruction> getInstructionList() {

@@ -59,17 +59,19 @@ public class CFG {
             BasicBlock block = iterator.next();
             if (nodes.get(block) == null) {
                 iterator.remove();
+//                System.err.println(block.getIdentifier());
                 for (Instruction instruction : block.getInstructionList()) {
-                    instruction.setFromBlock(null);
+                    instruction.collapse();
+//                    instruction.setFromBlock(null);
                 }
             }
         }
-        for (BasicBlock block : function.getBasicBlockList()) {
-            if (nodes.get(block) == null) {
-                toDelete.add(block);
-            }
-        }
-        toDelete.forEach(block -> function.getBasicBlockList().remove(block));
+//        for (BasicBlock block : function.getBasicBlockList()) {
+//            if (nodes.get(block) == null) {
+//                toDelete.add(block);
+//            }
+//        }
+//        toDelete.forEach(block -> function.getBasicBlockList().remove(block));
     }
 
     public CFG(Function function, BasicBlock root, boolean reverse) {
