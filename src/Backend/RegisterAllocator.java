@@ -180,18 +180,18 @@ public class RegisterAllocator {
     }
 
     private void calcPriority() {
-//        initial.forEach(reg -> priority.put(reg, 0.0));
-//        oldTemps.forEach(reg -> priority.put(reg, pow(10, 50)));
-//
-//        for (BlockRV block : curFunction.getBlocks()) {
-//            Double weight = pow(10, min(block.getPredecessors().size(), block.getSuccessors().size()));
-//            for (InstRV inst : block.getInstructions()) {
-//                inst.getDef().forEach(reg ->
-//                        priority.put(reg, priority.getOrDefault(reg, 666666.666) + weight));
-//                inst.getUses().forEach(reg ->
-//                        priority.put(reg, priority.getOrDefault(reg, 666666.666) + weight));
-//            }
-//        }
+        initial.forEach(reg -> priority.put(reg, 0.0));
+        oldTemps.forEach(reg -> priority.put(reg, pow(10, 50)));
+
+        for (BlockRV block : curFunction.getBlocks()) {
+            Double weight = pow(10, min(block.getPredecessors().size(), block.getSuccessors().size()));
+            for (InstRV inst : block.getInstructions()) {
+                inst.getDef().forEach(reg ->
+                        priority.put(reg, priority.getOrDefault(reg, 666666.666) + weight));
+                inst.getUses().forEach(reg ->
+                        priority.put(reg, priority.getOrDefault(reg, 666666.666) + weight));
+            }
+        }
     }
 
     private void build() {
@@ -455,27 +455,29 @@ public class RegisterAllocator {
     }
 
     private void selectSpill() {
-        var iterator = spillWorkList.iterator();
-        Register m = iterator.next();
-        iterator.remove();
+//        var iterator = spillWorkList.iterator();
+//        Register m = iterator.next();
+//        iterator.remove();
 
-//        Register m = null;
-//        double min = Double.POSITIVE_INFINITY;
-//
+        Register m = null;
+        double min = Double.POSITIVE_INFINITY;
+
 //        System.err.println(spillWorkList.size());
-//
-//        for (Register reg : spillWorkList) {
-//            double p = priority.get(reg) / degree.get(reg);
-//            if (p < min) {
-//                min = p;
-//                m = reg;
-//            }
-//        }
+        int size = min(spillWorkList.size(), 100);
+        var iterator = spillWorkList.iterator();
+        for (int i = 0; i < size; ++i) {
+            Register reg = iterator.next();
+            double p = priority.get(reg) / degree.get(reg);
+            if (p < min) {
+                min = p;
+                m = reg;
+            }
+        }
+        spillWorkList.remove(m);
+
 
 //        System.err.println(priority.get(m));
 //        System.err.println(m.getIdentifier());
-
-//        spillWorkList.remove(m);
         simplifyWorkList.add(m);
         freezeMoves(m);
     }
