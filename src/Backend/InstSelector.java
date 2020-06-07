@@ -250,7 +250,8 @@ public class InstSelector implements IRVisitor {
 
     @Override
     public void visit(IR.Instruction.BitCastInst node) {
-        node.setCorRV(regFor(node.getOperand(0)));
+        new MoveInst(regFor(node), regFor(node.getOperand(0)), curBlock);
+//        node.setCorRV(regFor(node.getOperand(0)));
     }
 
     @Override

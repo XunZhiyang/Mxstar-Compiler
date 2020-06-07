@@ -71,6 +71,9 @@ public class RVPrinter {
         blocks.clear();
         dfs(function.entryBlock(), true);
         blocks.forEach(this::print);
+//        function.getBlocks().forEach(b -> b.setIdentifier("." + b.getIdentifier()));
+//        function.entryBlock().setIdentifier(function.getIdentifier());
+//        function.getBlocks().forEach(this::print);
         write("");
     }
 

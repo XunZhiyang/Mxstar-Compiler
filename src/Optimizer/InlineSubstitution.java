@@ -53,13 +53,15 @@ public class InlineSubstitution extends Pass {
     }
 
     private BasicBlock splitAt(CallInst splitInst) {
-        BasicBlock nBlock = curFunction.add(curBlock.getIdentifier() + "_inline_" + inliningFunction.getIdentifier());
+        BasicBlock nBlock = curFunction.add(curBlock.getIdentifier() + "_inline_"
+                + inliningFunction.getIdentifier().substring(1));
         var iterator = curBlock.getInstructionList().listIterator();
         boolean start = false;
         while(iterator.hasNext()) {
             Instruction nowInst = iterator.next();
             if (!start) {
                 if (nowInst == splitInst) {
+                    nowInst.collapse();
                     iterator.remove();
                     start = true;
                 }
@@ -87,11 +89,11 @@ public class InlineSubstitution extends Pass {
                 Instruction newInst = instruction.cloneInst();
                 toBlock.addInst(newInst);
                 copy.put(instruction, newInst);
-                if (newInst instanceof CallInst) {
-                    String identifier = ((CallInst) newInst).getFunctionIdentifier();
-                    caller.putIfAbsent(identifier, new ArrayList<>());
-                    caller.get(identifier).add((CallInst) newInst);
-                }
+//                if (newInst instanceof CallInst) {
+//                    String identifier = ((CallInst) newInst).getFunctionIdentifier();
+//                    caller.putIfAbsent(identifier, new ArrayList<>());
+//                    caller.get(identifier).add((CallInst) newInst);
+//                }
             }
         }
         for (BasicBlock block : function.getBasicBlockList()) {
@@ -101,7 +103,7 @@ public class InlineSubstitution extends Pass {
                 while (iterator.hasNext()) {
                     Value operand = iterator.next();
                     if (operand == null) continue;
-                    if (operand instanceof Constant || operand.getType() == GlobalScope.getVoidType()) continue;
+                    if (operand instanceof Constant) continue;
                     Value copyValue = copy.get(operand);
                     if (copyValue == null) {
                         System.err.println("q");
@@ -151,7 +153,9 @@ public class InlineSubstitution extends Pass {
         if (retInst.getOperands().size() > 0) {
             instruction.replaceAllUsesWith(retInst.getOperand(0));
         }
+        retInst.collapse();
         exitBlock.getInstructionList().remove(retInst);
+        exitBlock.cancelTermination();
 
         new JumpInst(secondBlock, exitBlock);
     }

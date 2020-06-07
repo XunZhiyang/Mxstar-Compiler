@@ -25,10 +25,12 @@ public class IROptimizer {
     public void optimize() {
         mem2Reg.optimize();
 //        exterminator.optimize();
+//        dead.optimize();
+//        exterminator.optimize();
+//        StringPrinter.print("code.ll", (new IRPrinter() {{visit(module);}}).getIR(false));
+        inlineSubstitution.optimize();
         dead.optimize();
         exterminator.optimize();
-//        StringPrinter.print("code.ll", (new IRPrinter() {{visit(module);}}).getIR(false));
-//        inlineSubstitution.optimize();
 //        StringPrinter.print("code_opt.ll", (new IRPrinter() {{visit(module);}}).getIR(false));
 
 //        for (int i = 0; i < 5; ++i) {
