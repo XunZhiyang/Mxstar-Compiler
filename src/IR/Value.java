@@ -15,7 +15,7 @@ public class Value {
     protected String identifier;
     private Type type;
 
-    private List<User> uses = new ArrayList<>();
+    protected List<User> uses = new ArrayList<>();
 
     private OperandRV corRV;
 
@@ -24,7 +24,12 @@ public class Value {
         this.type = type;
     }
 
-    String rename(String origName) {
+    public Value(Value other) {
+        this.identifier = rename(other.identifier);
+        this.type = other.type;
+    }
+
+    protected String rename(String origName) {
         int cnt = 0;
         Integer times = freq.get(origName);
         if (times != null) {

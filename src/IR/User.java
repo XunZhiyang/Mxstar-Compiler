@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class User extends Value {
-    private List<Value> operands = new ArrayList<>();
+    protected List<Value> operands = new ArrayList<>();
 
     public User(String origName, Type type) {
         super(origName, type);
@@ -34,5 +34,17 @@ public class User extends Value {
 
     public Value getOperand(int index) {
         return operands.get(index);
+    }
+
+    public void replaceOperand(Value orig, Value replacement) {
+        var iterator = operands.listIterator();
+        while(iterator.hasNext()) {
+            Value current = iterator.next();
+            if (current == orig) {
+                current.deleteUse(this);
+                iterator.set(replacement);
+                replacement.addUse(this);
+            }
+        }
     }
 }

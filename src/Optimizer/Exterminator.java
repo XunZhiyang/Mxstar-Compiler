@@ -1,19 +1,14 @@
 package Optimizer;
 
-import Backend.IRPrinter;
 import IR.BasicBlock;
 import IR.Constant.Function;
 import IR.Instruction.*;
 import IR.Module;
 import IR.Value;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.List;
 
-public class Exterminator extends Pass {
+public class Exterminator extends FunctionOptimizer {
     private CFG cfg;
     private Function curFunction;
 

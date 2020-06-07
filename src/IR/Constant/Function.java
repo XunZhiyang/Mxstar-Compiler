@@ -20,6 +20,7 @@ public class Function extends Constant {
 
     public BasicBlock add(String identifier) {
         BasicBlock newBlock = new BasicBlock(identifier);
+        newBlock.setFromFunction(this);
         basicBlockList.add(newBlock);
         return newBlock;
     }
@@ -49,6 +50,14 @@ public class Function extends Constant {
             }
         }
         return ret;
+    }
+
+    public int instNum() {
+        int sum = 0;
+        for (BasicBlock block : basicBlockList) {
+            sum += block.getInstructionList().size();
+        }
+        return sum;
     }
 
     @Override

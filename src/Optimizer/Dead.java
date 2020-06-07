@@ -9,7 +9,7 @@ import IR.Value;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Dead extends Pass {
+public class Dead extends FunctionOptimizer {
     private DomTree reverseDomTree;
     private Set<Instruction> mark;
     private Set<BasicBlock> blockMark;

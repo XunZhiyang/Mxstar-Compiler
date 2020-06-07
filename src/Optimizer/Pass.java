@@ -1,6 +1,5 @@
 package Optimizer;
 
-import IR.Constant.Function;
 import IR.Module;
 
 public abstract class Pass {
@@ -10,14 +9,6 @@ public abstract class Pass {
         this.module = module;
     }
 
-    abstract void optimizeFunction(Function function);
+    abstract void optimize();
 
-    void init(){}
-
-    public void optimize() {
-        for (Function function : module.getFunctionList()) {
-            init();
-            optimizeFunction(function);
-        }
-    }
 }

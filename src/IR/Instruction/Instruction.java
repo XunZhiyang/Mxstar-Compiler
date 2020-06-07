@@ -6,7 +6,9 @@ import IR.User;
 import IR.Value;
 import Symbol.Type;
 
-public abstract class Instruction extends User {
+import java.util.ArrayList;
+
+public abstract class Instruction extends User implements Cloneable {
     private BasicBlock fromBlock;
 
     Instruction(String name, Type type) {
@@ -39,6 +41,26 @@ public abstract class Instruction extends User {
     }
 
     public boolean isTerminator() { return false;}
+
+
+    public Object clone() {
+        Object clone = null;
+        try {
+            clone = super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return clone;
+    }
+
+    public Instruction cloneInst() {
+        Instruction inst = (Instruction) this.clone();
+        inst.identifier = rename(this.identifier);
+        inst.operands = new ArrayList<>();
+        inst.uses = new ArrayList<>();
+        this.operands.forEach(inst::addOperand);
+        return inst;
+    }
 
     @Override
     public void accept(IRVisitor visitor) {

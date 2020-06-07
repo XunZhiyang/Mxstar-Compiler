@@ -10,7 +10,7 @@ import Symbol.PointerType;
 
 import java.util.*;
 
-public class Mem2Reg extends Pass {
+public class Mem2Reg extends FunctionOptimizer {
 
     private Map<String, List<Instruction>> workList = new HashMap<>();
     private Map<String, Stack<Value>> curValue = new HashMap<>();

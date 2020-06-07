@@ -59,7 +59,6 @@ public class CFG {
             BasicBlock block = iterator.next();
             if (nodes.get(block) == null) {
                 iterator.remove();
-//                System.err.println(block.getIdentifier());
                 for (Instruction instruction : block.getInstructionList()) {
                     instruction.collapse();
 //                    instruction.setFromBlock(null);

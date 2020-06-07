@@ -1,5 +1,6 @@
 package IR;
 
+import IR.Constant.Function;
 import IR.Instruction.BranchInst;
 import IR.Instruction.Instruction;
 import IR.Instruction.JumpInst;
@@ -12,6 +13,7 @@ import java.util.List;
 public class BasicBlock extends User {
     private List<Instruction> instructionList = new ArrayList<>();
     private boolean terminated = false;
+    private Function fromFunction;
 
     private BlockRV corRV;
 
@@ -90,10 +92,13 @@ public class BasicBlock extends User {
                 instruction.setOperand(2, to);
             }
         }
-//        if (flag) {
-//            System.err.println(this.identifier + " " + instruction.getOperand(1) + " " +
-//                    instruction.getOperand(2) + " " + from.identifier + " " + to.identifier);
-//            throw new RuntimeException();
-//        }
+    }
+
+    public void setFromFunction(Function fromFunction) {
+        this.fromFunction = fromFunction;
+    }
+
+    public Function getFromFunction() {
+        return fromFunction;
     }
 }
