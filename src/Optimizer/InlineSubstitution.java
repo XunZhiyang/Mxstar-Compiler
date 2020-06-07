@@ -20,7 +20,7 @@ public class InlineSubstitution extends Pass {
     private BasicBlock curBlock;
     private Map<Function, Integer> instNum;
     private Map<Value, Value> copy;
-    private Map<String, List<CallInst>> caller = new HashMap<>();
+    private Map<String, List<CallInst>> caller;
 
     class FunctionComparator implements Comparator<Function> {
         public int compare(Function u1, Function u2) {
@@ -29,6 +29,7 @@ public class InlineSubstitution extends Pass {
     }
 
     private void scanCalls() {
+        caller = new HashMap<>();
         for (Function function : module.getFunctionList()) {
             for (BasicBlock block : function.getBasicBlockList()) {
                 for (Instruction instruction : block.getInstructionList()) {
@@ -49,7 +50,7 @@ public class InlineSubstitution extends Pass {
     private boolean inlinable(Function function) {
         int num = function.instNum();
         instNum.put(function, num);
-        return num < FUNC_SIZE && !function.getIdentifier().equals("_init");
+        return num < FUNC_SIZE && !function.getIdentifier().equals("@_init");
     }
 
     private BasicBlock splitAt(CallInst splitInst) {

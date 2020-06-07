@@ -14,6 +14,11 @@ public class AllocaInst extends Instruction {
         super("alloca", type.getPointer(), curBlock);
     }
 
+    public AllocaInst(Type type) {
+        super("alloca", type.getPointer());
+    }
+
+
     @Override
     public void accept(IRVisitor visitor) {
         visitor.visit(this);

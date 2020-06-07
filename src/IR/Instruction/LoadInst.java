@@ -16,6 +16,11 @@ public class LoadInst extends Instruction {
         addOperand(value);
     }
 
+    public LoadInst(Value value) {
+        super(".load", f(value));
+        addOperand(value);
+    }
+
     @Override
     public void accept(IRVisitor visitor) {
         visitor.visit(this);

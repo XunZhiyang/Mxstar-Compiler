@@ -101,4 +101,28 @@ public class BasicBlock extends User {
     public Function getFromFunction() {
         return fromFunction;
     }
+
+    public void frontAdd(Instruction... instructions) {
+        assert this.terminated;
+        for (Instruction instruction : instructions) {
+            instruction.setFromBlock(this);
+            instructionList.add(0, instruction);
+        }
+    }
+
+    public void backAdd(Instruction... instructions) {
+        assert this.terminated;
+        for (Instruction instruction : instructions) {
+            instruction.setFromBlock(this);
+            instructionList.add(instructionList.size() - 1, instruction);
+        }
+    }
+
+    public void posAdd(int position, Instruction... instructions) {
+        assert this.terminated;
+        for (Instruction instruction : instructions) {
+            instruction.setFromBlock(this);
+            instructionList.add(position, instruction);
+        }
+    }
 }

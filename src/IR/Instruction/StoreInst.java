@@ -11,6 +11,11 @@ public class StoreInst extends Instruction {
         addOperand(value, dest);
     }
 
+    public StoreInst(Value value, Value dest) {
+        super("", GlobalScope.getVoidType());
+        addOperand(value, dest);
+    }
+
     @Override
     public void accept(IRVisitor visitor) {
         visitor.visit(this);
