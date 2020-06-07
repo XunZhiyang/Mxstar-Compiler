@@ -71,7 +71,7 @@ getString:                              # @getString
 	sw	s0, 8(sp)
 	.cfi_offset ra, -4
 	.cfi_offset s0, -8
-	addi	a0, zero, 256
+	addi	a0, zero, 128
 	mv	a1, zero
 	call	malloc
 	mv	s0, a0
@@ -125,127 +125,16 @@ toString:                               # @toString
 	.cfi_offset s0, -8
 	.cfi_offset s1, -12
 	mv	s0, a0
-	beqz	a0, .LBB6_3
-# %bb.1:                                # %.preheader1
-	mv	a0, zero
-	lui	a1, 419430
-	addi	a1, a1, 1639
-	addi	a2, zero, 18
-	mv	a3, s0
-.LBB6_2:                                # =>This Inner Loop Header: Depth=1
-	mulh	a4, a3, a1
-	srli	a5, a4, 31
-	srai	a4, a4, 2
-	addi	s1, a3, 9
-	add	a3, a4, a5
-	addi	a0, a0, 1
-	bltu	a2, s1, .LBB6_2
-	j	.LBB6_4
-.LBB6_3:
-	addi	a0, zero, 1
-.LBB6_4:
-	srli	a1, s0, 31
-	add	s1, a0, a1
-	addi	a0, s1, 1
+	addi	a0, zero, 12
 	mv	a1, zero
 	call	malloc
-	add	a1, a0, s1
-	addi	a2, zero, -1
-	sb	zero, 0(a1)
-	bge	a2, s0, .LBB6_6
-# %bb.5:
-	mv	a7, zero
-	blt	a7, s1, .LBB6_7
-	j	.LBB6_15
-.LBB6_6:
-	neg	s0, s0
-	addi	a1, zero, 45
-	sb	a1, 0(a0)
-	addi	a7, zero, 1
-	bge	a7, s1, .LBB6_15
-.LBB6_7:
-	srai	a5, s1, 31
-	sub	a1, s1, a7
-	not	t0, a7
-	andi	a1, a1, 1
-	addi	a6, zero, -1
-	bnez	a1, .LBB6_9
-# %bb.8:
-	mv	a3, s1
-	mv	a2, a5
-	j	.LBB6_10
-.LBB6_9:
-	srai	a1, s1, 31
-	addi	a3, s1, -1
-	sltu	a2, a3, s1
-	add	a1, a1, a2
-	addi	a2, a1, -1
-	lui	a1, 419430
-	addi	a1, a1, 1639
-	mulh	a1, s0, a1
-	srli	a4, a1, 31
-	srai	a1, a1, 2
-	add	a1, a1, a4
-	addi	a4, zero, 10
-	mul	a4, a1, a4
-	sub	a4, s0, a4
-	addi	a4, a4, 48
-	add	s0, a0, a3
-	sb	a4, 0(s0)
-	mv	s0, a1
-.LBB6_10:
-	snez	a1, s1
-	add	a1, a5, a1
-	neg	a1, a1
-	neg	a4, s1
-	xor	a4, t0, a4
-	xor	a1, a6, a1
-	or	a1, a4, a1
-	beqz	a1, .LBB6_15
-# %bb.11:                               # %.preheader
-	lui	a1, 419430
-	addi	a4, a1, 1639
-	addi	a6, zero, 10
-	lui	a1, 335544
-	addi	t0, a1, 1311
-	j	.LBB6_13
-.LBB6_12:                               #   in Loop: Header=BB6_13 Depth=1
-	sgtz	a5, a2
-	add	s0, a1, s0
-	beqz	a5, .LBB6_15
-.LBB6_13:                               # =>This Inner Loop Header: Depth=1
-	mv	a1, a3
-	mulh	a3, s0, a4
-	srli	a5, a3, 31
-	srai	a3, a3, 2
-	add	a5, a3, a5
-	mul	a3, a5, a6
-	sub	a3, s0, a3
-	addi	a3, a3, 48
-	add	s1, a1, a0
-	sb	a3, -1(s1)
-	addi	a3, a1, -2
-	sltu	a1, a3, a1
-	add	a1, a2, a1
-	addi	a2, a1, -1
-	mulh	a1, a5, a4
-	srli	s1, a1, 31
-	srli	a1, a1, 2
-	add	a1, a1, s1
-	mul	a1, a1, a6
-	sub	a1, a5, a1
-	addi	a1, a1, 48
-	add	a5, a0, a3
-	sb	a1, 0(a5)
-	mulh	a1, s0, t0
-	srli	s0, a1, 31
-	srai	a1, a1, 5
-	bnez	a2, .LBB6_12
-# %bb.14:                               #   in Loop: Header=BB6_13 Depth=1
-	sltu	a5, a7, a3
-	add	s0, a1, s0
-	bnez	a5, .LBB6_13
-.LBB6_15:
+	mv	s1, a0
+	lui	a0, %hi(.L.str.2)
+	addi	a1, a0, %lo(.L.str.2)
+	mv	a0, s1
+	mv	a2, s0
+	call	sprintf
+	mv	a0, s1
 	lw	s1, 4(sp)
 	lw	s0, 8(sp)
 	lw	ra, 12(sp)
@@ -279,46 +168,30 @@ string__length:                         # @string__length
 string__substring:                      # @string__substring
 	.cfi_startproc
 # %bb.0:
-	addi	sp, sp, -32
-	.cfi_def_cfa_offset 32
-	sw	ra, 28(sp)
-	sw	s0, 24(sp)
-	sw	s1, 20(sp)
-	sw	s2, 16(sp)
-	sw	s3, 12(sp)
-	sw	s4, 8(sp)
+	addi	sp, sp, -16
+	.cfi_def_cfa_offset 16
+	sw	ra, 12(sp)
+	sw	s0, 8(sp)
+	sw	s1, 4(sp)
+	sw	s2, 0(sp)
 	.cfi_offset ra, -4
 	.cfi_offset s0, -8
 	.cfi_offset s1, -12
 	.cfi_offset s2, -16
-	.cfi_offset s3, -20
-	.cfi_offset s4, -24
-	mv	s4, a2
 	mv	s0, a1
-	mv	s3, a0
-	sub	s2, a2, a1
-	addi	a0, s2, 1
+	mv	s2, a0
+	sub	s1, a2, a1
+	addi	a0, s1, 1
 	srai	a1, a0, 31
 	call	malloc
-	mv	s1, a0
-	bge	s0, s4, .LBB8_2
-# %bb.1:
-	add	a1, s3, s0
-	mv	a0, s1
-	mv	a2, s2
-	call	memcpy
-.LBB8_2:
-	add	a0, s1, s2
-	sb	zero, 0(a0)
-	mv	a0, s1
-	lw	s4, 8(sp)
-	lw	s3, 12(sp)
-	lw	s2, 16(sp)
-	lw	s1, 20(sp)
-	lw	s0, 24(sp)
-	lw	ra, 28(sp)
-	addi	sp, sp, 32
-	ret
+	add	a1, s2, s0
+	mv	a2, s1
+	lw	s2, 0(sp)
+	lw	s1, 4(sp)
+	lw	s0, 8(sp)
+	lw	ra, 12(sp)
+	addi	sp, sp, 16
+	tail	memcpy
 .Lfunc_end8:
 	.size	string__substring, .Lfunc_end8-string__substring
 	.cfi_endproc
@@ -329,46 +202,18 @@ string__substring:                      # @string__substring
 string__parseInt:                       # @string__parseInt
 	.cfi_startproc
 # %bb.0:
-	lbu	a6, 0(a0)
-	xori	a1, a6, 45
-	seqz	t0, a1
-	add	a1, a0, t0
-	lbu	a4, 0(a1)
-	addi	a1, a4, -48
-	andi	a1, a1, 255
-	addi	a2, zero, 9
-	bltu	a2, a1, .LBB9_6
-# %bb.1:                                # %.preheader
-	mv	a5, zero
-	mv	a1, zero
-	addi	a7, zero, 10
-.LBB9_2:                                # =>This Inner Loop Header: Depth=1
-	andi	a2, a4, 255
-	mul	a1, a1, a7
-	addi	a3, t0, 1
-	add	a4, a0, a3
-	lbu	a4, 0(a4)
-	add	a1, a1, a2
-	addi	a1, a1, -48
-	sltu	t0, a3, t0
-	addi	a2, a4, -48
-	andi	a2, a2, 255
-	add	a5, a5, t0
-	mv	t0, a3
-	bltu	a2, a7, .LBB9_2
-# %bb.3:
-	addi	a0, zero, 45
-	bne	a6, a0, .LBB9_5
-.LBB9_4:
-	neg	a1, a1
-.LBB9_5:
-	mv	a0, a1
+	addi	sp, sp, -16
+	.cfi_def_cfa_offset 16
+	sw	ra, 12(sp)
+	.cfi_offset ra, -4
+	lui	a1, %hi(.L.str.2)
+	addi	a1, a1, %lo(.L.str.2)
+	addi	a2, sp, 8
+	call	__isoc99_sscanf
+	lw	a0, 8(sp)
+	lw	ra, 12(sp)
+	addi	sp, sp, 16
 	ret
-.LBB9_6:
-	mv	a1, zero
-	addi	a0, zero, 45
-	beq	a6, a0, .LBB9_4
-	j	.LBB9_5
 .Lfunc_end9:
 	.size	string__parseInt, .Lfunc_end9-string__parseInt
 	.cfi_endproc
@@ -392,68 +237,41 @@ string__ord:                            # @string__ord
 _string_concatenate:                    # @_string_concatenate
 	.cfi_startproc
 # %bb.0:
-	addi	sp, sp, -48
-	.cfi_def_cfa_offset 48
-	sw	ra, 44(sp)
-	sw	s0, 40(sp)
-	sw	s1, 36(sp)
-	sw	s2, 32(sp)
-	sw	s3, 28(sp)
-	sw	s4, 24(sp)
-	sw	s5, 20(sp)
-	sw	s6, 16(sp)
-	sw	s7, 12(sp)
+	addi	sp, sp, -32
+	.cfi_def_cfa_offset 32
+	sw	ra, 28(sp)
+	sw	s0, 24(sp)
+	sw	s1, 20(sp)
+	sw	s2, 16(sp)
+	sw	s3, 12(sp)
 	.cfi_offset ra, -4
 	.cfi_offset s0, -8
 	.cfi_offset s1, -12
 	.cfi_offset s2, -16
 	.cfi_offset s3, -20
-	.cfi_offset s4, -24
-	.cfi_offset s5, -28
-	.cfi_offset s6, -32
-	.cfi_offset s7, -36
 	mv	s2, a1
 	mv	s3, a0
-	addi	s5, zero, -1
 	call	strlen
-	mv	s1, a0
+	mv	s0, a0
 	mv	a0, s2
 	call	strlen
-	mv	s4, a0
-	add	s6, a0, s1
-	addi	a0, s6, 1
+	add	a0, a0, s0
+	addi	a0, a0, 1
 	srai	a1, a0, 31
 	call	malloc
-	addi	s7, zero, 1
-	mv	s0, a0
-	blt	s1, s7, .LBB11_2
-# %bb.1:
-	and	a2, s1, s5
-	mv	a0, s0
+	mv	s1, a0
 	mv	a1, s3
+	mv	a2, s0
 	call	memcpy
-.LBB11_2:
-	blt	s4, s7, .LBB11_4
-# %bb.3:
-	and	a2, s4, s5
-	add	a0, s0, s1
+	mv	a0, s1
 	mv	a1, s2
-	call	memcpy
-.LBB11_4:
-	add	a0, s0, s6
-	sb	zero, 0(a0)
-	mv	a0, s0
-	lw	s7, 12(sp)
-	lw	s6, 16(sp)
-	lw	s5, 20(sp)
-	lw	s4, 24(sp)
-	lw	s3, 28(sp)
-	lw	s2, 32(sp)
-	lw	s1, 36(sp)
-	lw	s0, 40(sp)
-	lw	ra, 44(sp)
-	addi	sp, sp, 48
-	ret
+	lw	s3, 12(sp)
+	lw	s2, 16(sp)
+	lw	s1, 20(sp)
+	lw	s0, 24(sp)
+	lw	ra, 28(sp)
+	addi	sp, sp, 32
+	tail	strcat
 .Lfunc_end11:
 	.size	_string_concatenate, .Lfunc_end11-_string_concatenate
 	.cfi_endproc

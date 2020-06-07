@@ -29,18 +29,18 @@ public class IROptimizer {
     public void optimize() {
         mem2Reg.optimize();
         brick();
+//        StringPrinter.print("code.ll", (new IRPrinter() {{visit(module);}}).getIR(false));
         global2Local.optimize();
         brick();
         mem2Reg.optimize();
-//        brick();
+//        StringPrinter.print("code_opt.ll", (new IRPrinter() {{visit(module);}}).getIR(false));
+        brick();
         for (int i = 0; i < 2; ++i) {
             inlineSubstitution.optimize();
             brick();
         }
 
 
-//        StringPrinter.print("code.ll", (new IRPrinter() {{visit(module);}}).getIR(false));
-//        StringPrinter.print("code_opt.ll", (new IRPrinter() {{visit(module);}}).getIR(false));
 //        for (int i = 0; i < 5; ++i) {
 //        }
     }

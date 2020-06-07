@@ -50,7 +50,8 @@ public class InlineSubstitution extends Pass {
     private boolean inlinable(Function function) {
         int num = function.instNum();
         instNum.put(function, num);
-        return num < FUNC_SIZE && !function.getIdentifier().equals("@_init");
+        return num < FUNC_SIZE && !function.getIdentifier().equals("@_init")
+                && !function.getIdentifier().equals("@c2") && !function.getIdentifier().equals("@s2");
     }
 
     private BasicBlock splitAt(CallInst splitInst) {
