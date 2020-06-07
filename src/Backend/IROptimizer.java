@@ -25,8 +25,8 @@ public class IROptimizer {
     public void optimize() {
         mem2Reg.optimize();
 //        exterminator.optimize();
-//        dead.optimize();
-//        exterminator.optimize();
+        dead.optimize();
+        exterminator.optimize();
 //        StringPrinter.print("code.ll", (new IRPrinter() {{visit(module);}}).getIR(false));
 //        inlineSubstitution.optimize();
 //        StringPrinter.print("code_opt.ll", (new IRPrinter() {{visit(module);}}).getIR(false));

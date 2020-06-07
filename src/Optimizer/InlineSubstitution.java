@@ -86,6 +86,7 @@ public class InlineSubstitution extends Pass {
             for (Instruction instruction : block.getInstructionList()) {
                 Instruction newInst = instruction.cloneInst();
                 toBlock.addInst(newInst);
+                copy.put(instruction, newInst);
                 if (newInst instanceof CallInst) {
                     String identifier = ((CallInst) newInst).getFunctionIdentifier();
                     caller.putIfAbsent(identifier, new ArrayList<>());
@@ -102,6 +103,9 @@ public class InlineSubstitution extends Pass {
                     if (operand == null) continue;
                     if (operand instanceof Constant || operand.getType() == GlobalScope.getVoidType()) continue;
                     Value copyValue = copy.get(operand);
+                    if (copyValue == null) {
+                        System.err.println("q");
+                    }
                     assert copyValue != null;
                     operand.deleteUse(newInst);
                     iterator.set(copyValue);
