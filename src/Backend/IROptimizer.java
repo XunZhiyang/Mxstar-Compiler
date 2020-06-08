@@ -3,7 +3,6 @@ package Backend;
 import Optimizer.*;
 
 import IR.Module;
-import Utils.StringPrinter;
 
 public class IROptimizer {
     private Mem2Reg mem2Reg;
