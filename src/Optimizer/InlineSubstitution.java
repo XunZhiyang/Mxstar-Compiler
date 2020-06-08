@@ -12,9 +12,8 @@ import Symbol.GlobalScope;
 import java.util.*;
 
 public class InlineSubstitution extends Pass {
-    private final int DEPTH = 1;
     private final int FUNC_SIZE = 150;
-    private final int MAX_TIMES = 40;
+    private final int MAX_TIMES = 50;
 
     private Function curFunction, inliningFunction;
     private BasicBlock curBlock;
@@ -91,11 +90,6 @@ public class InlineSubstitution extends Pass {
                 Instruction newInst = instruction.cloneInst();
                 toBlock.addInst(newInst);
                 copy.put(instruction, newInst);
-//                if (newInst instanceof CallInst) {
-//                    String identifier = ((CallInst) newInst).getFunctionIdentifier();
-//                    caller.putIfAbsent(identifier, new ArrayList<>());
-//                    caller.get(identifier).add((CallInst) newInst);
-//                }
             }
         }
         for (BasicBlock block : function.getBasicBlockList()) {
@@ -176,16 +170,14 @@ public class InlineSubstitution extends Pass {
     @Override
     public void optimize() {
         scanCalls();
-        for (int i = 0; i < DEPTH; ++i) {
-            instNum = new HashMap<>();
-            List<Function> inlinableFunctions = new ArrayList<>();
-            for (Function function : module.getFunctionList()) {
-                if (inlinable(function)) {
-                    inlinableFunctions.add(function);
-                }
+        instNum = new HashMap<>();
+        List<Function> inlinableFunctions = new ArrayList<>();
+        for (Function function : module.getFunctionList()) {
+            if (inlinable(function)) {
+                inlinableFunctions.add(function);
             }
-            inlinableFunctions.sort(new FunctionComparator());
-            inlinableFunctions.forEach(this::replace);
         }
+        inlinableFunctions.sort(new FunctionComparator());
+        inlinableFunctions.forEach(this::replace);
     }
 }

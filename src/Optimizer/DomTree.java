@@ -114,6 +114,12 @@ public class DomTree {
         return nodes.get(basicBlock).IDom.block;
     }
 
+    public List<BasicBlock> getChildren(BasicBlock basicBlock) {
+        List<BasicBlock> children = new ArrayList<>();
+        nodes.get(basicBlock).children.forEach(child -> children.add(child.block));
+        return children;
+    }
+
     public Node getRoot() {
         return root;
     }

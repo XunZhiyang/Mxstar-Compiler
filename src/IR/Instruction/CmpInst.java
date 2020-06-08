@@ -19,6 +19,14 @@ public class CmpInst extends Instruction {
     }
 
     @Override
+    public boolean deterministic() { return true;}
+
+    @Override
+    public boolean commutative() {
+        return op.equals("eq") || op.equals("ne");
+    }
+
+    @Override
     public void accept(IRVisitor visitor) {
         visitor.visit(this);
     }

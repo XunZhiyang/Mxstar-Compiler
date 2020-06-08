@@ -43,6 +43,23 @@ public class BinaryOpInst extends Instruction {
         return op;
     }
 
+    @Override
+    public boolean deterministic() { return true;}
+
+    @Override
+    public boolean commutative() {
+        switch(op) {
+            case "mul":
+            case "add":
+            case "and":
+            case "or":
+            case "xor":
+                return true;
+            default:
+                return false;
+        }
+    }
+
     //    public enum IRBinaryOp{
 //        mul, sdiv, add, sub, srem, shl, ashr, and, or, xor, slt, sle, sgt, sge, eq, ne
 

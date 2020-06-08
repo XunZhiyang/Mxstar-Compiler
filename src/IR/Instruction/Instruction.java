@@ -42,11 +42,11 @@ public abstract class Instruction extends User implements Cloneable {
 
     public boolean isTerminator() { return false;}
 
-
-    public Object clone() {
-        Object clone = null;
+    @Override
+    public Instruction clone() {
+        Instruction clone = null;
         try {
-            clone = super.clone();
+            clone = (Instruction) super.clone();
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
         }
@@ -54,13 +54,17 @@ public abstract class Instruction extends User implements Cloneable {
     }
 
     public Instruction cloneInst() {
-        Instruction inst = (Instruction) this.clone();
+        Instruction inst = this.clone();
         inst.identifier = rename(this.identifier);
         inst.operands = new ArrayList<>();
         inst.uses = new ArrayList<>();
         this.operands.forEach(inst::addOperand);
         return inst;
     }
+
+    public boolean deterministic() { return false;}
+
+    public boolean commutative() { return false;}
 
     @Override
     public void accept(IRVisitor visitor) {

@@ -12,6 +12,9 @@ public class BitCastInst extends Instruction{
     }
 
     @Override
+    public boolean deterministic() { return true;}
+
+    @Override
     public void accept(IRVisitor visitor) {
         visitor.visit(this);
     }

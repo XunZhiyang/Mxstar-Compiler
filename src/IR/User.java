@@ -4,6 +4,7 @@ import Symbol.Type;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class User extends Value {
@@ -46,5 +47,9 @@ public class User extends Value {
                 replacement.addUse(this);
             }
         }
+    }
+
+    public void reverseOperands() {
+        Collections.reverse(operands);
     }
 }

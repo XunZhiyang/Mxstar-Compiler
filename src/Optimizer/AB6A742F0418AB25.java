@@ -14,13 +14,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class Global2Local extends Pass {
+public class AB6A742F0418AB25 extends Pass {
     private Set<GlobalVariable> globals = new HashSet<>();
     private Map<String, Set<GlobalVariable>> mark = new HashMap<>();
     private Map<String, Set<GlobalVariable>> hasStore = new HashMap<>();
     private Map<String, Set<GlobalVariable>> noStore = new HashMap<>();
     private Map<Function, Set<GlobalVariable>> local = new HashMap<>();
-    public Global2Local(Module module) {
+    public AB6A742F0418AB25(Module module) {
         super(module);
     }
 
