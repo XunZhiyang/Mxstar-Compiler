@@ -22,8 +22,9 @@ public class IROptimizer {
     }
 
     private void brick() {
+//        exterminator.optimize();
         dead.optimize();
-        exterminator.optimize();
+//        exterminator.optimize();
     }
 
     public void optimize() {
@@ -31,7 +32,7 @@ public class IROptimizer {
         brick();
 //        StringPrinter.print("code.ll", (new IRPrinter() {{visit(module);}}).getIR(false));
         global2Local.optimize();
-        brick();
+//        brick();
         mem2Reg.optimize();
 //        StringPrinter.print("code_opt.ll", (new IRPrinter() {{visit(module);}}).getIR(false));
         brick();
@@ -39,6 +40,8 @@ public class IROptimizer {
             inlineSubstitution.optimize();
             brick();
         }
+        exterminator.optimize();
+
 
 
 //        for (int i = 0; i < 5; ++i) {
