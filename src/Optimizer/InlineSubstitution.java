@@ -13,7 +13,7 @@ import java.util.*;
 
 public class InlineSubstitution extends Pass {
     private final int FUNC_SIZE = 150;
-    private final int MAX_TIMES = 50;
+    private final int MAX_TIMES = 7;
 
     private Function curFunction, inliningFunction;
     private BasicBlock curBlock;
@@ -49,8 +49,7 @@ public class InlineSubstitution extends Pass {
     private boolean inlinable(Function function) {
         int num = function.instNum();
         instNum.put(function, num);
-        return num < FUNC_SIZE && !function.getIdentifier().equals("@_init")
-                && !function.getIdentifier().equals("@c2") && !function.getIdentifier().equals("@s2");
+        return num < FUNC_SIZE && !function.getIdentifier().equals("@_init");
     }
 
     private BasicBlock splitAt(CallInst splitInst) {
