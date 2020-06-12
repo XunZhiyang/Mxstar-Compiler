@@ -5,15 +5,13 @@ import IR.Constant.Constant;
 import IR.Constant.Function;
 import IR.Instruction.*;
 import IR.Module;
-import IR.User;
 import IR.Value;
-import Symbol.GlobalScope;
 
 import java.util.*;
 
 public class InlineSubstitution extends Pass {
     private final int FUNC_SIZE = 150;
-    private final int MAX_TIMES = 7;
+    private int MAX_TIMES;
 
     private Function curFunction, inliningFunction;
     private BasicBlock curBlock;
@@ -178,5 +176,10 @@ public class InlineSubstitution extends Pass {
         }
         inlinableFunctions.sort(new FunctionComparator());
         inlinableFunctions.forEach(this::replace);
+    }
+
+    public void optimize(int max_times){
+        MAX_TIMES = max_times;
+        optimize();
     }
 }
