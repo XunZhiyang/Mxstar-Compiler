@@ -10,8 +10,10 @@ import IR.Value;
 import java.util.*;
 
 public class InlineSubstitution extends Pass {
-    private final int FUNC_SIZE = 150;
-    private int MAX_TIMES;
+    private final int FUNC_SIZE_BIG = 150;
+    private final int FUNC_SIZE_SMALL = 50;
+    private final int BLOCK_SIZE = 20;
+    private final int MAX_TIMES = 20;
 
     private Function curFunction, inliningFunction;
     private BasicBlock curBlock;
@@ -47,7 +49,9 @@ public class InlineSubstitution extends Pass {
     private boolean inlinable(Function function) {
         int num = function.instNum();
         instNum.put(function, num);
-        return num < FUNC_SIZE && !function.getIdentifier().equals("@_init");
+        return num < FUNC_SIZE_BIG
+                && (num > FUNC_SIZE_SMALL || function.getBasicBlockList().size() < BLOCK_SIZE)
+                && !function.getIdentifier().equals("@_init");
     }
 
     private BasicBlock splitAt(CallInst splitInst) {
@@ -176,10 +180,5 @@ public class InlineSubstitution extends Pass {
         }
         inlinableFunctions.sort(new FunctionComparator());
         inlinableFunctions.forEach(this::replace);
-    }
-
-    public void optimize(int max_times){
-        MAX_TIMES = max_times;
-        optimize();
     }
 }

@@ -29,8 +29,8 @@ public class IROptimizer {
         mem2Reg.optimize();
         valueNumbering.optimize();
         dead.optimize();
-        inlineSubstitution.optimize(20);
-        inlineSubstitution.optimize(5);
+        inlineSubstitution.optimize();
+        inlineSubstitution.optimize();
         valueNumbering.optimize();
         dead.optimize();
         exterminator.optimize();
